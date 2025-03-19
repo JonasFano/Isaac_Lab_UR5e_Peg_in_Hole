@@ -47,7 +47,7 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
         tcp_pose_b: TCP pose in the robot's base frame (position + quaternion).
     """
     # Access the robot object from the scene using the provided configuration
-    robot: RigidObject = env.scene[robot_cfg.name]
+    robot: RigidObject | Articulation = env.scene[robot_cfg.name]
 
     # Clone the body states in the world frame to avoid modifying the original tensor
     body_state_w_list = robot.data.body_state_w.clone()
@@ -87,8 +87,8 @@ def object_position_in_robot_root_frame(
     object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
 ) -> torch.Tensor:
     """The position of the object in the robot's root frame."""
-    robot: RigidObject = env.scene[robot_cfg.name]
-    object: RigidObject = env.scene[object_cfg.name]
+    robot: RigidObject | Articulation = env.scene[robot_cfg.name]
+    object: RigidObject | Articulation = env.scene[object_cfg.name]
     object_pos_w = object.data.root_pos_w[:, :3]
     object_pos_b, object_quat_b = subtract_frame_transforms(
         robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], object_pos_w
@@ -103,7 +103,7 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     Converts from end-effector frame to world frame and vice versa.
     """
     # Extract the used quantities (to enable type-hinting)
-    asset: Articulation = env.scene[asset_cfg.name]
+    asset: RigidObject | Articulation = env.scene[asset_cfg.name]
 
     # Obtain the link incoming forces in an unknown frame
     link_incoming_forces = asset.root_physx_view.get_link_incoming_joint_force()[:, asset_cfg.body_ids]

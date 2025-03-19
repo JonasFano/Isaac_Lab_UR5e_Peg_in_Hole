@@ -14,11 +14,12 @@ from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils import configclass
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.sim.schemas.schemas_cfg import RigidBodyPropertiesCfg, MassPropertiesCfg
+from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR
 from . import mdp
 import os
 import math
 
-from taskparameters import TaskParams
+from taskparameters_peginsert import TaskParams
 
 ##
 # Scene definition
@@ -27,7 +28,7 @@ from taskparameters import TaskParams
 MODEL_PATH = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")), "scene_models")
 
 @configclass
-class UR5e_PegInHoleSceneCfg(InteractiveSceneCfg):
+class UR5e_PegInsertSceneCfg(InteractiveSceneCfg):
     """Configuration for the lift scene with a robot and a object."""
     # articulation
     robot = ArticulationCfg(
@@ -55,7 +56,7 @@ class UR5e_PegInHoleSceneCfg(InteractiveSceneCfg):
             collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
         ),  
         init_state=ArticulationCfg.InitialStateCfg(
-            pos=(0.175, -0.175, 0.0), 
+            pos=(0.3, -0.1, 0.0), 
             joint_pos={
                 "shoulder_pan_joint": TaskParams.robot_initial_joint_pos[0], 
                 "shoulder_lift_joint": TaskParams.robot_initial_joint_pos[1], 
@@ -63,8 +64,8 @@ class UR5e_PegInHoleSceneCfg(InteractiveSceneCfg):
                 "wrist_1_joint": TaskParams.robot_initial_joint_pos[3], 
                 "wrist_2_joint": TaskParams.robot_initial_joint_pos[4], 
                 "wrist_3_joint": TaskParams.robot_initial_joint_pos[5], 
-                "joint_left": TaskParams.robot_initial_joint_pos[6], # or robotiq_hande_left_finger_joint
-                "joint_right": TaskParams.robot_initial_joint_pos[7], # or robotiq_hande_right_finger_joint
+                "joint_left": TaskParams.robot_initial_joint_pos[6],
+                "joint_right": TaskParams.robot_initial_joint_pos[7],
             }
         ),
         actuators={
@@ -116,12 +117,12 @@ class UR5e_PegInHoleSceneCfg(InteractiveSceneCfg):
     )
 
     # Add peg and hole objects on the table
-    object = RigidObjectCfg(
-        prim_path = "{ENV_REGEX_NS}/object", 
+    hole: ArticulationCfg = ArticulationCfg(
+        prim_path="{ENV_REGEX_NS}/object",
         spawn=sim_utils.UsdFileCfg(
-            usd_path=os.path.join(MODEL_PATH, "cranfield_model/Cranfield parts - BolzenKleinEckig.usd"), 
-            scale=TaskParams.object_scale,
-            rigid_props=RigidBodyPropertiesCfg(
+            usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Factory/factory_hole_8mm.usd",
+            activate_contact_sensors=True,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 disable_gravity=False,
                 max_depenetration_velocity=5.0,
                 linear_damping=0.0,
@@ -133,26 +134,39 @@ class UR5e_PegInHoleSceneCfg(InteractiveSceneCfg):
                 solver_velocity_iteration_count=1,
                 max_contact_impulse=1e32,
             ),
-            mass_props=MassPropertiesCfg(
-                mass=TaskParams.object_init_mass,
-            ),
+            mass_props=sim_utils.MassPropertiesCfg(mass=TaskParams.hole_init_mass),
             collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
-        ), 
-        init_state=RigidObjectCfg.InitialStateCfg(pos=TaskParams.object_init_pos, lin_vel=(0.0, 0.0, 0.0)),
+        ),
+        init_state=ArticulationCfg.InitialStateCfg(
+            pos=TaskParams.hole_init_pos, rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
+        ),
+        actuators={},
     )
 
-    hole = RigidObjectCfg(
-        prim_path = "{ENV_REGEX_NS}/hole", 
+    object: ArticulationCfg = ArticulationCfg(
+        prim_path="{ENV_REGEX_NS}/hole",
         spawn=sim_utils.UsdFileCfg(
-            usd_path=os.path.join(MODEL_PATH, "cranfield_model/Cranfield parts - CranfieldBase.usd"),
-            mass_props=MassPropertiesCfg(
-                mass=TaskParams.hole_init_mass,
+            usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Factory/factory_peg_8mm.usd",
+            activate_contact_sensors=True,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                disable_gravity=False,
+                max_depenetration_velocity=5.0,
+                linear_damping=0.0,
+                angular_damping=0.0,
+                max_linear_velocity=1000.0,
+                max_angular_velocity=3666.0,
+                enable_gyroscopic_forces=True,
+                solver_position_iteration_count=192,
+                solver_velocity_iteration_count=1,
+                max_contact_impulse=1e32,
             ),
+            mass_props=sim_utils.MassPropertiesCfg(mass=TaskParams.object_init_mass),
             collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
-        ), 
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=TaskParams.hole_init_pos,
         ),
+        init_state=ArticulationCfg.InitialStateCfg(
+            pos=TaskParams.object_init_pos, rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
+        ),
+        actuators={},
     )
 
     # ground plane
@@ -172,7 +186,7 @@ class UR5e_PegInHoleSceneCfg(InteractiveSceneCfg):
     table = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/table", 
         spawn=sim_utils.UsdFileCfg(usd_path=os.path.join(MODEL_PATH, "Single_Siegmund_table.usd")), 
-        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.0, 0.0, 0.0), rot=(0.7071, 0.0, 0.0, 0.7071)),
+        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.0, 0.0, 0.0), rot=(1.0, 0.0, 0.0, 0.0)),
     )
 
 
@@ -320,10 +334,10 @@ class CurriculumCfg:
 ##
 
 @configclass
-class UR5e_PegInHoleEnvCfg(ManagerBasedRLEnvCfg):
+class UR5e_PegInsertEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the lifting environment."""
     # Scene settings
-    scene: UR5e_PegInHoleSceneCfg = UR5e_PegInHoleSceneCfg(num_envs=4, env_spacing=2.5)
+    scene: UR5e_PegInsertSceneCfg = UR5e_PegInsertSceneCfg(num_envs=4, env_spacing=2.5)
 
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
@@ -350,4 +364,4 @@ class UR5e_PegInHoleEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.physx.gpu_found_lost_aggregate_pairs_capacity = 1024 * 1024 * 4
         self.sim.physx.gpu_total_aggregate_pairs_capacity = 16 * 1024
         self.sim.physx.friction_correlation_distance = 0.00625
-        self.sim.physx.gpu_collision_stack_size = 4096 * 4096 * 120 # Was added due to an PhysX error: collisionStackSize buffer overflow detected
+        self.sim.physx.gpu_collision_stack_size = 4096 * 4096 * 100 # Was added due to an PhysX error: collisionStackSize buffer overflow detected

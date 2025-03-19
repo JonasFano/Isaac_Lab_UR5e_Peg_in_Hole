@@ -1,9 +1,9 @@
-from omni.isaac.lab.utils import configclass
-from omni.isaac.lab.sensors import FrameTransformerCfg
-from omni.isaac.lab.markers.config import FRAME_MARKER_CFG  # isort: skip
-from omni.isaac.lab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
-from omni.isaac.lab.controllers.differential_ik_cfg import DifferentialIKControllerCfg
-from omni.isaac.lab.envs.mdp.actions.actions_cfg import DifferentialInverseKinematicsActionCfg
+from isaaclab.utils import configclass
+from isaaclab.sensors import FrameTransformerCfg
+from isaaclab.markers.config import FRAME_MARKER_CFG  # isort: skip
+from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
+from isaaclab.controllers.differential_ik_cfg import DifferentialIKControllerCfg
+from isaaclab.envs.mdp.actions.actions_cfg import DifferentialInverseKinematicsActionCfg
 
 from . import peg_in_hole_env_cfg
 
@@ -20,7 +20,7 @@ class RelIK_UR5e_PegInHoleEnvCfg(peg_in_hole_env_cfg.UR5e_PegInHoleEnvCfg):
         marker_cfg.prim_path = "/Visuals/FrameTransformer"
         self.scene.ee_frame = FrameTransformerCfg(
             prim_path="{ENV_REGEX_NS}/robot/base_link",
-            debug_vis=False,
+            debug_vis=False, # True to visualize ee frame
             visualizer_cfg=marker_cfg,
             target_frames=[
                 FrameTransformerCfg.FrameCfg(
@@ -29,6 +29,36 @@ class RelIK_UR5e_PegInHoleEnvCfg(peg_in_hole_env_cfg.UR5e_PegInHoleEnvCfg):
                     offset=OffsetCfg(
                         pos=TaskParams.gripper_offset,
                     ),
+                ),
+            ],
+        )
+
+        marker2_cfg = FRAME_MARKER_CFG.copy()
+        marker2_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
+        marker2_cfg.prim_path = "/Visuals/FrameTransformer"
+        self.scene.hole_frame = FrameTransformerCfg(
+            prim_path="{ENV_REGEX_NS}/hole",
+            debug_vis=True,
+            visualizer_cfg=marker2_cfg,
+            target_frames=[
+                FrameTransformerCfg.FrameCfg(
+                    prim_path="{ENV_REGEX_NS}/hole",
+                    name="hole_frame",
+                ),
+            ],
+        )
+
+        marker3_cfg = FRAME_MARKER_CFG.copy()
+        marker3_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
+        marker3_cfg.prim_path = "/Visuals/FrameTransformer"
+        self.scene.object_frame = FrameTransformerCfg(
+            prim_path="{ENV_REGEX_NS}/object",
+            debug_vis=True,
+            visualizer_cfg=marker3_cfg,
+            target_frames=[
+                FrameTransformerCfg.FrameCfg(
+                    prim_path="{ENV_REGEX_NS}/object",
+                    name="object_frame",
                 ),
             ],
         )

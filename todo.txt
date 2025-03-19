@@ -1,0 +1,17 @@
+TODO:
+
+1. Change actions so that the robot does not move from its initial pose (and disable gravity)
+2. Write function in EventCfg to randomize the TCP of the robot within a given small range above the fixed hole using IK (with the help of Isaac Lab Factory)
+3. Write function in EventCfg to randomize the position of the held peg relative to the gripper and ensure the peg is gripped after reseting the environment (with the help of Isaac Lab Factory)
+
+
+How to do that:
+1. Disable gravity
+2. Sample pose above hole (possibly use UniformPoseCommandCfg as inspiration or actually use it to sample)
+3. Use IK with Levenberg-Marquardt to compute joint positions
+4. Write joint positions to the robot
+
+5. Sample pose for peg with small changes to position and orientation
+6. Set peg to that pose
+7. Close gripper fingers
+8. Enable gravity

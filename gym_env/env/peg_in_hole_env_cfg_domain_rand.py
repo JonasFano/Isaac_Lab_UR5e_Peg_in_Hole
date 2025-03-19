@@ -1,22 +1,24 @@
 from dataclasses import MISSING
 
-import omni.isaac.lab.sim as sim_utils
-from omni.isaac.lab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
-from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
-from omni.isaac.lab.managers import CurriculumTermCfg as CurrTerm
-from omni.isaac.lab.managers import EventTermCfg as EventTerm
-from omni.isaac.lab.managers import ObservationGroupCfg as ObsGroup
-from omni.isaac.lab.managers import ObservationTermCfg as ObsTerm
-from omni.isaac.lab.managers import RewardTermCfg as RewTerm
-from omni.isaac.lab.managers import SceneEntityCfg
-from omni.isaac.lab.managers import TerminationTermCfg as DoneTerm
-from omni.isaac.lab.scene import InteractiveSceneCfg
-from omni.isaac.lab.utils import configclass
-from omni.isaac.lab.actuators import ImplicitActuatorCfg
-from omni.isaac.lab.sim.schemas.schemas_cfg import MassPropertiesCfg
+import isaaclab.sim as sim_utils
+from isaaclab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
+from isaaclab.envs import ManagerBasedRLEnvCfg
+from isaaclab.managers import CurriculumTermCfg as CurrTerm
+from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import ObservationGroupCfg as ObsGroup
+from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import SceneEntityCfg
+from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.scene import InteractiveSceneCfg
+from isaaclab.utils import configclass
+from isaaclab.actuators import ImplicitActuatorCfg
+from isaaclab.sim.schemas.schemas_cfg import RigidBodyPropertiesCfg, MassPropertiesCfg
 from . import mdp
 import os
+import math
 
+from taskparameters import TaskParams
 
 ##
 # Scene definition
@@ -31,87 +33,83 @@ class UR5e_Domain_Rand_PegInHoleSceneCfg(InteractiveSceneCfg):
     robot = ArticulationCfg(
         prim_path="{ENV_REGEX_NS}/robot", 
         spawn=sim_utils.UsdFileCfg(
-            usd_path=os.path.join(MODEL_PATH, "ur5e_robotiq_new.usd"),
+            usd_path=os.path.join(MODEL_PATH, "ur5e_robotiq_hand_e.usd"),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 disable_gravity=False,
                 max_depenetration_velocity=5.0,
+                linear_damping=0.0,
+                angular_damping=0.0,
+                max_linear_velocity=1000.0,
+                max_angular_velocity=3666.0,
+                enable_gyroscopic_forces=True,
+                solver_position_iteration_count=192,
+                solver_velocity_iteration_count=1,
+                max_contact_impulse=1e32,
             ),
-            activate_contact_sensors=True,), 
+            articulation_props=sim_utils.ArticulationRootPropertiesCfg(
+                enabled_self_collisions=True,
+                solver_position_iteration_count=192,
+                solver_velocity_iteration_count=1,
+            ),
+            activate_contact_sensors=True,
+            collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
+        ),  
         init_state=ArticulationCfg.InitialStateCfg(
             pos=(0.175, -0.175, 0.0), 
             joint_pos={
-                "shoulder_pan_joint": 1.3, 
-                "shoulder_lift_joint": -2.0, 
-                "elbow_joint": 2.0, 
-                "wrist_1_joint": -1.5, 
-                "wrist_2_joint": -1.5, 
-                "wrist_3_joint": 3.14, 
-                "joint_left": 0.0, 
-                "joint_right": 0.0,
+                "shoulder_pan_joint": TaskParams.robot_initial_joint_pos[0], 
+                "shoulder_lift_joint": TaskParams.robot_initial_joint_pos[1], 
+                "elbow_joint": TaskParams.robot_initial_joint_pos[2], 
+                "wrist_1_joint": TaskParams.robot_initial_joint_pos[3], 
+                "wrist_2_joint": TaskParams.robot_initial_joint_pos[4], 
+                "wrist_3_joint": TaskParams.robot_initial_joint_pos[5], 
+                "joint_left": TaskParams.robot_initial_joint_pos[6], # or robotiq_hande_left_finger_joint
+                "joint_right": TaskParams.robot_initial_joint_pos[7], # or robotiq_hande_right_finger_joint
             }
         ),
         actuators={
             "all_joints": ImplicitActuatorCfg(
                 joint_names_expr=[".*"],  # Match all joints
                 velocity_limit={
-                    "shoulder_pan_joint": 180.0,
-                    "shoulder_lift_joint": 180.0,
-                    "elbow_joint": 180.0,
-                    "wrist_1_joint": 180.0,
-                    "wrist_2_joint": 180.0,
-                    "wrist_3_joint": 180.0,
-                    "joint_left": 1000000.0,
-                    "joint_right": 1000000.0,
+                    "shoulder_pan_joint": TaskParams.robot_vel_limit,
+                    "shoulder_lift_joint": TaskParams.robot_vel_limit,
+                    "elbow_joint": TaskParams.robot_vel_limit,
+                    "wrist_1_joint": TaskParams.robot_vel_limit,
+                    "wrist_2_joint": TaskParams.robot_vel_limit,
+                    "wrist_3_joint": TaskParams.robot_vel_limit,
+                    "joint_left": TaskParams.gripper_vel_limit,
+                    "joint_right": TaskParams.gripper_vel_limit,
                 },
                 effort_limit={
-                    "shoulder_pan_joint": 87.0,
-                    "shoulder_lift_joint": 87.0,
-                    "elbow_joint": 87.0,
-                    "wrist_1_joint": 87.0,
-                    "wrist_2_joint": 87.0,
-                    "wrist_3_joint": 87.0,
-                    "joint_left": 200.0,
-                    "joint_right": 200.0,
+                    "shoulder_pan_joint": TaskParams.robot_effort_limit,
+                    "shoulder_lift_joint": TaskParams.robot_effort_limit,
+                    "elbow_joint": TaskParams.robot_effort_limit,
+                    "wrist_1_joint": TaskParams.robot_effort_limit,
+                    "wrist_2_joint": TaskParams.robot_effort_limit,
+                    "wrist_3_joint": TaskParams.robot_effort_limit,
+                    "joint_left": TaskParams.gripper_effort_limit,
+                    "joint_right": TaskParams.gripper_effort_limit,
                 },
-                # stiffness={
-                #     "shoulder_pan_joint": 261.79941,
-                #     "shoulder_lift_joint": 261.79941,
-                #     "elbow_joint": 261.79941,
-                #     "wrist_1_joint": 261.79941,
-                #     "wrist_2_joint": 261.79941,
-                #     "wrist_3_joint": 261.79941,
-                #     "joint_left": 3000.0,
-                #     "joint_right": 3000.0,
-                # },
-                # damping={
-                #     "shoulder_pan_joint": 26.17994,
-                #     "shoulder_lift_joint": 26.17994,
-                #     "elbow_joint": 26.17994,
-                #     "wrist_1_joint": 26.17994,
-                #     "wrist_2_joint": 26.17994,
-                #     "wrist_3_joint": 26.17994,
-                #     "joint_left": 800.0,
-                #     "joint_right": 800.0,
-                # }
-                stiffness={
-                    "shoulder_pan_joint": 1000.0,
-                    "shoulder_lift_joint": 1000.0,
-                    "elbow_joint": 1000.0,
-                    "wrist_1_joint": 1000.0,
-                    "wrist_2_joint": 1000.0,
-                    "wrist_3_joint": 1000.0,
-                    "joint_left": 3000.0,
-                    "joint_right": 3000.0,
+                ############### Stiffness 10000000 ###############
+                stiffness = {
+                    "shoulder_pan_joint": TaskParams.robot_stiffness,
+                    "shoulder_lift_joint": TaskParams.robot_stiffness,
+                    "elbow_joint": TaskParams.robot_stiffness,
+                    "wrist_1_joint": TaskParams.robot_stiffness,
+                    "wrist_2_joint": TaskParams.robot_stiffness,
+                    "wrist_3_joint": TaskParams.robot_stiffness,
+                    "joint_left": TaskParams.gripper_stiffness,
+                    "joint_right": TaskParams.gripper_stiffness,
                 },
-                damping={
-                    "shoulder_pan_joint": 121.66,
-                    "shoulder_lift_joint": 183.23,
-                    "elbow_joint": 96.54,
-                    "wrist_1_joint": 69.83,
-                    "wrist_2_joint": 69.83,
-                    "wrist_3_joint": 27.42,
-                    "joint_left": 500.0,
-                    "joint_right": 500.0,
+                damping = {
+                    "shoulder_pan_joint": TaskParams.shoulder_pan_damping,
+                    "shoulder_lift_joint": TaskParams.shoulder_lift_damping,
+                    "elbow_joint": TaskParams.elbow_damping,
+                    "wrist_1_joint": TaskParams.wrist_1_damping,
+                    "wrist_2_joint": TaskParams.wrist_2_damping,
+                    "wrist_3_joint": TaskParams.wrist_3_damping,
+                    "joint_left": TaskParams.gripper_damping,
+                    "joint_right": TaskParams.gripper_damping,
                 }
             )
         }
@@ -119,21 +117,42 @@ class UR5e_Domain_Rand_PegInHoleSceneCfg(InteractiveSceneCfg):
 
     # Add peg and hole objects on the table
     object = RigidObjectCfg(
-        prim_path = "{ENV_REGEX_NS}/Object", 
+        prim_path = "{ENV_REGEX_NS}/object", 
         spawn=sim_utils.UsdFileCfg(
             usd_path=os.path.join(MODEL_PATH, "cranfield_model/Cranfield parts - BolzenKleinEckig.usd"), 
-            scale=(0.92, 0.92, 1),
-            mass_props=MassPropertiesCfg(
-                mass=1.0,
+            scale=TaskParams.object_scale,
+            rigid_props=RigidBodyPropertiesCfg(
+                disable_gravity=False,
+                max_depenetration_velocity=5.0,
+                linear_damping=0.0,
+                angular_damping=0.0,
+                max_linear_velocity=1000.0,
+                max_angular_velocity=3666.0,
+                enable_gyroscopic_forces=True,
+                solver_position_iteration_count=192,
+                solver_velocity_iteration_count=1,
+                max_contact_impulse=1e32,
             ),
+            mass_props=MassPropertiesCfg(
+                mass=TaskParams.object_init_mass,
+            ),
+            collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
         ), 
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(0.04, 0.35, 0.0), lin_vel=(0.0, 0.0, 0.0)),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=TaskParams.object_init_pos, lin_vel=(0.0, 0.0, 0.0)),
     )
 
     hole = RigidObjectCfg(
         prim_path = "{ENV_REGEX_NS}/hole", 
-        spawn=sim_utils.UsdFileCfg(usd_path=os.path.join(MODEL_PATH, "cranfield_model/Cranfield parts - CranfieldBase.usd")), 
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(0.2, 0.3, 0.0)),
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=os.path.join(MODEL_PATH, "cranfield_model/Cranfield parts - CranfieldBase.usd"),
+            mass_props=MassPropertiesCfg(
+                mass=TaskParams.hole_init_mass,
+            ),
+            collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
+        ), 
+        init_state=RigidObjectCfg.InitialStateCfg(
+            pos=TaskParams.hole_init_pos,
+        ),
     )
 
     # ground plane
@@ -165,15 +184,20 @@ class UR5e_Domain_Rand_PegInHoleSceneCfg(InteractiveSceneCfg):
 @configclass
 class CommandsCfg:
     """Command terms for the MDP."""
-    object_pose = mdp.UniformPoseCommandCfg(
-        asset_name="robot",
-        body_name="wrist_3_link", 
-        resampling_time_range=(5.0, 5.0),
-        debug_vis=True,
-        ranges=mdp.UniformPoseCommandCfg.Ranges(
-            pos_x=(0.25, 0.35), pos_y=(0.3, 0.4), pos_z=(0.25, 0.35), roll=(0.0, 0.0), pitch=(0.0, 0.0), yaw=(0.0, 0.0)
-        ),
-    )
+    # object_pose = mdp.UniformPoseCommandCfg(
+    #     asset_name="robot",
+    #     body_name="wrist_3_link", 
+    #     resampling_time_range=(5.0, 5.0),
+    #     debug_vis=True,
+    #     ranges=mdp.UniformPoseCommandCfg.Ranges(
+    #         pos_x=(0.25, 0.35), 
+    #         pos_y=(0.3, 0.4), 
+    #         pos_z=(0.25, 0.35), 
+    #         roll=(0.0, 0.0),
+    #         pitch=(math.pi, math.pi),  # depends on end-effector axis
+    #         yaw=(-3.14, 3.14), # (0.0, 0.0), # y
+    #     ),
+    # )
 
 
 @configclass
@@ -185,8 +209,8 @@ class ActionsCfg:
     gripper_action = mdp.BinaryJointPositionActionCfg(
         asset_name="robot",
         joint_names=["joint_left", "joint_right"],
-        open_command_expr={"joint_left": 0.0, "joint_right": 0.0},
-        close_command_expr={"joint_left": 0.02, "joint_right": 0.02},
+        open_command_expr={"joint_left": TaskParams.gripper_open[0], "joint_right": TaskParams.gripper_open[1]},
+        close_command_expr={"joint_left": TaskParams.gripper_close[0], "joint_right": TaskParams.gripper_close[1]},
     )
 
 
@@ -197,11 +221,24 @@ class ObservationsCfg:
     @configclass
     class PolicyCfg(ObsGroup):
         """Observations for policy group."""
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel = ObsTerm(func=mdp.joint_vel_rel)
-        object_position = ObsTerm(func=mdp.object_position_in_robot_root_frame)
-        target_object_position = ObsTerm(func=mdp.generated_commands, params={"command_name": "object_pose"})
-        actions = ObsTerm(func=mdp.last_action)
+        gripper_joint_pos = ObsTerm(
+            func=mdp.joint_pos, 
+            params={"asset_cfg": SceneEntityCfg("robot", joint_names=["joint_left", "joint_right"]),},
+        )
+
+        tcp_pose = ObsTerm(
+            func=mdp.get_current_tcp_pose,
+            params={"gripper_offset": TaskParams.gripper_offset, "robot_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
+        )
+
+        ee_wrench_b = ObsTerm(
+            func=mdp.body_incoming_wrench_transform,
+            params={"asset_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])}
+        ) # Small force/torque if not in contact, small but noticeable changes when moving, gets big when in contact
+
+        actions = ObsTerm(
+            func=mdp.last_action
+        )
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -216,14 +253,24 @@ class EventCfg:
     """Configuration for events."""
     reset_all = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
 
-    # Randomize the object position 
-    reset_object_position = EventTerm(
+    reset_robot_joints = EventTerm(
+        func=mdp.reset_joints_by_scale,
+        mode="reset",
+        params={
+            "position_range": TaskParams.robot_reset_joints_pos_range,
+            "velocity_range": TaskParams.robot_reset_joints_vel_range,
+            "asset_cfg": TaskParams.robot_reset_joints_asset_cfg,
+        },
+    )
+
+    # Randomize the hole position 
+    reset_hole_position = EventTerm(
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
-            "pose_range": {"x": (-0.1, 0.1), "y": (-0.25, 0.25), "z": (0.0, 0.0)},
+            "pose_range": {"x": TaskParams.hole_randomize_pose_range_x, "y": TaskParams.hole_randomize_pose_range_y, "z": TaskParams.hole_randomize_pose_range_z}, # "yaw": TaskParams.hole_randomize_pose_range_yaw},
             "velocity_range": {},
-            "asset_cfg": SceneEntityCfg("object", body_names="object"),
+            "asset_cfg": SceneEntityCfg("hole"),
         },
     )
 
@@ -231,11 +278,23 @@ class EventCfg:
         func=mdp.randomize_rigid_body_mass, 
         mode="reset",
         params={
-            "asset_cfg": SceneEntityCfg("object", body_names="Object"),
-            "mass_distribution_params": (0.1, 1.5),
-            "operation": "abs",
-            "distribution": "uniform",
-            "recompute_inertia": True,
+            "asset_cfg": SceneEntityCfg("object"),
+            "mass_distribution_params": TaskParams.object_randomize_mass_range,
+            "operation": TaskParams.object_randomize_mass_operation,
+            "distribution": TaskParams.object_randomize_mass_distribution,
+            "recompute_inertia": TaskParams.object_randomize_mass_recompute_inertia,
+        }
+    )
+
+    randomize_object_mass = EventTerm(
+        func=mdp.randomize_rigid_body_mass, 
+        mode="reset",
+        params={
+            "asset_cfg": SceneEntityCfg("hole"),
+            "mass_distribution_params": TaskParams.hole_randomize_mass_range,
+            "operation": TaskParams.hole_randomize_mass_operation,
+            "distribution": TaskParams.hole_randomize_mass_distribution,
+            "recompute_inertia": TaskParams.hole_randomize_mass_recompute_inertia,
         }
     )
 
@@ -244,12 +303,12 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("robot", joint_names=["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]),
-            "stiffness_distribution_params": (0.8, 1.2),
-            "damping_distribution_params": (0.9, 1.1),
-            "operation_stiffness": "scale",
-            "operation_damping": "scale",
-            "distribution_stiffness": "uniform",
-            "distribution_damping": "uniform",
+            "stiffness_distribution_params": TaskParams.robot_randomize_stiffness,
+            "damping_distribution_params": TaskParams.robot_randomize_damping,
+            "operation_stiffness": TaskParams.robot_randomize_stiffness_operation,
+            "operation_damping": TaskParams.robot_randomize_damping_operation,
+            "distribution_stiffness": TaskParams.robot_randomize_stiffness_distribution,
+            "distribution_damping": TaskParams.robot_randomize_damping_distribution,
         }
     )
 
@@ -258,12 +317,12 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("robot", joint_names=["joint_left", "joint_right"]),
-            "stiffness_distribution_params": (2500, 3500),
-            "damping_distribution_params": (300, 700),
-            "operation_stiffness": "scale",
-            "operation_damping": "abs",
-            "distribution_stiffness": "uniform",
-            "distribution_damping": "uniform",
+            "stiffness_distribution_params": TaskParams.gripper_randomize_stiffness,
+            "damping_distribution_params": TaskParams.gripper_randomize_damping,
+            "operation_stiffness": TaskParams.gripper_randomize_stiffness_operation,
+            "operation_damping": TaskParams.gripper_randomize_damping_operation,
+            "distribution_stiffness": TaskParams.gripper_randomize_stiffness_distribution,
+            "distribution_damping": TaskParams.gripper_randomize_damping_distribution,
         }
     )
 
@@ -272,12 +331,12 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=["finger_left", "finger_right"]),
-            "static_friction_distribution_params": (0.5, 1.2), #(0.1, 1.5),
-            "dynamic_friction_distribution_params": (0.4, 1.0), #(0.05, 1.2),
-            "restitution_distribution_params": (0.2, 0.6), #(0.0, 1.0),
-            "operation": "abs",
-            "distribution": "uniform",
-            "make_consistent": True,  # Ensure dynamic friction <= static friction
+            "static_friction_distribution_params": TaskParams.gripper_randomize_static_friction,
+            "dynamic_friction_distribution_params": TaskParams.gripper_randomize_dynamic_friction,
+            "restitution_distribution_params": TaskParams.gripper_randomize_restitution,
+            "operation": TaskParams.gripper_randomize_friction_operation,
+            "distribution": TaskParams.gripper_randomize_friction_distribution,
+            "make_consistent": TaskParams.gripper_randomize_friction_make_consistent,  
         }
     )
 
@@ -285,13 +344,13 @@ class EventCfg:
         func=mdp.randomize_friction_coefficients,
         mode="reset",
         params={
-            "asset_cfg": SceneEntityCfg("object", body_names="Object"),
-            "static_friction_distribution_params": (0.4, 0.8),
-            "dynamic_friction_distribution_params": (0.3, 0.6),
-            "restitution_distribution_params": (0.3, 0.7),
-            "operation": "abs",
-            "distribution": "uniform",
-            "make_consistent": True,  # Ensure dynamic friction <= static friction
+            "asset_cfg": SceneEntityCfg("object"),
+            "static_friction_distribution_params": TaskParams.gripper_randomize_static_friction,
+            "dynamic_friction_distribution_params": TaskParams.gripper_randomize_dynamic_friction,
+            "restitution_distribution_params": TaskParams.gripper_randomize_restitution,
+            "operation": TaskParams.gripper_randomize_friction_operation,
+            "distribution": TaskParams.gripper_randomize_friction_distribution,
+            "make_consistent": TaskParams.gripper_randomize_friction_make_consistent,  
         }
     )
 
@@ -299,54 +358,50 @@ class EventCfg:
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
-
-    reaching_object = RewTerm(func=mdp.object_ee_distance, params={"std": 0.1}, weight=1.0)
-
-    lifting_object = RewTerm(func=mdp.object_is_lifted, params={"minimal_height": 0.09}, weight=15.0)
-
-    object_goal_tracking = RewTerm(
-        func=mdp.object_goal_distance,
-        params={"std": 0.3, "minimal_height": 0.09, "command_name": "object_pose"},
-        weight=16.0,
+    hole_ee_distance = RewTerm(
+        func=mdp.hole_ee_distance, 
+        params={"std": TaskParams.hole_ee_distance_std}, 
+        weight=TaskParams.hole_ee_distance_weight,
     )
 
-    object_goal_tracking_fine_grained = RewTerm(
-        func=mdp.object_goal_distance,
-        params={"std": 0.05, "minimal_height": 0.09, "command_name": "object_pose"},
-        weight=5.0,
+    orientation_tracking = RewTerm(
+        func=mdp.object_hole_orientation_error, 
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+        }, 
+        weight=TaskParams.orientation_tracking_weight
     )
 
     # action penalty
-    action_rate = RewTerm(func=mdp.action_rate_l2, weight=-1e-4)
+    action_rate = RewTerm(func=mdp.action_rate_l2, weight=TaskParams.action_rate_weight)
 
-    joint_vel = RewTerm(
-        func=mdp.joint_vel_l2,
-        weight=-1e-4,
-        params={"asset_cfg": SceneEntityCfg("robot")},
-    )
 
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
-
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
 
     object_dropping = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("object")}
+        func=mdp.root_height_below_minimum, 
+        params={
+            "minimum_height": TaskParams.object_dropping_min_height, 
+            "asset_cfg": SceneEntityCfg("object"),
+        },
     )
 
 
 @configclass
 class CurriculumCfg:
     """Curriculum terms for the MDP."""
-
     action_rate = CurrTerm(
-        func=mdp.modify_reward_weight, params={"term_name": "action_rate", "weight": -1e-1, "num_steps": 10000}
-    )
-
-    joint_vel = CurrTerm(
-        func=mdp.modify_reward_weight, params={"term_name": "joint_vel", "weight": -1e-1, "num_steps": 10000}
+        func=mdp.modify_reward_weight, 
+        params={
+            "term_name": "action_rate", 
+            "weight": TaskParams.action_rate_curriculum_weight, 
+            "num_steps": TaskParams.action_rate_curriculum_num_steps,
+        },
     )
 
 
@@ -374,10 +429,10 @@ class UR5e_Domain_Rand_PegInHoleEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self):
         """Post initialization."""
         # general settings
-        self.decimation = 2
-        self.episode_length_s = 5.0
+        self.decimation = TaskParams.decimation
+        self.episode_length_s = TaskParams.episode_length_s
         # simulation settings
-        self.sim.dt = 0.01  # 100Hz
+        self.sim.dt = TaskParams.dt  # 100Hz
         self.sim.render_interval = self.decimation
 
         self.sim.physx.bounce_threshold_velocity = 0.2
@@ -385,4 +440,4 @@ class UR5e_Domain_Rand_PegInHoleEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.physx.gpu_found_lost_aggregate_pairs_capacity = 1024 * 1024 * 4
         self.sim.physx.gpu_total_aggregate_pairs_capacity = 16 * 1024
         self.sim.physx.friction_correlation_distance = 0.00625
-        self.sim.physx.gpu_collision_stack_size = 4096 * 4096 * 64 # Was added due to an PhysX error: collisionStackSize buffer overflow detected
+        self.sim.physx.gpu_collision_stack_size = 4096 * 4096 * 120 # Was added due to an PhysX error: collisionStackSize buffer overflow detected

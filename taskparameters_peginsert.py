@@ -69,7 +69,7 @@ class TaskParams:
     robot_randomize_stiffness_distribution = "uniform"
     robot_randomize_damping_distribution = "uniform"
 
-    robot_initial_joint_pos = [1.3, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0] # With gripper joint pos set to 0.0
+    robot_initial_joint_pos = [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0] # With gripper joint pos set to 0.0
     robot_reset_joints_pos_range = (1.0, 1.0)
     robot_reset_joints_vel_range = (0.0, 0.0)
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
@@ -115,7 +115,7 @@ class TaskParams:
     object_randomize_mass_operation = "abs"
     object_randomize_mass_distribution = "uniform"
     object_randomize_mass_recompute_inertia = True
-    object_init_pos = (0.15, 0.25, 0.1)
+    object_init_pos = (-0.2, 0.0, 0.1)
 
     # Domain randomize object friction
     object_randomize_static_friction = (0.6, 1.0)
@@ -131,7 +131,7 @@ class TaskParams:
     ##############
     # Hole parameters
     hole_init_mass = 10
-    hole_init_pos = (0.2, 0.3, 0.0)
+    hole_init_pos = (-0.2, 0.2, 0.05)
     hole_randomize_mass_range = (5, 15)
     hole_randomize_mass_operation = "abs"
     hole_randomize_mass_distribution = "uniform"

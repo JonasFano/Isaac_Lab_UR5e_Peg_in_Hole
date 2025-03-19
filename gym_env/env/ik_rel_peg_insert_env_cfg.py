@@ -5,12 +5,12 @@ from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
 from isaaclab.controllers.differential_ik_cfg import DifferentialIKControllerCfg
 from isaaclab.envs.mdp.actions.actions_cfg import DifferentialInverseKinematicsActionCfg
 
-from . import peg_in_hole_env_cfg_domain_rand
+from . import peg_insert_env_cfg
 
 from taskparameters import TaskParams
 
 @configclass
-class RelIK_UR5e_Domain_Rand_PegInHoleEnvCfg(peg_in_hole_env_cfg_domain_rand.UR5e_Domain_Rand_PegInHoleEnvCfg):
+class RelIK_UR5e_PegInsertEnvCfg(peg_insert_env_cfg.UR5e_PegInsertEnvCfg):
     def __post_init__(self):
         super().__post_init__()
 
@@ -33,24 +33,6 @@ class RelIK_UR5e_Domain_Rand_PegInHoleEnvCfg(peg_in_hole_env_cfg_domain_rand.UR5
             ],
         )
 
-        marker2_cfg = FRAME_MARKER_CFG.copy()
-        marker2_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
-        marker2_cfg.prim_path = "/Visuals/FrameTransformer"
-        self.scene.hole_frame = FrameTransformerCfg(
-            prim_path="{ENV_REGEX_NS}/hole",
-            debug_vis=True,
-            visualizer_cfg=marker2_cfg,
-        )
-
-        marker3_cfg = FRAME_MARKER_CFG.copy()
-        marker3_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
-        marker3_cfg.prim_path = "/Visuals/FrameTransformer"
-        self.scene.object_frame = FrameTransformerCfg(
-            prim_path="{ENV_REGEX_NS}/object",
-            debug_vis=True,
-            visualizer_cfg=marker3_cfg,
-        )
-
         # print(self.commands.object_pose) # Do not show current end-effector frame
         # self.commands.object_pose.current_pose_visualizer_cfg.markers['frame'].visible = False
 
@@ -66,7 +48,7 @@ class RelIK_UR5e_Domain_Rand_PegInHoleEnvCfg(peg_in_hole_env_cfg_domain_rand.UR5
 
 
 @configclass
-class RelIK_UR5e_Domain_Rand_PegInHoleEnvCfg_PLAY(RelIK_UR5e_Domain_Rand_PegInHoleEnvCfg):
+class RelIK_UR5e_PegInsertEnvCfg_PLAY(RelIK_UR5e_PegInsertEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
