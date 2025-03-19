@@ -1,0 +1,133 @@
+program: train_sb3_wandb_ppo_domain_rand.py
+method: grid
+name: rel_ik_sb3_ppo_ur5e_lift_cube_0_05_hand_e_domain_rand_with_small_friction_and_without_mass_v9
+metric:
+  goal: maximize
+  name: rollout/ep_rew_mean
+
+parameters:
+  seed:
+    value: 42
+    # values: [42, 24]
+
+  num_envs:
+    value: 2048
+
+  n_timesteps: # Total number of environment interactions: iteration * n_steps * num_envs: 1000 * 64 * 4096 = 262144000 # 52428800 # 78643200
+    value: 393216000 # 393216000
+
+  policy:
+    value: 'MlpPolicy'
+
+  n_steps: # Number of steps each environment runs before the collected data is used for policy update
+    value: 64
+
+  batch_size: # Data is divided into minibatches of size batch_size. = number of samples used for one gradient update during training
+    value: 16384
+
+  gae_lambda:
+    value: 0.95
+
+  gamma:
+    value: 0.95
+
+  n_epochs: # Number of times the entire collected dataset is used to update the policz during one iteration
+    value: 8
+
+  ent_coef: # Possibly change this to encourange more exploration
+    value: 0.01
+
+  vf_coef:
+    value: 0.1
+
+  learning_rate:
+    value: !!float 3e-4
+
+  clip_range:
+    value: 0.2
+
+  policy_kwargs:
+    parameters:
+      activation_fn: 
+        value: nn.Tanh
+      net_arch:
+        parameters:
+          pi:
+            value: [256, 128, 64]
+          vf:
+            value: [256, 128, 64]
+
+  target_kl:
+    value: 0.02
+
+  max_grad_norm:
+    value: 1.0
+
+
+
+
+# parameters:
+#   seed:
+#     value: 42
+
+#   num_envs:
+#     values: [128, 1024]
+
+#   n_timesteps: # Total number of environment interactions: iteration * n_steps * num_envs: 1000 * 64 * 4096 = 262144000 # 52428800 # 78643200
+#     value: 262144000
+
+#   policy:
+#     value: 'MlpPolicy'
+
+#   n_steps: # Number of steps each environment runs before the collected data is used for policy update
+#     value: 64
+
+#   batch_size: # Data is divided into minibatches of size batch_size. = number of samples used for one gradient update during training
+#     value: 16384
+
+#   gae_lambda:
+#     value: 0.95
+
+#   gamma:
+#     value: 0.95
+
+#   n_epochs: # Number of times the entire collected dataset is used to update the policz during one iteration
+#     value: 8
+
+#   ent_coef: # Possibly change this to encourange more exploration
+#     value: 0.01
+
+#   vf_coef:
+#     value: 0.1
+
+#   learning_rate:
+#     value: 3e-4
+
+#   clip_range:
+#     value: 0.2
+
+#   policy_kwargs:
+#     parameters:
+#       activation_fn: 
+#         value: nn.Tanh
+#       net_arch:
+#         parameters:
+#           pi:
+#             value: [256, 128, 64]
+#           vf:
+#             value: [256, 128, 64]
+
+#   target_kl:
+#     value: 0.02
+
+#   max_grad_norm:
+#     value: 1.0
+
+  normalize_input:
+    value: False
+
+  normalize_value:
+    value: False
+
+  clip_obs:
+    value: 50.0
