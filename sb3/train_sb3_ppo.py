@@ -36,6 +36,7 @@ import sys
 import gymnasium as gym
 import numpy as np
 import os
+import torch
 from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -167,6 +168,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     #     # print(f"Timestep: {timestep}, Action: {action}")
 
+    #     action = torch.tensor([0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    #     action = action.unsqueeze(0).repeat(env.num_envs, 1)  # Shape: [num_envs, 7]
+
     #     # Take the action in the environment
     #     new_obs, reward, done, info = env.step(action)
 
@@ -182,8 +186,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     #     obs = new_obs
 
     #     # If any of the environments are done, reset them
-    #     if np.any(done):  # Use np.any to handle the array
+    #     if np.any(done):  # This resets *all* envs if *any* is done
     #         obs = env.reset()
+
 
     #     # Increment the timestep
     #     timestep += 1

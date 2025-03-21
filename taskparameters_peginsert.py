@@ -75,9 +75,9 @@ class TaskParams:
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
 
-    ##############
+    ###############
     ### Gripper ###
-    ##############
+    ###############
     # Gripper parameters/gains
     gripper_vel_limit = 1000000.0
     gripper_effort_limit = 200.0
@@ -126,12 +126,12 @@ class TaskParams:
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
 
-    ##############
+    ############
     ### Hole ###
-    ##############
+    ############
     # Hole parameters
     hole_init_mass = 10
-    hole_init_pos = (-0.2, 0.2, 0.05)
+    hole_init_pos = (-0.2, 0.2, 0.0)
     hole_randomize_mass_range = (5, 15)
     hole_randomize_mass_operation = "abs"
     hole_randomize_mass_distribution = "uniform"

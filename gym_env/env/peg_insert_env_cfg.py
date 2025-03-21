@@ -18,6 +18,8 @@ from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR
 from . import mdp
 import os
 import math
+from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
+
 
 from taskparameters_peginsert import TaskParams
 
@@ -267,15 +269,45 @@ class EventCfg:
     """Configuration for events."""
     reset_all = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
 
-    # Randomize the hole position 
-    reset_hole_position = EventTerm(
+    # # Randomize the hole position 
+    # reset_hole_position = EventTerm(
+    #     func=mdp.reset_root_state_uniform,
+    #     mode="reset",
+    #     params={
+    #         "pose_range": {"x": TaskParams.hole_randomize_pose_range_x, "y": TaskParams.hole_randomize_pose_range_y, "z": TaskParams.hole_randomize_pose_range_z}, # "yaw": TaskParams.hole_randomize_pose_range_yaw},
+    #         "velocity_range": {},
+    #         "asset_cfg": SceneEntityCfg("hole"),
+    #     },
+    # )
+
+    reset_object_position = EventTerm(
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
-            "pose_range": {"x": TaskParams.hole_randomize_pose_range_x, "y": TaskParams.hole_randomize_pose_range_y, "z": TaskParams.hole_randomize_pose_range_z}, # "yaw": TaskParams.hole_randomize_pose_range_yaw},
+            "pose_range": {"x": (-0.2, -0.2), "y": (0.3, 0.5), "z": TaskParams.hole_randomize_pose_range_z}, # "yaw": TaskParams.hole_randomize_pose_range_yaw},
             "velocity_range": {},
-            "asset_cfg": SceneEntityCfg("hole"),
+            "asset_cfg": SceneEntityCfg("object"),
         },
+    )
+
+    randomize_initial_robot_state = EventTerm(
+        func=mdp.randomize_initial_state,
+        mode="reset",
+        params={
+            "asset_cfg": SceneEntityCfg("robot"),
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "range_x": (-0.01, 0.01),
+            "range_y": (-0.01, 0.01),
+            "range_z": (0.05, 0.06),
+            "range_roll": (0.0, 0.0),
+            "range_pitch": (math.pi, math.pi),
+            "range_yaw": (-3.14, 3.14),
+            "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"],
+            "body_name": "wrist_3_link",
+            "body_offset": OffsetCfg(pos=[0.0, 0.0, 0.15]),
+            "default_joint_pos": [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0],
+        }
     )
 
 
