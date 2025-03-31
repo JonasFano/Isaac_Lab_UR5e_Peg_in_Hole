@@ -168,8 +168,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     #     # print(f"Timestep: {timestep}, Action: {action}")
 
-    #     action = torch.tensor([0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-    #     action = action.unsqueeze(0).repeat(env.num_envs, 1)  # Shape: [num_envs, 7]
+    #     # action = torch.tensor([0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    #     action = np.zeros_like(action)
+    #     # action = action.unsqueeze(0).repeat(env.num_envs, 1)  # Shape: [num_envs, 7]
 
     #     # Take the action in the environment
     #     new_obs, reward, done, info = env.step(action)

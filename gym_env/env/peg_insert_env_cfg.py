@@ -200,20 +200,6 @@ class UR5e_PegInsertSceneCfg(InteractiveSceneCfg):
 @configclass
 class CommandsCfg:
     """Command terms for the MDP."""
-    # object_pose = mdp.UniformPoseCommandCfg(
-    #     asset_name="robot",
-    #     body_name="wrist_3_link", 
-    #     resampling_time_range=(5.0, 5.0),
-    #     debug_vis=True,
-    #     ranges=mdp.UniformPoseCommandCfg.Ranges(
-    #         pos_x=(0.25, 0.35), 
-    #         pos_y=(0.3, 0.4), 
-    #         pos_z=(0.25, 0.35), 
-    #         roll=(0.0, 0.0),
-    #         pitch=(math.pi, math.pi),  # depends on end-effector axis
-    #         yaw=(-3.14, 3.14), # (0.0, 0.0), # y
-    #     ),
-    # )
 
 
 @configclass
@@ -229,6 +215,12 @@ class ActionsCfg:
     #     close_command_expr={"joint_left": TaskParams.gripper_close[0], "joint_right": TaskParams.gripper_close[1]},
     # )
 
+    # gripper_action = mdp.JointPositionActionCfg(
+    #     asset_name="robot",
+    #     joint_names=["joint_left", "joint_right"],
+    #     scale=1.0,
+    # )
+
 
 @configclass
 class ObservationsCfg:
@@ -237,6 +229,11 @@ class ObservationsCfg:
     @configclass
     class PolicyCfg(ObsGroup):
         """Observations for policy group."""
+        object_pos = ObsTerm(
+            mdp.object_position_in_robot_root_frame,
+            params={"asset_cfg": SceneEntityCfg("robot"), "object_cfg": SceneEntityCfg("object"),}
+        )
+
         gripper_joint_pos = ObsTerm(
             func=mdp.joint_pos, 
             params={"asset_cfg": SceneEntityCfg("robot", joint_names=["joint_left", "joint_right"]),},
@@ -311,7 +308,6 @@ class EventCfg:
         }
     )
 
-
     randomize_gripper_fingers_friction_coefficients = EventTerm(
         func=mdp.randomize_friction_coefficients,
         mode="reset",
@@ -350,14 +346,14 @@ class RewardsCfg:
         weight=TaskParams.hole_ee_distance_weight,
     )
 
-    orientation_tracking = RewTerm(
-        func=mdp.object_hole_orientation_error, 
-        params={
-            "hole_cfg": SceneEntityCfg("hole"),
-            "object_cfg": SceneEntityCfg("object"),
-        }, 
-        weight=TaskParams.orientation_tracking_weight
-    )
+    # orientation_tracking = RewTerm(
+    #     func=mdp.object_hole_orientation_error, 
+    #     params={
+    #         "hole_cfg": SceneEntityCfg("hole"),
+    #         "object_cfg": SceneEntityCfg("object"),
+    #     }, 
+    #     weight=TaskParams.orientation_tracking_weight
+    # )
 
     # action penalty
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=TaskParams.action_rate_weight)
@@ -375,6 +371,17 @@ class TerminationsCfg:
             "minimum_height": TaskParams.object_dropping_min_height, 
             "asset_cfg": SceneEntityCfg("object"),
         },
+    )
+
+    is_peg_inserted = DoneTerm(
+        func=mdp.is_peg_inserted,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "object_height": 0.05,
+            "xy_threshold": 0.001,
+            "z_threshold": 0.001,
+        }
     )
 
 

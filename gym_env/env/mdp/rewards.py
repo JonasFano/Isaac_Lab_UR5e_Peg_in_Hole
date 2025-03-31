@@ -29,13 +29,13 @@ def hole_ee_distance(
     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
     
     # Target hole position: (num_envs, 3)
-    cube_pos_w = hole.data.root_pos_w
+    hole_pos_w = hole.data.root_pos_w
 
     # End-effector position: (num_envs, 3)
     ee_w = ee_frame.data.target_pos_w[..., 0, :]
 
     # Distance of the end-effector to the hole: (num_envs,)
-    hole_ee_distance = torch.norm(cube_pos_w - ee_w, dim=1)
+    hole_ee_distance = torch.norm(hole_pos_w - ee_w, dim=1)
 
     # print("Hole_ee_distance: ", hole_ee_distance)
 

@@ -14,7 +14,7 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
-from isaaclab.assets import RigidObject
+from isaaclab.assets import Articulation, RigidObject
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils.math import combine_frame_transforms
 
@@ -51,3 +51,33 @@ def object_reached_goal(
 
     # rewarded if the object is lifted above the threshold
     return distance < threshold
+
+
+def is_peg_inserted(
+    env: ManagerBasedRLEnv,
+    hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
+    object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
+    object_height: float = 0.05,
+    xy_threshold: float = 0.001,
+    z_threshold: float = 0.001,
+) -> torch.Tensor:
+    """ Check if peg is in the hole. Returns a binary tensor: 1 if success, 0 otherwise. """
+    object: RigidObject | Articulation = env.scene[object_cfg.name]
+    hole: RigidObject | Articulation = env.scene[hole_cfg.name]
+
+    hole_pos_w = hole.data.root_pos_w        # shape: [N, 3]
+    object_pos_w = object.data.root_pos_w    # shape: [N, 3]
+
+    # Compute position delta
+    delta = hole_pos_w - object_pos_w        # shape: [N, 3]
+
+    # Condition 1: XY error less than predefined threshold
+    xy_ok = torch.all(torch.abs(delta[:, :2]) < xy_threshold, dim=1)  # shape: [N]
+
+    # Condition 2: Z error in predefined range
+    z_ok = (torch.abs(delta[:, 2]) >= object_height - z_threshold) & (torch.abs(delta[:, 2]) <= object_height + z_threshold)
+
+    # Combine both
+    success = (xy_ok & z_ok).bool()  # Returns 1 if both true, else 0
+
+    return success  # shape: [N]

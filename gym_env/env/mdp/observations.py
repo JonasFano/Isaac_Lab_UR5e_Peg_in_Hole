@@ -83,11 +83,11 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
 
 def object_position_in_robot_root_frame(
     env: ManagerBasedRLEnv,
-    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
     object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
 ) -> torch.Tensor:
     """The position of the object in the robot's root frame."""
-    robot: RigidObject | Articulation = env.scene[robot_cfg.name]
+    robot: RigidObject | Articulation = env.scene[asset_cfg.name]
     object: RigidObject | Articulation = env.scene[object_cfg.name]
     object_pos_w = object.data.root_pos_w[:, :3]
     object_pos_b, object_quat_b = subtract_frame_transforms(

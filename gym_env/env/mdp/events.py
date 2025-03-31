@@ -322,7 +322,7 @@ def randomize_initial_state(
     hole: RigidObject | Articulation = env.scene[hole_cfg.name]
     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
 
-    pose_command_b = torch.zeros(len(env_ids), 7, device=env.device)
+    pose_command_b = torch.zeros(env.num_envs, 7, device=env.device)
 
     # Use IK with Levenberg-Marquardt to get joint positions for the sampled pose
     bad_envs = env_ids.clone()
@@ -382,8 +382,8 @@ def randomize_initial_state(
         set_robot_to_default_joint_pos(env, asset, joints=default_joint_pos, env_ids=bad_envs, gripper_width = 0)
 
     # Get current end-effector pose in world base frame
-    tcp_pos_w = ee_frame.data.target_pos_w[..., 0, :]
-    tcp_quat_w = ee_frame.data.target_quat_w[..., 0, :]
+    tcp_pos_w = ee_frame.data.target_pos_w[env_ids, 0, :]
+    tcp_quat_w = ee_frame.data.target_quat_w[env_ids, 0, :]
 
     # Sample z offset for the object/peg in world frame
     sampled_z = torch.rand(len(env_ids), 1, device=tcp_pos_w.device) * (object_z_range[1] - object_z_range[0]) + object_z_range[0]
@@ -392,7 +392,7 @@ def randomize_initial_state(
     sampled_x_tcp = torch.rand(len(env_ids), 1, device=tcp_pos_w.device) * (object_x_range[1] - object_x_range[0]) + object_x_range[0]
 
     # Convert quaternions to rotation matrices
-    tcp_rot_w = matrix_from_quat(tcp_quat_w[env_ids, :])
+    tcp_rot_w = matrix_from_quat(tcp_quat_w)
 
     # Create local offset [x, 0, 0] in TCP frame
     tcp_local_offset = torch.cat([sampled_x_tcp, torch.zeros_like(sampled_x_tcp), torch.zeros_like(sampled_x_tcp)], dim=-1).unsqueeze(-1)  # [B, 3, 1]
@@ -400,10 +400,11 @@ def randomize_initial_state(
     # Transform local offset into world frame
     x_offset_world = torch.bmm(tcp_rot_w, tcp_local_offset).squeeze(-1)  # [B, 3]
 
-    positions = tcp_pos_w[env_ids, :].clone()
+    # positions = hole.data.root_pos_w[env_ids, :3] # To test terminating environments if the peg is inserted in the hole
+    positions = tcp_pos_w.clone()
     positions += x_offset_world
     positions[:, 2:3] += sampled_z
-    orientations = tcp_quat_w[env_ids, :]
+    orientations = tcp_quat_w
 
     # set into the physics simulation
     object.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
@@ -414,9 +415,10 @@ def randomize_initial_state(
     gripper_offset = (object_width - 0.0005) / 2
     adjusted_gripper_close = [v + gripper_offset for v in gripper_close]
 
-    joint_pos = asset.data.joint_pos[env_ids, :]
+    joint_pos = asset.data.joint_pos[env_ids, :].clone()
     # joint_pos[env_ids, 6:8] = torch.tensor(gripper_close, device=env.device).repeat(len(env_ids), 1) # Fully closing the gripper
-    joint_pos[env_ids, 6:8] = torch.tensor(adjusted_gripper_close, device=env.device).repeat(len(env_ids), 1) 
+    joint_pos[:, 6:8] = torch.tensor(adjusted_gripper_close, device=env.device).repeat(len(env_ids), 1) 
+    
     joint_vel = torch.zeros_like(joint_pos)
 
     asset.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
