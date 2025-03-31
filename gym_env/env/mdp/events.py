@@ -10,8 +10,9 @@ import isaaclab.sim as sim_utils
 import isaaclab.utils.math as math_utils
 from isaaclab.actuators import ImplicitActuator
 from isaaclab.assets import Articulation, RigidObject
+from isaaclab.sensors import FrameTransformer
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.utils.math import subtract_frame_transforms, compute_pose_error, quat_from_euler_xyz, quat_unique
+from isaaclab.utils.math import subtract_frame_transforms, compute_pose_error, quat_from_euler_xyz, quat_apply, matrix_from_quat
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
 
 if TYPE_CHECKING:
@@ -294,6 +295,7 @@ def randomize_initial_state(
         asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
         hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
         object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
+        ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame"),
         range_x: tuple[float, float] = (-0.02, 0.02),
         range_y: tuple[float, float] = (-0.02, 0.02),
         range_z: tuple[float, float] = (0.05, 0.1),
@@ -304,7 +306,11 @@ def randomize_initial_state(
         body_name: str = "wrist_3_link",
         body_offset: OffsetCfg = OffsetCfg(pos=[0.0, 0.0, 0.15]),
         default_joint_pos = [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0],
-        gravity: carb = carb.Float3(0.0, 0.0, -9.81)
+        gravity: carb = carb.Float3(0.0, 0.0, -9.81),
+        object_x_range: tuple[float, float] =(-0.005, 0.005),  #(-0.01, 0.01),
+        object_z_range: tuple[float, float] = (0.01, 0.02),
+        gripper_close: list[float, float] = [-0.025, -0.025],
+        object_width: float = 0.008,
     ):
     """Randomize the starting TCP pose within a predefined range above the hole and randomize the peg pose and ensure it is grasped upon reset."""
     # Disable gravity.
@@ -314,8 +320,9 @@ def randomize_initial_state(
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
     object: RigidObject | Articulation = env.scene[object_cfg.name]
     hole: RigidObject | Articulation = env.scene[hole_cfg.name]
+    ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
 
-    pose_command_b = torch.zeros(env.num_envs, 7, device=env.device)
+    pose_command_b = torch.zeros(len(env_ids), 7, device=env.device)
 
     # Use IK with Levenberg-Marquardt to get joint positions for the sampled pose
     bad_envs = env_ids.clone()
@@ -374,31 +381,51 @@ def randomize_initial_state(
         # Set robot to default joint position in all bad_envs
         set_robot_to_default_joint_pos(env, asset, joints=default_joint_pos, env_ids=bad_envs, gripper_width = 0)
 
+    # Get current end-effector pose in world base frame
+    tcp_pos_w = ee_frame.data.target_pos_w[..., 0, :]
+    tcp_quat_w = ee_frame.data.target_quat_w[..., 0, :]
 
-    # TODO: Insert code here to set object position between gripper fingers and close gripper
-    # get default root state
-    root_states = asset.data.default_root_state[env_ids].clone()
+    # Sample z offset for the object/peg in world frame
+    sampled_z = torch.rand(len(env_ids), 1, device=tcp_pos_w.device) * (object_z_range[1] - object_z_range[0]) + object_z_range[0]
 
-    # Get current end-effector pose in robot base frame
-    ee_pos_curr, ee_quat_curr = compute_frame_pose(env, asset, body_idx, body_offset)
+    # Sample x offset in TCP frame
+    sampled_x_tcp = torch.rand(len(env_ids), 1, device=tcp_pos_w.device) * (object_x_range[1] - object_x_range[0]) + object_x_range[0]
 
-    positions = ee_pos_curr[env_ids, 0:3] + env.scene.env_origins[env_ids]
-    orientations = math_utils.random_orientation(len(env_ids), device=asset.device)
+    # Convert quaternions to rotation matrices
+    tcp_rot_w = matrix_from_quat(tcp_quat_w[env_ids, :])
 
-    print(positions)
+    # Create local offset [x, 0, 0] in TCP frame
+    tcp_local_offset = torch.cat([sampled_x_tcp, torch.zeros_like(sampled_x_tcp), torch.zeros_like(sampled_x_tcp)], dim=-1).unsqueeze(-1)  # [B, 3, 1]
 
-    # Set root velocities to initial root state
-    velocities = root_states[:, 7:13]
+    # Transform local offset into world frame
+    x_offset_world = torch.bmm(tcp_rot_w, tcp_local_offset).squeeze(-1)  # [B, 3]
+
+    positions = tcp_pos_w[env_ids, :].clone()
+    positions += x_offset_world
+    positions[:, 2:3] += sampled_z
+    orientations = tcp_quat_w[env_ids, :]
 
     # set into the physics simulation
-    asset.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
-    asset.write_root_velocity_to_sim(velocities, env_ids=env_ids)
+    object.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
+    object.write_root_velocity_to_sim(torch.zeros(len(env_ids), 6, device=env.device), env_ids=env_ids)
+    object.reset()
 
+    # Close gripper
+    gripper_offset = (object_width - 0.0005) / 2
+    adjusted_gripper_close = [v + gripper_offset for v in gripper_close]
 
+    joint_pos = asset.data.joint_pos[env_ids, :]
+    # joint_pos[env_ids, 6:8] = torch.tensor(gripper_close, device=env.device).repeat(len(env_ids), 1) # Fully closing the gripper
+    joint_pos[env_ids, 6:8] = torch.tensor(adjusted_gripper_close, device=env.device).repeat(len(env_ids), 1) 
+    joint_vel = torch.zeros_like(joint_pos)
+
+    asset.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
+    asset.set_joint_position_target(joint_pos, env_ids=env_ids)
 
     # Enable gravity
     # physics_sim_view.set_gravity(carb.Float3(0.0, 0.0, -9.81))
     physics_sim_view.set_gravity(gravity)
+
 
 
 def get_pose_error(
@@ -587,3 +614,24 @@ def hole_position_in_robot_base_frame(
     )
     hole_pose_b = torch.cat((hole_pos_b, hole_quat_b), dim=-1)
     return hole_pose_b
+
+
+
+def quat_rotate_vector(quat: torch.Tensor, vec: torch.Tensor) -> torch.Tensor:
+    """
+    Rotate a vector by a quaternion using provided utility functions.
+    
+    Args:
+        quat: [..., 4] tensor representing quaternions (w, x, y, z).
+        vec: [..., 3] tensor representing the vectors to rotate.
+    
+    Returns:
+        Rotated vector of shape [..., 3].
+    """
+    # Ensure the quaternion is normalized to avoid unintended scaling effects
+    quat = torch.nn.functional.normalize(quat, p=2, dim=-1)
+    
+    # Rotate the input vector using the quaternion
+    rotated_vec = quat_apply(quat, vec)
+    
+    return rotated_vec

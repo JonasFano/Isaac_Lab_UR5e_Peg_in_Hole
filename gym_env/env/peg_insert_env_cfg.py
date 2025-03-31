@@ -120,7 +120,7 @@ class UR5e_PegInsertSceneCfg(InteractiveSceneCfg):
 
     # Add peg and hole objects on the table
     hole: ArticulationCfg = ArticulationCfg(
-        prim_path="{ENV_REGEX_NS}/object",
+        prim_path="{ENV_REGEX_NS}/hole",
         spawn=sim_utils.UsdFileCfg(
             usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Factory/factory_hole_8mm.usd",
             activate_contact_sensors=True,
@@ -146,7 +146,7 @@ class UR5e_PegInsertSceneCfg(InteractiveSceneCfg):
     )
 
     object: ArticulationCfg = ArticulationCfg(
-        prim_path="{ENV_REGEX_NS}/hole",
+        prim_path="{ENV_REGEX_NS}/object",
         spawn=sim_utils.UsdFileCfg(
             usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Factory/factory_peg_8mm.usd",
             activate_contact_sensors=True,
@@ -222,12 +222,12 @@ class ActionsCfg:
     # Set actions
     arm_action: mdp.JointPositionActionCfg | mdp.DifferentialInverseKinematicsActionCfg = MISSING
 
-    gripper_action = mdp.BinaryJointPositionActionCfg(
-        asset_name="robot",
-        joint_names=["joint_left", "joint_right"],
-        open_command_expr={"joint_left": TaskParams.gripper_open[0], "joint_right": TaskParams.gripper_open[1]},
-        close_command_expr={"joint_left": TaskParams.gripper_close[0], "joint_right": TaskParams.gripper_close[1]},
-    )
+    # gripper_action = mdp.BinaryJointPositionActionCfg(
+    #     asset_name="robot",
+    #     joint_names=["joint_left", "joint_right"],
+    #     open_command_expr={"joint_left": TaskParams.gripper_open[0], "joint_right": TaskParams.gripper_open[1]},
+    #     close_command_expr={"joint_left": TaskParams.gripper_close[0], "joint_right": TaskParams.gripper_close[1]},
+    # )
 
 
 @configclass
@@ -280,15 +280,15 @@ class EventCfg:
     #     },
     # )
 
-    reset_object_position = EventTerm(
-        func=mdp.reset_root_state_uniform,
-        mode="reset",
-        params={
-            "pose_range": {"x": (-0.2, -0.2), "y": (0.3, 0.5), "z": TaskParams.hole_randomize_pose_range_z}, # "yaw": TaskParams.hole_randomize_pose_range_yaw},
-            "velocity_range": {},
-            "asset_cfg": SceneEntityCfg("object"),
-        },
-    )
+    # reset_object_position = EventTerm(
+    #     func=mdp.reset_root_state_uniform,
+    #     mode="reset",
+    #     params={
+    #         "pose_range": {"x": (-0.2, -0.2), "y": (0.3, 0.5), "z": TaskParams.hole_randomize_pose_range_z}, # "yaw": TaskParams.hole_randomize_pose_range_yaw},
+    #         "velocity_range": {},
+    #         "asset_cfg": SceneEntityCfg("object"),
+    #     },
+    # )
 
     randomize_initial_robot_state = EventTerm(
         func=mdp.randomize_initial_state,
@@ -297,9 +297,10 @@ class EventCfg:
             "asset_cfg": SceneEntityCfg("robot"),
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
+            "ee_frame_cfg": SceneEntityCfg("ee_frame"),
             "range_x": (-0.01, 0.01),
             "range_y": (-0.01, 0.01),
-            "range_z": (0.05, 0.06),
+            "range_z": (0.1, 0.12),
             "range_roll": (0.0, 0.0),
             "range_pitch": (math.pi, math.pi),
             "range_yaw": (-3.14, 3.14),
@@ -307,6 +308,35 @@ class EventCfg:
             "body_name": "wrist_3_link",
             "body_offset": OffsetCfg(pos=[0.0, 0.0, 0.15]),
             "default_joint_pos": [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0],
+        }
+    )
+
+
+    randomize_gripper_fingers_friction_coefficients = EventTerm(
+        func=mdp.randomize_friction_coefficients,
+        mode="reset",
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=["finger_left", "finger_right"]),
+            "static_friction_distribution_params": (1.4, 1.4),
+            "dynamic_friction_distribution_params": (1.4, 1.4),
+            "restitution_distribution_params": (0.1, 0.1), 
+            "operation": "abs",
+            "distribution": "uniform",
+            "make_consistent": True,  # Ensure dynamic friction <= static friction
+        }
+    )
+
+    randomize_object_friction_coefficients = EventTerm(
+        func=mdp.randomize_friction_coefficients,
+        mode="reset",
+        params={
+            "asset_cfg": SceneEntityCfg("object", body_names="forge_round_peg_8mm"),
+            "static_friction_distribution_params": (1.4, 1.4), 
+            "dynamic_friction_distribution_params": (1.4, 1.4), 
+            "restitution_distribution_params": (0.2, 0.2), 
+            "operation": "abs",
+            "distribution": "uniform",
+            "make_consistent": True,  # Ensure dynamic friction <= static friction
         }
     )
 

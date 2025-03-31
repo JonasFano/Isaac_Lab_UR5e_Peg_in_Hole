@@ -7,7 +7,7 @@ from isaaclab.envs.mdp.actions.actions_cfg import DifferentialInverseKinematicsA
 
 from . import peg_insert_env_cfg
 
-from taskparameters import TaskParams
+from taskparameters_peginsert import TaskParams
 
 @configclass
 class RelIK_UR5e_PegInsertEnvCfg(peg_insert_env_cfg.UR5e_PegInsertEnvCfg):
@@ -20,7 +20,7 @@ class RelIK_UR5e_PegInsertEnvCfg(peg_insert_env_cfg.UR5e_PegInsertEnvCfg):
         marker_cfg.prim_path = "/Visuals/FrameTransformer"
         self.scene.ee_frame = FrameTransformerCfg(
             prim_path="{ENV_REGEX_NS}/robot/base_link",
-            debug_vis=False, # True to visualize ee frame
+            debug_vis=False, # True to visualize ee frame or False
             visualizer_cfg=marker_cfg,
             target_frames=[
                 FrameTransformerCfg.FrameCfg(
