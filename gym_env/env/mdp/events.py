@@ -412,7 +412,7 @@ def randomize_initial_state(
     object.reset()
 
     # Close gripper
-    gripper_offset = (object_width - 0.0005) / 2
+    gripper_offset = (object_width - 0.001) / 2 # or 0.0005
     adjusted_gripper_close = [v + gripper_offset for v in gripper_close]
 
     joint_pos = asset.data.joint_pos[env_ids, :].clone()

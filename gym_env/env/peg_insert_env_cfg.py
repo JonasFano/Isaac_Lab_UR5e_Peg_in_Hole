@@ -229,10 +229,10 @@ class ObservationsCfg:
     @configclass
     class PolicyCfg(ObsGroup):
         """Observations for policy group."""
-        object_pos = ObsTerm(
-            mdp.object_position_in_robot_root_frame,
-            params={"asset_cfg": SceneEntityCfg("robot"), "object_cfg": SceneEntityCfg("object"),}
-        )
+        # object_pos = ObsTerm(
+        #     mdp.object_position_in_robot_root_frame,
+        #     params={"asset_cfg": SceneEntityCfg("robot"), "object_cfg": SceneEntityCfg("object"),}
+        # )
 
         gripper_joint_pos = ObsTerm(
             func=mdp.joint_pos, 
@@ -340,11 +340,11 @@ class EventCfg:
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
-    hole_ee_distance = RewTerm(
-        func=mdp.hole_ee_distance, 
-        params={"std": TaskParams.hole_ee_distance_std}, 
-        weight=TaskParams.hole_ee_distance_weight,
-    )
+    # hole_ee_distance = RewTerm(
+    #     func=mdp.hole_ee_distance, 
+    #     params={"std": TaskParams.hole_ee_distance_std}, 
+    #     weight=TaskParams.hole_ee_distance_weight,
+    # )
 
     # orientation_tracking = RewTerm(
     #     func=mdp.object_hole_orientation_error, 
@@ -354,6 +354,43 @@ class RewardsCfg:
     #     }, 
     #     weight=TaskParams.orientation_tracking_weight
     # )
+
+    # Keypoint distance rewards
+    keypoint_distance_coarse = RewTerm(
+        func=mdp.keypoint_distance,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "num_keypoints": 4,
+            "object_height": 0.05,
+            "a": 50,
+            "b": 2,
+        },
+        weight=1.0
+    )
+
+    keypoint_distance_fine = RewTerm(
+        func=mdp.keypoint_distance,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "num_keypoints": 4,
+            "object_height": 0.05,
+            "a": 100,
+            "b": 0,
+        },
+        weight=0.0
+    )
+
+
+    is_peg_inserted_penalty = RewTerm(
+        func=mdp.is_terminated_term,
+        params={
+            "term_keys": "is_peg_inserted",  # name of the termination you want to check
+        },
+        weight=1.0,
+    )
+
 
     # action penalty
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=TaskParams.action_rate_weight)
