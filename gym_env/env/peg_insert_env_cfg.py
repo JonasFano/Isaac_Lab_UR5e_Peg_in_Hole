@@ -13,12 +13,11 @@ from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils import configclass
 from isaaclab.actuators import ImplicitActuatorCfg
-from isaaclab.sim.schemas.schemas_cfg import RigidBodyPropertiesCfg, MassPropertiesCfg
+from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR
 from . import mdp
 import os
 import math
-from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
 
 
 from taskparameters_peginsert import TaskParams
@@ -234,20 +233,31 @@ class ObservationsCfg:
         #     params={"asset_cfg": SceneEntityCfg("robot"), "object_cfg": SceneEntityCfg("object"),}
         # )
 
-        gripper_joint_pos = ObsTerm(
-            func=mdp.joint_pos, 
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=["joint_left", "joint_right"]),},
-        )
+        # gripper_joint_pos = ObsTerm(
+        #     func=mdp.joint_pos, 
+        #     params={"asset_cfg": SceneEntityCfg("robot", joint_names=["joint_left", "joint_right"]),},
+        # )
 
         tcp_pose = ObsTerm(
             func=mdp.get_current_tcp_pose,
             params={"gripper_offset": TaskParams.gripper_offset, "robot_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
+            noise=Unoise(n_min=-0.0001, n_max=0.0001),
         )
 
         ee_wrench_b = ObsTerm(
             func=mdp.body_incoming_wrench_transform,
-            params={"asset_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])}
+            params={"asset_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
+            # noise=Unoise(n_min=-0.1, n_max=0.1),
         ) # Small force/torque if not in contact, small but noticeable changes when moving, gets big when in contact
+
+        noisy_hole_pose_estimate = ObsTerm(
+            func=mdp.noisy_hole_pose_estimate,
+            params={
+                "asset_cfg": SceneEntityCfg("robot"),
+                "hole_cfg": SceneEntityCfg("hole"),
+                "noise_std": 0.0025,  # 2.5 mm
+            },
+        )
 
         actions = ObsTerm(
             func=mdp.last_action
@@ -266,17 +276,18 @@ class EventCfg:
     """Configuration for events."""
     reset_all = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
 
-    # # Randomize the hole position 
-    # reset_hole_position = EventTerm(
-    #     func=mdp.reset_root_state_uniform,
-    #     mode="reset",
-    #     params={
-    #         "pose_range": {"x": TaskParams.hole_randomize_pose_range_x, "y": TaskParams.hole_randomize_pose_range_y, "z": TaskParams.hole_randomize_pose_range_z}, # "yaw": TaskParams.hole_randomize_pose_range_yaw},
-    #         "velocity_range": {},
-    #         "asset_cfg": SceneEntityCfg("hole"),
-    #     },
-    # )
+    # Randomize the hole position 
+    reset_hole_position = EventTerm(
+        func=mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {"x": TaskParams.hole_randomize_pose_range_x, "y": TaskParams.hole_randomize_pose_range_y, "z": TaskParams.hole_randomize_pose_range_z}, # "yaw": TaskParams.hole_randomize_pose_range_yaw},
+            "velocity_range": {},
+            "asset_cfg": SceneEntityCfg("hole"),
+        },
+    )
 
+    # To test randomize_initial_state domain randomization
     # reset_object_position = EventTerm(
     #     func=mdp.reset_root_state_uniform,
     #     mode="reset",
@@ -295,16 +306,21 @@ class EventCfg:
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
             "ee_frame_cfg": SceneEntityCfg("ee_frame"),
-            "range_x": (-0.01, 0.01),
-            "range_y": (-0.01, 0.01),
-            "range_z": (0.1, 0.12),
+            "range_x": (-0.02, 0.02),
+            "range_y": (-0.02, 0.02),
+            "range_z": (0.1, 0.125), # (0.076, 0.076),
             "range_roll": (0.0, 0.0),
             "range_pitch": (math.pi, math.pi),
             "range_yaw": (-3.14, 3.14),
             "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"],
             "body_name": "wrist_3_link",
-            "body_offset": OffsetCfg(pos=[0.0, 0.0, 0.15]),
+            "tcp_offset": [0.0, 0.0, 0.15],
             "default_joint_pos": [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0],
+            "gravity": [0.0, 0.0, -9.81],
+            "object_x_range": (-0.003, 0.003),
+            "object_z_range": (0.005, 0.02),
+            "gripper_close": [-0.025, -0.025],
+            "object_width": 0.008,
         }
     )
 
@@ -355,7 +371,7 @@ class RewardsCfg:
     #     weight=TaskParams.orientation_tracking_weight
     # )
 
-    # Keypoint distance rewards
+    # Dense keypoint distance rewards
     keypoint_distance_coarse = RewTerm(
         func=mdp.keypoint_distance,
         params={
@@ -379,20 +395,32 @@ class RewardsCfg:
             "a": 100,
             "b": 0,
         },
-        weight=0.0
+        weight=2.0
     )
 
+    # Sparse rewards
+    is_peg_centered = RewTerm(
+        func=mdp.is_peg_centered,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "object_height": 0.05,
+            "xy_threshold": 0.0025,
+            "z_threshold": 0.08,
+        },
+        weight=1.0,
+    )
 
-    is_peg_inserted_penalty = RewTerm(
+    is_peg_inserted = RewTerm(
         func=mdp.is_terminated_term,
         params={
-            "term_keys": "is_peg_inserted",  # name of the termination you want to check
+            "term_keys": "is_peg_inserted", 
         },
         weight=1.0,
     )
 
 
-    # action penalty
+    # Action penalty
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=TaskParams.action_rate_weight)
 
 
@@ -416,7 +444,7 @@ class TerminationsCfg:
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
             "object_height": 0.05,
-            "xy_threshold": 0.001,
+            "xy_threshold": 0.0025,
             "z_threshold": 0.001,
         }
     )

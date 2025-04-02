@@ -144,3 +144,29 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     # print("World forces: ", forces_world)
 
     return wrench_world.view(env.num_envs, -1)
+
+
+def noisy_hole_pose_estimate(
+    env: ManagerBasedRLEnv,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
+    noise_std: float = 0.0025,  # 2.5 mm
+) -> torch.Tensor:
+    """Provide a noisy estimate of the hole position in the robot's root frame."""
+    robot: RigidObject | Articulation = env.scene[asset_cfg.name]
+    hole: RigidObject | Articulation = env.scene[hole_cfg.name]
+
+    # Get hole position in world frame
+    hole_pos_w = hole.data.root_pos_w[:, :3]
+
+    # Transform to robot base frame
+    hole_pos_b, hole_quat_b = subtract_frame_transforms(
+        robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], hole_pos_w
+    )
+
+    # Add Gaussian noise to X and Y
+    xy_noise = torch.randn_like(hole_pos_b[:, :2]) * noise_std
+    hole_pos_b[:, :2] += xy_noise
+
+    hole_pose_b = torch.cat((hole_pos_b, hole_quat_b), dim=-1)
+    return hole_pose_b

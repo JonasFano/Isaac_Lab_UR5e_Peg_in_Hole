@@ -296,20 +296,20 @@ def randomize_initial_state(
         hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
         object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
         ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame"),
-        range_x: tuple[float, float] = (-0.02, 0.02),
-        range_y: tuple[float, float] = (-0.02, 0.02),
-        range_z: tuple[float, float] = (0.05, 0.1),
+        range_x: tuple[float, float] = (-0.0125, 0.0125),
+        range_y: tuple[float, float] = (-0.0125, 0.0125),
+        range_z: tuple[float, float] = (0.1, 0.125),
         range_roll: tuple[float, float] = (0.0, 0.0),
         range_pitch: tuple[float, float] = (math.pi, math.pi),
         range_yaw: tuple[float, float] = (-3.14, 3.14),
         joint_names: list[str] = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"],
         body_name: str = "wrist_3_link",
-        body_offset: OffsetCfg = OffsetCfg(pos=[0.0, 0.0, 0.15]),
+        tcp_offset: list[float] = [0.0, 0.0, 0.15],
         default_joint_pos = [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0],
-        gravity: carb = carb.Float3(0.0, 0.0, -9.81),
-        object_x_range: tuple[float, float] =(-0.005, 0.005),  #(-0.01, 0.01),
-        object_z_range: tuple[float, float] = (0.01, 0.02),
-        gripper_close: list[float, float] = [-0.025, -0.025],
+        gravity: list[float] = [0.0, 0.0, -9.81],
+        object_x_range: tuple[float, float] = (-0.005, 0.005),  #(-0.01, 0.01),
+        object_z_range: tuple[float, float] = (0.005, 0.025), #(0.01, 0.02),
+        gripper_close: list[float] = [-0.025, -0.025],
         object_width: float = 0.008,
     ):
     """Randomize the starting TCP pose within a predefined range above the hole and randomize the peg pose and ensure it is grasped upon reset."""
@@ -323,27 +323,25 @@ def randomize_initial_state(
     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
 
     pose_command_b = torch.zeros(env.num_envs, 7, device=env.device)
-
-    # Use IK with Levenberg-Marquardt to get joint positions for the sampled pose
     bad_envs = env_ids.clone()
 
     while True:
         n_bad = bad_envs.shape[0]
 
-        # print(bad_envs)
+        # print("Bad envs: ", n_bad)
 
-        # Position
+        # sample only for bad envs!
         r = torch.empty(n_bad, device=env.device)
-        pose_command_b[env_ids, 0] = r.uniform_(*range_x)
-        pose_command_b[env_ids, 1] = r.uniform_(*range_y)
-        pose_command_b[env_ids, 2] = r.uniform_(*range_z)
-
+        pose_command_b[bad_envs, 0] = r.uniform_(*range_x)
+        pose_command_b[bad_envs, 1] = r.uniform_(*range_y)
+        pose_command_b[bad_envs, 2] = r.uniform_(*range_z)
+        
         # Orientation
-        euler_angles = torch.zeros_like(pose_command_b[env_ids, :3])
+        euler_angles = torch.zeros_like(pose_command_b[bad_envs, :3])
         euler_angles[:, 0].uniform_(*range_roll)
         euler_angles[:, 1].uniform_(*range_pitch)
         euler_angles[:, 2].uniform_(*range_yaw)
-        pose_command_b[env_ids, 3:] = quat_from_euler_xyz(euler_angles[:, 0], euler_angles[:, 1], euler_angles[:, 2])
+        pose_command_b[bad_envs, 3:] = quat_from_euler_xyz(euler_angles[:, 0], euler_angles[:, 1], euler_angles[:, 2])
 
         hole_position = hole_position_in_robot_base_frame(asset, hole)[:, :3]
 
@@ -362,20 +360,31 @@ def randomize_initial_state(
         if num_joints == asset.num_joints:
             joint_ids = slice(None)
 
+        body_offset = OffsetCfg(pos=tcp_offset)
+
+        # Run IK only on bad_envs
         pose_error = compute_inverse_kinematics(env, env_ids=bad_envs, asset=asset, joint_ids=joint_ids, body_idx=body_idx, command=above_hole_sampled_pose, body_offset=body_offset)
 
-        pose_error, _ = get_pose_error(env, env_ids, asset, body_idx, above_hole_sampled_pose, body_offset)
-        # print("Pose Error: ", pose_error)
+        # print("Pose Error", pose_error)
 
+        # Then recompute pose error for all env_ids
+        pose_error, _ = get_pose_error(env, env_ids, asset, body_idx, above_hole_sampled_pose, body_offset)
+
+        # Determine new bad_envs
         pos_error = torch.linalg.norm(pose_error[:, :3], dim=1) > 1e-3
         angle_error = torch.norm(pose_error[:, 3:7], dim=1) > 1e-3
         any_error = torch.logical_or(pos_error, angle_error)
-        bad_envs = bad_envs[any_error.nonzero(as_tuple=False).squeeze(-1)]
 
-        # print(any_error)
+        if env_ids.numel() == any_error.numel():
+            bad_envs = env_ids[any_error]
+        elif env_ids.numel() == 1 and any_error[env_ids.item()]:
+            bad_envs = env_ids
+        else:
+            bad_envs = torch.empty(0, dtype=torch.long, device=env.device)
 
-        # Check IK succeeded for all envs, otherwise try again for those envs
-        if bad_envs.shape[0] == 0:
+        # print(len(bad_envs))
+
+        if len(bad_envs) == 0:
             break
 
         # Set robot to default joint position in all bad_envs
@@ -400,7 +409,10 @@ def randomize_initial_state(
     # Transform local offset into world frame
     x_offset_world = torch.bmm(tcp_rot_w, tcp_local_offset).squeeze(-1)  # [B, 3]
 
-    # positions = hole.data.root_pos_w[env_ids, :3] # To test terminating environments if the peg is inserted in the hole
+    # To test terminating environments if the peg is inserted in the hole
+    # positions = hole.data.root_pos_w[env_ids, :3] 
+    # positions[:, 2:3] += sampled_z + torch.tensor([0.05], device=env.device).repeat(len(env_ids), 1)
+    # Otherwise use this
     positions = tcp_pos_w.clone()
     positions += x_offset_world
     positions[:, 2:3] += sampled_z
@@ -412,23 +424,24 @@ def randomize_initial_state(
     object.reset()
 
     # Close gripper
-    gripper_offset = (object_width - 0.001) / 2 # or 0.0005
+    # Set gripper_offset = 0.025 to fully open the gripper
+    gripper_offset = (object_width - 0.001) / 2 # or 0.0005 
     adjusted_gripper_close = [v + gripper_offset for v in gripper_close]
 
     joint_pos = asset.data.joint_pos[env_ids, :].clone()
-    # joint_pos[env_ids, 6:8] = torch.tensor(gripper_close, device=env.device).repeat(len(env_ids), 1) # Fully closing the gripper
-    joint_pos[:, 6:8] = torch.tensor(adjusted_gripper_close, device=env.device).repeat(len(env_ids), 1) 
-    
+    # joint_pos[:, 6:8] = torch.tensor(gripper_close, device=env.device).repeat(len(env_ids), 1) # Fully closing the gripper
+    joint_pos[:, 6:8] = torch.tensor(adjusted_gripper_close, device=env.device).repeat(len(env_ids), 1) # Otherwise
+
     joint_vel = torch.zeros_like(joint_pos)
 
     asset.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
     asset.set_joint_position_target(joint_pos, env_ids=env_ids)
 
     # Enable gravity
-    # physics_sim_view.set_gravity(carb.Float3(0.0, 0.0, -9.81))
-    physics_sim_view.set_gravity(gravity)
+    physics_sim_view.set_gravity(carb.Float3(*gravity))
 
 
+# ---------------- Helper Functions ---------------------
 
 def get_pose_error(
         env: ManagerBasedRLEnv, 
@@ -444,7 +457,7 @@ def get_pose_error(
     ee_pos_curr, ee_quat_curr = compute_frame_pose(env, asset, body_idx, body_offset)
 
     position_error, axis_angle_error = compute_pose_error(
-        ee_pos_curr[env_ids, :], ee_quat_curr[env_ids, :], ee_pos_des[env_ids, :], ee_quat_des[env_ids, :], rot_error_type="axis_angle"
+        ee_pos_curr, ee_quat_curr, ee_pos_des, ee_quat_des, rot_error_type="axis_angle"
     )
     pose_error = torch.cat((position_error, axis_angle_error), dim=1)
     return pose_error, ee_quat_curr
@@ -455,37 +468,45 @@ def compute_inverse_kinematics(
         env_ids: torch.Tensor | None, 
         asset: RigidObject | Articulation, 
         joint_ids: list, 
-        body_idx: list, 
+        body_idx: int, 
         command: torch.Tensor, 
         body_offset: OffsetCfg,
     ) -> tuple[torch.Tensor, torch.Tensor]:
+
     ik_time = 0.0
-    while ik_time < 0.9:
-        joint_pos = asset.data.joint_pos[env_ids, :]
+    while ik_time < 0.1:
+        joint_pos = asset.data.joint_pos.clone()
 
         pose_error, ee_quat_curr = get_pose_error(env, env_ids, asset, body_idx, command, body_offset)
-        # print("Pose Error: ", pose_error)
 
-        # compute the delta in joint-space
         if ee_quat_curr.norm() != 0:
             jacobian = compute_frame_jacobian(env, asset, body_idx, joint_ids, body_offset)
 
             delta_joint_pos = compute_delta_joint_pos(env=env, delta_pose=pose_error, jacobian=jacobian)
-            # print("Delta Joint Position: ", delta_joint_pos[env_ids.unsqueeze(1), joint_ids])
 
-            # print("Joint pos: ", joint_pos[:, joint_ids])
-            joint_pos[:, joint_ids] += delta_joint_pos[env_ids.unsqueeze(1), joint_ids]
+            if isinstance(joint_ids, list):
+                joint_ids = torch.tensor(joint_ids, device=env.device)
+
+            # Also simplify this indexing
+            joint_pos[:, joint_ids] += delta_joint_pos[:, joint_ids]
         else:
             joint_pos = joint_pos.clone()
 
         joint_vel = torch.zeros_like(joint_pos)
 
-        asset.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
-        asset.set_joint_position_target(joint_pos, env_ids=env_ids)
+        # print(joint_pos.shape)
+        # print(joint_vel.shape)
+        # print(len(env_ids))
+
+        # asset.write_joint_state_to_sim(joint_pos, joint_vel)
+        # asset.set_joint_position_target(joint_pos)
+        asset.write_joint_state_to_sim(joint_pos[env_ids], joint_vel[env_ids], env_ids=env_ids)
+        asset.set_joint_position_target(joint_pos[env_ids], env_ids=env_ids)
 
         ik_time += env.physics_dt
 
     return pose_error
+
 
 
 def compute_delta_joint_pos(env: ManagerBasedRLEnv, delta_pose: torch.Tensor, jacobian: torch.Tensor, lambda_val = 0.01) -> torch.Tensor:

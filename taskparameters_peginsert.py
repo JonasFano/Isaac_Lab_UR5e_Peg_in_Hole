@@ -6,7 +6,7 @@ class TaskParams:
     ### General Simulation Params ###
     #################################
     decimation = 2
-    episode_length_s = 5.0 # 0.5 # 5.0
+    episode_length_s = 5.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 0.01
 
 
@@ -16,7 +16,7 @@ class TaskParams:
     command_type = "pose"
     use_relative_mode = True
     ik_method = "dls"
-    action_scale= 0.005 # 0.0
+    action_scale= 0.0 # 0.005 # 0.0
 
 
     ##############
@@ -131,12 +131,12 @@ class TaskParams:
     ############
     # Hole parameters
     hole_init_mass = 10
-    hole_init_pos = (-0.2, 0.2, 0.0)
-    hole_randomize_mass_range = (5, 15)
+    hole_init_pos = (-0.2, 0.2, 0.0025)
+    hole_randomize_mass_range = (10, 15)
     hole_randomize_mass_operation = "abs"
     hole_randomize_mass_distribution = "uniform"
     hole_randomize_mass_recompute_inertia = True
-    hole_randomize_pose_range_x = (-0.02, 0.02) #(0.0, 0.0) #(-0.01, 0.01)
-    hole_randomize_pose_range_y = (-0.02, 0.02) #(0.0, 0.0) #(-0.01, 0.01)
+    hole_randomize_pose_range_x = (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
+    hole_randomize_pose_range_y = (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
     hole_randomize_pose_range_z = (0.0, 0.0)
     # hole_randomize_pose_range_yaw = (-math.pi, math.pi)
