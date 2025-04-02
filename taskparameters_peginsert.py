@@ -6,7 +6,7 @@ class TaskParams:
     ### General Simulation Params ###
     #################################
     decimation = 2
-    episode_length_s = 5.0 # 10.0  # 10.0 # 0.5 # 5.0
+    episode_length_s = 10.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 0.01
 
 
@@ -16,7 +16,7 @@ class TaskParams:
     command_type = "pose"
     use_relative_mode = True
     ik_method = "dls"
-    action_scale= 0.0 # 0.005 # 0.0
+    action_scale= 0.005 # 0.005 # 0.0
 
 
     ##############
