@@ -143,6 +143,10 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     # Concatenate transformed force and torque to return full wrench in world frame
     wrench_world = torch.cat((forces_world, torques_world), dim=-1)
 
+    # Cap wrench values to +/- 10000
+    wrench_world = torch.clamp(wrench_world, min=-10000.0, max=10000.0)
+
+
     # print("World forces: ", forces_world)
 
     # ---------- Logging to disk directly inside the function ----------
