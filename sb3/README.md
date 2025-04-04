@@ -39,4 +39,5 @@ Contains all necessary information on how to start training and how to run a tra
     source isaaclab/bin/activate
     cd /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3
     wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_005 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_005_v2 config_sb3_ppo.yaml
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001 config_sb3_ppo.yaml
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v2 config_sb3_ppo.yaml
