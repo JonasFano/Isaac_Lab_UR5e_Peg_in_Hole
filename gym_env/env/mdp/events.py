@@ -292,24 +292,29 @@ def _randomize_prop_by_op(
 def randomize_initial_state(
         env: ManagerBasedRLEnv,
         env_ids: torch.Tensor | None,
-        asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+        robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
         hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
         object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
         ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame"),
-        range_x: tuple[float, float] = (-0.0125, 0.0125),
-        range_y: tuple[float, float] = (-0.0125, 0.0125),
-        range_z: tuple[float, float] = (0.1, 0.125),
-        range_roll: tuple[float, float] = (0.0, 0.0),
-        range_pitch: tuple[float, float] = (math.pi, math.pi),
-        range_yaw: tuple[float, float] = (-3.14, 3.14),
+        tcp_rand_range_x: tuple[float, float] = (-0.0125, 0.0125),
+        tcp_rand_range_y: tuple[float, float] = (-0.0125, 0.0125),
+        tcp_rand_range_z: tuple[float, float] = (0.1, 0.125),
+        tcp_rand_range_roll: tuple[float, float] = (0.0, 0.0),
+        tcp_rand_range_pitch: tuple[float, float] = (math.pi, math.pi),
+        tcp_rand_range_yaw: tuple[float, float] = (-3.14, 3.14),
         joint_names: list[str] = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"],
-        body_name: str = "wrist_3_link",
+        ee_body_name: str = "wrist_3_link",
         tcp_offset: list[float] = [0.0, 0.0, 0.15],
+        ik_max_iters: int = 10,
+        pos_error_threshold: float = 1e-3,
+        angle_error_threshold: float = 1e-3,
+        levenberg_marquardt_lambda: float = 0.01,
         default_joint_pos = [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0],
         gravity: list[float] = [0.0, 0.0, -9.81],
-        object_x_range: tuple[float, float] = (-0.005, 0.005),  #(-0.01, 0.01),
-        object_z_range: tuple[float, float] = (0.005, 0.025), #(0.01, 0.02),
-        gripper_close: list[float] = [-0.025, -0.025],
+        object_rand_range_x: tuple[float, float] = (-0.005, 0.005),  #(-0.01, 0.01),
+        object_rand_range_z: tuple[float, float] = (0.005, 0.025), #(0.01, 0.02),
+        gripper_joint_names: list[str] = ["joint_left", "joint_right"],
+        gripper_joint_pos_close: list[float] = [-0.025, -0.025],
         object_width: float = 0.008,
     ):
     """Randomize the starting TCP pose within a predefined range above the hole and randomize the peg pose and ensure it is grasped upon reset."""
@@ -317,12 +322,12 @@ def randomize_initial_state(
     physics_sim_view: physx.SimulationView = sim_utils.SimulationContext.instance().physics_sim_view
     physics_sim_view.set_gravity(carb.Float3(0.0, 0.0, 0.0))
 
-    asset: RigidObject | Articulation = env.scene[asset_cfg.name]
+    robot: RigidObject | Articulation = env.scene[robot_cfg.name]
     object: RigidObject | Articulation = env.scene[object_cfg.name]
     hole: RigidObject | Articulation = env.scene[hole_cfg.name]
     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
 
-    pose_command_b = torch.zeros(env.num_envs, 7, device=env.device)
+    tcp_target_pose_b = torch.zeros(env.num_envs, 7, device=env.device)
     bad_envs = env_ids.clone()
 
     while True:
@@ -332,47 +337,58 @@ def randomize_initial_state(
 
         # sample only for bad envs!
         r = torch.empty(n_bad, device=env.device)
-        pose_command_b[bad_envs, 0] = r.uniform_(*range_x)
-        pose_command_b[bad_envs, 1] = r.uniform_(*range_y)
-        pose_command_b[bad_envs, 2] = r.uniform_(*range_z)
+        tcp_target_pose_b[bad_envs, 0] = r.uniform_(*tcp_rand_range_x)
+        tcp_target_pose_b[bad_envs, 1] = r.uniform_(*tcp_rand_range_y)
+        tcp_target_pose_b[bad_envs, 2] = r.uniform_(*tcp_rand_range_z)
         
         # Orientation
-        euler_angles = torch.zeros_like(pose_command_b[bad_envs, :3])
-        euler_angles[:, 0].uniform_(*range_roll)
-        euler_angles[:, 1].uniform_(*range_pitch)
-        euler_angles[:, 2].uniform_(*range_yaw)
-        pose_command_b[bad_envs, 3:] = quat_from_euler_xyz(euler_angles[:, 0], euler_angles[:, 1], euler_angles[:, 2])
+        euler_angles = torch.zeros_like(tcp_target_pose_b[bad_envs, :3])
+        euler_angles[:, 0].uniform_(*tcp_rand_range_roll)
+        euler_angles[:, 1].uniform_(*tcp_rand_range_pitch)
+        euler_angles[:, 2].uniform_(*tcp_rand_range_yaw)
+        tcp_target_pose_b[bad_envs, 3:] = quat_from_euler_xyz(euler_angles[:, 0], euler_angles[:, 1], euler_angles[:, 2])
 
-        hole_position = hole_position_in_robot_base_frame(asset, hole)[:, :3]
+        hole_position_b = hole_position_in_robot_base_frame(robot, hole)[:, :3]
+        tcp_target_pose_b[bad_envs, :3] += hole_position_b[bad_envs, :3]
 
-        above_hole_sampled_pose = pose_command_b
-        above_hole_sampled_pose[bad_envs, :3] += hole_position[bad_envs, :3]
+        # print("Hole Position: ", hole_position_b)
+        # print("Sampled Pose: ", tcp_target_pose_b)
 
-        # print("Hole Position: ", hole_position)
-        # print("Sampled Pose: ", above_hole_sampled_pose)
-
-        joint_ids, joint_names = asset.find_joints(joint_names)
+        joint_ids, joint_names = robot.find_joints(joint_names)
         num_joints = len(joint_ids)
-        body_ids, _ = asset.find_bodies(body_name)
+        body_ids, _ = robot.find_bodies(ee_body_name)
         body_idx = body_ids[0]
 
         # Avoid indexing across all joints for efficiency
-        if num_joints == asset.num_joints:
+        if num_joints == robot.num_joints:
             joint_ids = slice(None)
+
+        if isinstance(joint_ids, list):
+            joint_ids = torch.tensor(joint_ids, device=env.device)
 
         body_offset = OffsetCfg(pos=tcp_offset)
 
         # Run IK only on bad_envs
-        pose_error = compute_inverse_kinematics(env, env_ids=bad_envs, asset=asset, joint_ids=joint_ids, body_idx=body_idx, command=above_hole_sampled_pose, body_offset=body_offset)
+        compute_inverse_kinematics(
+            env, 
+            env_ids=bad_envs, 
+            robot=robot, 
+            joint_ids=joint_ids, 
+            body_idx=body_idx, 
+            command=tcp_target_pose_b, 
+            body_offset=body_offset,
+            ik_max_iters=ik_max_iters,
+            pos_error_threshold=pos_error_threshold,
+            angle_error_threshold=angle_error_threshold,
+            levenberg_marquardt_lambda=levenberg_marquardt_lambda
+        )
 
-        # print("Pose Error", pose_error)
-
-        # Then recompute pose error for all env_ids
-        pose_error, _ = get_pose_error(env, env_ids, asset, body_idx, above_hole_sampled_pose, body_offset)
+        # Compute TCP pose error for all env_ids
+        tcp_pose_error, _ = get_tcp_pose_error(env, env_ids, robot, body_idx, tcp_target_pose_b, body_offset)
 
         # Determine new bad_envs
-        pos_error = torch.linalg.norm(pose_error[:, :3], dim=1) > 1e-3
-        angle_error = torch.norm(pose_error[:, 3:7], dim=1) > 1e-3
+        pos_error = torch.linalg.norm(tcp_pose_error[:, :3], dim=1) > pos_error_threshold
+        angle_error = torch.norm(tcp_pose_error[:, 3:7], dim=1) > angle_error_threshold
         any_error = torch.logical_or(pos_error, angle_error)
 
         if env_ids.numel() == any_error.numel():
@@ -388,54 +404,58 @@ def randomize_initial_state(
             break
 
         # Set robot to default joint position in all bad_envs
-        set_robot_to_default_joint_pos(env, asset, joints=default_joint_pos, env_ids=bad_envs, gripper_width = 0)
+        set_robot_to_default_joint_pos(env, robot, joints=default_joint_pos, env_ids=bad_envs, gripper_width = 0)
 
     # Get current end-effector pose in world base frame
     tcp_pos_w = ee_frame.data.target_pos_w[env_ids, 0, :]
     tcp_quat_w = ee_frame.data.target_quat_w[env_ids, 0, :]
 
     # Sample z offset for the object/peg in world frame
-    sampled_z = torch.rand(len(env_ids), 1, device=tcp_pos_w.device) * (object_z_range[1] - object_z_range[0]) + object_z_range[0]
+    object_sampled_z = torch.rand(len(env_ids), 1, device=tcp_pos_w.device) * (object_rand_range_z[1] - object_rand_range_z[0]) + object_rand_range_z[0]
 
     # Sample x offset in TCP frame
-    sampled_x_tcp = torch.rand(len(env_ids), 1, device=tcp_pos_w.device) * (object_x_range[1] - object_x_range[0]) + object_x_range[0]
+    object_sampled_x_tcp = torch.rand(len(env_ids), 1, device=tcp_pos_w.device) * (object_rand_range_x[1] - object_rand_range_x[0]) + object_rand_range_x[0]
 
     # Convert quaternions to rotation matrices
     tcp_rot_w = matrix_from_quat(tcp_quat_w)
 
     # Create local offset [x, 0, 0] in TCP frame
-    tcp_local_offset = torch.cat([sampled_x_tcp, torch.zeros_like(sampled_x_tcp), torch.zeros_like(sampled_x_tcp)], dim=-1).unsqueeze(-1)  # [B, 3, 1]
+    object_offset_tcp = torch.cat([object_sampled_x_tcp, torch.zeros_like(object_sampled_x_tcp), torch.zeros_like(object_sampled_x_tcp)], dim=-1).unsqueeze(-1)  # [B, 3, 1]
 
     # Transform local offset into world frame
-    x_offset_world = torch.bmm(tcp_rot_w, tcp_local_offset).squeeze(-1)  # [B, 3]
+    object_x_offset_w = torch.bmm(tcp_rot_w, object_offset_tcp).squeeze(-1)  # [B, 3]
 
     # To test terminating environments if the peg is inserted in the hole
     # positions = hole.data.root_pos_w[env_ids, :3] 
     # positions[:, 2:3] += sampled_z + torch.tensor([0.05], device=env.device).repeat(len(env_ids), 1)
     # Otherwise use this
-    positions = tcp_pos_w.clone()
-    positions += x_offset_world
-    positions[:, 2:3] += sampled_z
-    orientations = tcp_quat_w
+    new_object_pos = tcp_pos_w.clone() + object_x_offset_w
+    new_object_pos[:, 2:3] += object_sampled_z
+    new_object_quat = tcp_quat_w
 
     # set into the physics simulation
-    object.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
+    object.write_root_pose_to_sim(torch.cat([new_object_pos, new_object_quat], dim=-1), env_ids=env_ids)
     object.write_root_velocity_to_sim(torch.zeros(len(env_ids), 6, device=env.device), env_ids=env_ids)
     object.reset()
 
     # Close gripper
     # Set gripper_offset = 0.025 to fully open the gripper
-    gripper_offset = (object_width - 0.001) / 2 # or 0.0005 
-    adjusted_gripper_close = [v + gripper_offset for v in gripper_close]
+    gripper_joint_pos_offset = (object_width - 0.001) / 2 # or 0.0005 
+    adjusted_gripper_joint_pos_close = [v + gripper_joint_pos_offset for v in gripper_joint_pos_close]
 
-    joint_pos = asset.data.joint_pos[env_ids, :].clone()
-    # joint_pos[:, 6:8] = torch.tensor(gripper_close, device=env.device).repeat(len(env_ids), 1) # Fully closing the gripper
-    joint_pos[:, 6:8] = torch.tensor(adjusted_gripper_close, device=env.device).repeat(len(env_ids), 1) # Otherwise
+    joint_pos = robot.data.joint_pos[env_ids, :].clone()
+
+    gripper_joint_ids, _ = robot.find_joints(gripper_joint_names)
+    if isinstance(gripper_joint_ids, list):
+        gripper_joint_ids = torch.tensor(gripper_joint_ids, device=env.device)
+
+    # joint_pos[:, gripper_joint_ids] = torch.tensor(gripper_joint_pos_close, device=env.device).repeat(len(env_ids), 1) # Fully closing the gripper
+    joint_pos[:, gripper_joint_ids] = torch.tensor(adjusted_gripper_joint_pos_close, device=env.device).repeat(len(env_ids), 1) # Otherwise
 
     joint_vel = torch.zeros_like(joint_pos)
 
-    asset.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
-    asset.set_joint_position_target(joint_pos, env_ids=env_ids)
+    robot.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
+    robot.set_joint_position_target(joint_pos, env_ids=env_ids)
 
     # Enable gravity
     physics_sim_view.set_gravity(carb.Float3(*gravity))
@@ -443,73 +463,87 @@ def randomize_initial_state(
 
 # ---------------- Helper Functions ---------------------
 
-def get_pose_error(
-        env: ManagerBasedRLEnv, 
-        env_ids: torch.Tensor | None, 
-        asset: RigidObject | Articulation, 
-        body_idx: int, 
-        command: torch.Tensor,
-        body_offset: OffsetCfg,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-    ee_pos_des = command[:, 0:3]
-    ee_quat_des = command[:, 3:7]
+def get_tcp_pose_error(
+    env: ManagerBasedRLEnv, 
+    env_ids: torch.Tensor, 
+    robot: RigidObject | Articulation, 
+    body_idx: int, 
+    command: torch.Tensor,
+    body_offset: OffsetCfg,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    ee_pos_des = command[env_ids, 0:3]
+    ee_quat_des = command[env_ids, 3:7]
 
-    ee_pos_curr, ee_quat_curr = compute_frame_pose(env, asset, body_idx, body_offset)
+    ee_pos_curr, ee_quat_curr = compute_frame_pose(env, robot, body_idx, body_offset, env_ids=env_ids)
 
     position_error, axis_angle_error = compute_pose_error(
         ee_pos_curr, ee_quat_curr, ee_pos_des, ee_quat_des, rot_error_type="axis_angle"
     )
-    pose_error = torch.cat((position_error, axis_angle_error), dim=1)
-    return pose_error, ee_quat_curr
+    tcp_pose_error = torch.cat((position_error, axis_angle_error), dim=1)
+    return tcp_pose_error, ee_quat_curr
+
 
 
 def compute_inverse_kinematics(
-        env: ManagerBasedRLEnv, 
-        env_ids: torch.Tensor | None, 
-        asset: RigidObject | Articulation, 
-        joint_ids: list, 
-        body_idx: int, 
-        command: torch.Tensor, 
-        body_offset: OffsetCfg,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    env: ManagerBasedRLEnv, 
+    env_ids: torch.Tensor | None, 
+    robot: RigidObject | Articulation, 
+    joint_ids: torch.Tensor, 
+    body_idx: int, 
+    command: torch.Tensor, 
+    body_offset: OffsetCfg,
+    ik_max_iters: int = 10,
+    pos_error_threshold: float = 1e-3,
+    angle_error_threshold: float = 1e-3,
+    levenberg_marquardt_lambda: float = 0.01
+) -> torch.Tensor:
+    """
+    Solves inverse kinematics via iterative updates using the Jacobian.
 
-    ik_time = 0.0
-    while ik_time < 0.1:
-        joint_pos = asset.data.joint_pos.clone()
+    Args:
+        env: The environment.
+        env_ids: Environment indices to solve for.
+        robot: Robot articulation.
+        joint_ids: Joint indices to optimise.
+        body_idx: Index of the end-effector body.
+        command: Target poses [N, 7] (pos + quat).
+        body_offset: Offset of the TCP relative to the end-effector link.
+        ik_max_iters: Max number of IK iterations per call.
+        pos_error_threshold: Early exit if all envs have position error below this.
+        angle_error_threshold: Early exit if all envs have orientation error below this.
 
-        pose_error, ee_quat_curr = get_pose_error(env, env_ids, asset, body_idx, command, body_offset)
+    Returns:
+        Final pose error after last iteration [N, 7].
+    """
+    for _ in range(ik_max_iters):
+        joint_pos = robot.data.joint_pos[env_ids].clone()
 
-        if ee_quat_curr.norm() != 0:
-            jacobian = compute_frame_jacobian(env, asset, body_idx, joint_ids, body_offset)
+        tcp_pose_error, ee_quat_curr = get_tcp_pose_error(env, env_ids, robot, body_idx, command, body_offset)
 
-            delta_joint_pos = compute_delta_joint_pos(env=env, delta_pose=pose_error, jacobian=jacobian)
+        # Early stopping
+        pos_error = torch.linalg.norm(tcp_pose_error[:, :3], dim=-1)
+        ang_error = torch.norm(tcp_pose_error[:, 3:], dim=-1)
+        if torch.all(pos_error < pos_error_threshold) and torch.all(ang_error < angle_error_threshold):
+            break
 
-            if isinstance(joint_ids, list):
-                joint_ids = torch.tensor(joint_ids, device=env.device)
+        if torch.any(ee_quat_curr.norm(dim=-1) == 0):
+            continue
 
-            # Also simplify this indexing
-            joint_pos[:, joint_ids] += delta_joint_pos[:, joint_ids]
-        else:
-            joint_pos = joint_pos.clone()
+        jacobian = compute_frame_jacobian(env, robot, env_ids, body_idx, joint_ids, body_offset)
+        delta_joint_pos = compute_delta_joint_pos(env, tcp_pose_error, jacobian, levenberg_marquardt_lambda = levenberg_marquardt_lambda)
 
-        joint_vel = torch.zeros_like(joint_pos)
+        joint_pos[:, joint_ids] += delta_joint_pos
 
-        # print(joint_pos.shape)
-        # print(joint_vel.shape)
-        # print(len(env_ids))
-
-        # asset.write_joint_state_to_sim(joint_pos, joint_vel)
-        # asset.set_joint_position_target(joint_pos)
-        asset.write_joint_state_to_sim(joint_pos[env_ids], joint_vel[env_ids], env_ids=env_ids)
-        asset.set_joint_position_target(joint_pos[env_ids], env_ids=env_ids)
-
-        ik_time += env.physics_dt
-
-    return pose_error
+        robot.write_joint_state_to_sim(joint_pos, torch.zeros_like(joint_pos), env_ids=env_ids)
+        robot.set_joint_position_target(joint_pos, env_ids=env_ids)
 
 
-
-def compute_delta_joint_pos(env: ManagerBasedRLEnv, delta_pose: torch.Tensor, jacobian: torch.Tensor, lambda_val = 0.01) -> torch.Tensor:
+def compute_delta_joint_pos(
+    env: ManagerBasedRLEnv, 
+    delta_pose: torch.Tensor, 
+    jacobian: torch.Tensor, 
+    levenberg_marquardt_lambda: float = 0.01,
+) -> torch.Tensor:
     """Computes the change in joint position that yields the desired change in pose.
 
     The method uses the Jacobian mapping from joint-space velocities to end-effector velocities
@@ -524,10 +558,8 @@ def compute_delta_joint_pos(env: ManagerBasedRLEnv, delta_pose: torch.Tensor, ja
         The desired delta in joint space. Shape is (N, num-jointsß).
     """
     # compute the delta in joint-space
-    lambda_val = lambda_val # For Levenberg-Marquardt
-    # computation
     jacobian_T = torch.transpose(jacobian, dim0=1, dim1=2)
-    lambda_matrix = (lambda_val**2) * torch.eye(n=jacobian.shape[1], device=env.device)
+    lambda_matrix = (levenberg_marquardt_lambda**2) * torch.eye(n=jacobian.shape[1], device=env.device)
     delta_joint_pos = (
         jacobian_T @ torch.inverse(jacobian @ jacobian_T + lambda_matrix) @ delta_pose.unsqueeze(-1)
     )
@@ -536,44 +568,49 @@ def compute_delta_joint_pos(env: ManagerBasedRLEnv, delta_pose: torch.Tensor, ja
     return delta_joint_pos
 
 
-def compute_frame_pose(env: ManagerBasedRLEnv, asset: RigidObject | Articulation, body_idx: int, body_offset: OffsetCfg) -> tuple[torch.Tensor, torch.Tensor]:
-    """Computes the pose of the target frame in the root frame.
+def compute_frame_pose(
+    env: ManagerBasedRLEnv,
+    robot: RigidObject | Articulation,
+    body_idx: int,
+    body_offset: OffsetCfg,
+    env_ids: torch.Tensor | None = None,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    env_ids = slice(None) if env_ids is None else env_ids
 
-    Returns:
-        A tuple of the body's position and orientation in the root frame.
-    """
     if body_offset is not None:
-        offset_pos = torch.tensor(body_offset.pos, device=env.device).repeat(env.num_envs, 1)
-        offset_rot = torch.tensor(body_offset.rot, device=env.device).repeat(env.num_envs, 1)
+        offset_pos = torch.tensor(body_offset.pos, device=env.device).repeat(len(env_ids), 1)
+        offset_rot = torch.tensor(body_offset.rot, device=env.device).repeat(len(env_ids), 1)
 
-    # obtain quantities from simulation
-    ee_pos_w = asset.data.body_pos_w[:, body_idx]
-    ee_quat_w = asset.data.body_quat_w[:, body_idx]
-    root_pos_w = asset.data.root_pos_w
-    root_quat_w = asset.data.root_quat_w
-    # compute the pose of the body in the root frame
+    ee_pos_w = robot.data.body_pos_w[env_ids, body_idx]
+    ee_quat_w = robot.data.body_quat_w[env_ids, body_idx]
+    root_pos_w = robot.data.root_pos_w[env_ids]
+    root_quat_w = robot.data.root_quat_w[env_ids]
+
     ee_pose_b, ee_quat_b = math_utils.subtract_frame_transforms(root_pos_w, root_quat_w, ee_pos_w, ee_quat_w)
-    # account for the offset
     if body_offset is not None:
-        ee_pose_b, ee_quat_b = math_utils.combine_frame_transforms(
-            ee_pose_b, ee_quat_b, offset_pos, offset_rot
-        )
+        ee_pose_b, ee_quat_b = math_utils.combine_frame_transforms(ee_pose_b, ee_quat_b, offset_pos, offset_rot)
+
     return ee_pose_b, ee_quat_b
 
 
-def compute_frame_jacobian(env: ManagerBasedRLEnv, asset: RigidObject | Articulation, body_idx: torch.Tensor, joint_ids: torch.Tensor, body_offset: OffsetCfg):
+def compute_frame_jacobian(
+    env: ManagerBasedRLEnv,
+    robot: RigidObject | Articulation,
+    env_ids: torch.Tensor,
+    body_idx: int,
+    joint_ids: torch.Tensor,
+    body_offset: OffsetCfg,
+) -> torch.Tensor:
     """Computes the geometric Jacobian of the target frame in the root frame.
 
     This function accounts for the target frame offset and applies the necessary transformations to obtain
     the right Jacobian from the parent body Jacobian.
     """
-    # read the parent jacobian
-    jacobian = jacobian_b(asset, body_idx, joint_ids)
+    jacobian = jacobian_b(robot, body_idx, joint_ids)[env_ids]
 
-    # account for the offset
     if body_offset is not None:
-        offset_pos = torch.tensor(body_offset.pos, device=env.device).repeat(env.num_envs, 1)
-        offset_rot = torch.tensor(body_offset.rot, device=env.device).repeat(env.num_envs, 1)
+        offset_pos = torch.tensor(body_offset.pos, device=env.device).repeat(len(env_ids), 1)
+        offset_rot = torch.tensor(body_offset.rot, device=env.device).repeat(len(env_ids), 1)
 
         # Modify the jacobian to account for the offset
         # -- translational part
@@ -588,40 +625,38 @@ def compute_frame_jacobian(env: ManagerBasedRLEnv, asset: RigidObject | Articula
     return jacobian
 
 
-def jacobian_b(asset: RigidObject | Articulation, body_idx: torch.Tensor, joint_ids: torch.Tensor) -> torch.Tensor:
-    if asset.is_fixed_base:
+
+def jacobian_b(robot: RigidObject | Articulation, body_idx: torch.Tensor, joint_ids: torch.Tensor) -> torch.Tensor:
+    if robot.is_fixed_base:
         jacobi_body_idx = body_idx - 1
         jacobi_joint_ids = joint_ids
     else:
         jacobi_body_idx = body_idx
         jacobi_joint_ids = [i + 6 for i in joint_ids]
 
-    jacobian = jacobian_w(asset, jacobi_body_idx, jacobi_joint_ids)
-    base_rot = asset.data.root_quat_w
+    jacobian = jacobian_w(robot, jacobi_body_idx, jacobi_joint_ids)
+    base_rot = robot.data.root_quat_w
     base_rot_matrix = math_utils.matrix_from_quat(math_utils.quat_inv(base_rot))
     jacobian[:, :3, :] = torch.bmm(base_rot_matrix, jacobian[:, :3, :])
     jacobian[:, 3:, :] = torch.bmm(base_rot_matrix, jacobian[:, 3:, :])
     return jacobian
 
 
-def jacobian_w(asset: RigidObject | Articulation, jacobi_body_idx, jacobi_joint_ids) -> torch.Tensor:
-    return asset.root_physx_view.get_jacobians()[:, jacobi_body_idx, :, jacobi_joint_ids]
+def jacobian_w(robot: RigidObject | Articulation, jacobi_body_idx, jacobi_joint_ids) -> torch.Tensor:
+    return robot.root_physx_view.get_jacobians()[:, jacobi_body_idx, :, jacobi_joint_ids]
 
 
-def set_robot_to_default_joint_pos(env: ManagerBasedRLEnv, asset: RigidObject | Articulation, joints, env_ids, gripper_width = 0):
-    joint_pos = asset.data.default_joint_pos[env_ids]
+def set_robot_to_default_joint_pos(env: ManagerBasedRLEnv, robot: RigidObject | Articulation, joints, env_ids, gripper_width = 0):
+    joint_pos = robot.data.default_joint_pos[env_ids]
     joint_pos[:, 6:] = gripper_width
     joint_pos[:, :8] = torch.tensor(joints, device=env.device)[None, :]
     joint_vel = torch.zeros_like(joint_pos)
     joint_effort = torch.zeros_like(joint_pos)
 
-    # ctrl_target_joint_pos[env_ids, :] = joint_pos
-    # asset.set_joint_position_target(ctrl_target_joint_pos[env_ids], env_ids=env_ids)
-    asset.set_joint_position_target(joint_pos, env_ids=env_ids)
-
-    asset.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
-    asset.reset()
-    asset.set_joint_effort_target(joint_effort, env_ids=env_ids)
+    robot.set_joint_position_target(joint_pos, env_ids=env_ids)
+    robot.write_joint_state_to_sim(joint_pos, joint_vel, env_ids=env_ids)
+    robot.reset()
+    robot.set_joint_effort_target(joint_effort, env_ids=env_ids)
 
 
 def hole_position_in_robot_base_frame(
@@ -637,24 +672,3 @@ def hole_position_in_robot_base_frame(
     )
     hole_pose_b = torch.cat((hole_pos_b, hole_quat_b), dim=-1)
     return hole_pose_b
-
-
-
-def quat_rotate_vector(quat: torch.Tensor, vec: torch.Tensor) -> torch.Tensor:
-    """
-    Rotate a vector by a quaternion using provided utility functions.
-    
-    Args:
-        quat: [..., 4] tensor representing quaternions (w, x, y, z).
-        vec: [..., 3] tensor representing the vectors to rotate.
-    
-    Returns:
-        Rotated vector of shape [..., 3].
-    """
-    # Ensure the quaternion is normalized to avoid unintended scaling effects
-    quat = torch.nn.functional.normalize(quat, p=2, dim=-1)
-    
-    # Rotate the input vector using the quaternion
-    rotated_vec = quat_apply(quat, vec)
-    
-    return rotated_vec

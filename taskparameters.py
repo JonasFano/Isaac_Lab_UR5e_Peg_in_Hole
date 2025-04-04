@@ -16,7 +16,7 @@ class TaskParams:
     command_type = "pose"
     use_relative_mode = True
     ik_method = "dls"
-    action_scale=0.05
+    action_scale = 0.05
 
 
     ##############
@@ -42,6 +42,9 @@ class TaskParams:
     ### Robot ###
     #############
     # Robot parameters/gains
+    joint_names = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    ee_body_name = "wrist_3_link"
+
     robot_vel_limit = 180.0
     robot_effort_limit = 87.0
     robot_stiffness = 10000000.0
@@ -69,16 +72,17 @@ class TaskParams:
     robot_randomize_stiffness_distribution = "uniform"
     robot_randomize_damping_distribution = "uniform"
 
-    robot_initial_joint_pos = [1.3, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0] # With gripper joint pos set to 0.0
+    robot_initial_joint_pos = [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0] # With gripper joint pos set to 0.0
     robot_reset_joints_pos_range = (1.0, 1.0)
     robot_reset_joints_vel_range = (0.0, 0.0)
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
 
-    ##############
+    ###############
     ### Gripper ###
-    ##############
+    ###############
     # Gripper parameters/gains
+    gripper_joint_names = ["finger_left", "finger_right"]
     gripper_vel_limit = 1000000.0
     gripper_effort_limit = 200.0
     gripper_stiffness = 10000000.0
@@ -92,17 +96,17 @@ class TaskParams:
     gripper_randomize_stiffness_distribution = "uniform"
     gripper_randomize_damping_distribution = "uniform"
 
-    # Domain randomize gripper friction
-    gripper_randomize_static_friction = (0.8, 1.2)
-    gripper_randomize_dynamic_friction = (0.6, 1.2)
-    gripper_randomize_restitution = (0.0, 0.3)
+    # Randomize gripper finger friction
+    gripper_static_friction_distribution_params = (1.4, 1.4)
+    gripper_dynamic_friction_distribution_params = (1.4, 1.4)
+    gripper_restitution_distribution_params = (0.1, 0.1)
     gripper_randomize_friction_operation = "abs"
     gripper_randomize_friction_distribution = "uniform"
     gripper_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
-    gripper_offset = [0, 0, 0.15] # or [0, 0, 0.135]
+    gripper_offset = [0.0, 0.0, 0.15] # or [0, 0, 0.135]
     gripper_open = [0.0, 0.0]
-    gripper_close = [-0.025, -0.025]
+    gripper_joint_pos_close = [-0.025, -0.025]
 
 
     ##############
@@ -118,9 +122,9 @@ class TaskParams:
     object_init_pos = (0.15, 0.25, 0.1)
 
     # Domain randomize object friction
-    object_randomize_static_friction = (0.6, 1.0)
-    object_randomize_dynamic_friction = (0.4, 1.0)
-    object_randomize_restitution = (0.0, 0.3)
+    object_static_friction_distribution_params = (0.6, 1.0)
+    object_dynamic_friction_distribution_params = (0.4, 1.0)
+    object_restitution_distribution_params = (0.0, 0.3)
     object_randomize_friction_operation = "abs"
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction

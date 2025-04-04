@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING, List
 from isaaclab.assets import RigidObject, Articulation
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils.math import subtract_frame_transforms, quat_apply, matrix_from_quat
+from pathlib import Path
+import numpy as np
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedRLEnv
@@ -142,6 +144,24 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     wrench_world = torch.cat((forces_world, torques_world), dim=-1)
 
     # print("World forces: ", forces_world)
+
+    # ---------- Logging to disk directly inside the function ----------
+    try:
+        log_path = Path(__file__).resolve().parents[3] / "data" / "wrench_log_minmax.bin"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Compute min and max over all environments
+        min_wrench = torch.min(wrench_world, dim=0).values  # shape: (6,)
+        max_wrench = torch.max(wrench_world, dim=0).values  # shape: (6,)
+        wrench_minmax = torch.cat([min_wrench, max_wrench], dim=0)  # shape: (12,)
+
+        # Write to binary file
+        wrench_np = wrench_minmax.detach().cpu().numpy().astype(np.float32)
+        with open(log_path, "ab") as f:
+            wrench_np.tofile(f)
+    except Exception as e:
+        print(f"[Wrench Logging Error] {e}")
+    # ------------------------------------------------------------------
 
     return wrench_world.view(env.num_envs, -1)
 

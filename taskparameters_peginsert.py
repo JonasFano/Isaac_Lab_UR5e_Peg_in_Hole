@@ -8,6 +8,7 @@ class TaskParams:
     decimation = 2
     episode_length_s = 10.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 0.01
+    gravity = [0.0, 0.0, -9.81]
 
 
     #######################
@@ -16,7 +17,25 @@ class TaskParams:
     command_type = "pose"
     use_relative_mode = True
     ik_method = "dls"
-    action_scale= 0.005 # 0.005 # 0.0
+    action_scale= 0.001 # 0.005 # 0.0
+
+
+    ################
+    # Observations #
+    ################
+    tcp_pose_unoise_min = -0.0001 # 0.1 mm
+    tcp_pose_unoise_max = 0.0001 # 0.1 mm
+
+    noise_std_hole_pose = 0.0025 # 2.5 mm
+
+
+    #########
+    # Event #
+    #########
+    ik_max_iters = 10
+    pos_error_threshold = 1e-3
+    angle_error_threshold = 1e-3
+    levenberg_marquardt_lambda = 0.01
 
 
     ##############
@@ -26,10 +45,23 @@ class TaskParams:
     action_rate_curriculum_weight = -1e-1
     action_rate_curriculum_num_steps = 50000
 
-    hole_ee_distance_std = 0.05
-    hole_ee_distance_weight = 1.0
+    # Keypoint distance
+    num_keypoints = 4
+    coarse_kernel_a = 50
+    coarse_kernel_b = 2
+    keypoint_distance_coarse_weight = 10.0
 
-    orientation_tracking_weight = 15.0
+    fine_kernel_a = 100
+    fine_kernel_b = 0
+    keypoint_distance_fine_weight = 20.0
+
+    # Is peg centered
+    is_peg_centered_xy_threshold = 0.0025 # 2.5 mm
+    is_peg_centered_z_threshold = 0.08 # 8 cm
+    is_peg_centered_weight = 2.0
+
+    # Is peg inserted
+    is_peg_inserted_weight = 10.0
 
 
     ###################
@@ -42,6 +74,9 @@ class TaskParams:
     ### Robot ###
     #############
     # Robot parameters/gains
+    joint_names = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    ee_body_name = "wrist_3_link"
+
     robot_vel_limit = 180.0
     robot_effort_limit = 87.0
     robot_stiffness = 10000000.0
@@ -74,11 +109,20 @@ class TaskParams:
     robot_reset_joints_vel_range = (0.0, 0.0)
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
+    tcp_rand_range_x = (-0.02, 0.02)
+    tcp_rand_range_y = (-0.02, 0.02)
+    tcp_rand_range_z = (0.1, 0.125) # (0.076, 0.076)
+    tcp_rand_range_roll = (0.0, 0.0)
+    tcp_rand_range_pitch = (math.pi, math.pi)
+    tcp_rand_range_yaw = (-3.14, 3.14)
+
 
     ###############
     ### Gripper ###
     ###############
     # Gripper parameters/gains
+    gripper_joint_names = ["joint_left", "joint_right"]
+    gripper_body_names = ["finger_left", "finger_right"]
     gripper_vel_limit = 1000000.0
     gripper_effort_limit = 200.0
     gripper_stiffness = 10000000.0
@@ -92,17 +136,17 @@ class TaskParams:
     gripper_randomize_stiffness_distribution = "uniform"
     gripper_randomize_damping_distribution = "uniform"
 
-    # Domain randomize gripper friction
-    gripper_randomize_static_friction = (0.8, 1.2)
-    gripper_randomize_dynamic_friction = (0.6, 1.2)
-    gripper_randomize_restitution = (0.0, 0.3)
+    # Randomize gripper finger friction
+    gripper_static_friction_distribution_params = (1.4, 1.4)
+    gripper_dynamic_friction_distribution_params = (1.4, 1.4)
+    gripper_restitution_distribution_params = (0.1, 0.1)
     gripper_randomize_friction_operation = "abs"
     gripper_randomize_friction_distribution = "uniform"
     gripper_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
-    gripper_offset = [0, 0, 0.15] # or [0, 0, 0.135]
+    gripper_offset = [0.0, 0.0, 0.15] # or [0, 0, 0.135]
     gripper_open = [0.0, 0.0]
-    gripper_close = [-0.025, -0.025]
+    gripper_joint_pos_close = [-0.025, -0.025]
 
 
     ##############
@@ -118,13 +162,17 @@ class TaskParams:
     object_init_pos = (-0.2, 0.0, 0.1)
 
     # Domain randomize object friction
-    object_randomize_static_friction = (0.6, 1.0)
-    object_randomize_dynamic_friction = (0.4, 1.0)
-    object_randomize_restitution = (0.0, 0.3)
+    object_static_friction_distribution_params = (1.4, 1.4)
+    object_dynamic_friction_distribution_params = (1.4, 1.4)
+    object_restitution_distribution_params = (0.3, 0.3)
     object_randomize_friction_operation = "abs"
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
+    object_rand_pos_range_x = (-0.003, 0.003)
+    object_rand_pos_range_z = (0.005, 0.02)
+    object_width = 0.008 # 8 mm
+    object_height = 0.05 # 5 cm
 
     ############
     ### Hole ###

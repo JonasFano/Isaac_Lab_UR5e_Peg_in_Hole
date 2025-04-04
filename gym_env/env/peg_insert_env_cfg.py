@@ -211,7 +211,7 @@ class ActionsCfg:
     #     asset_name="robot",
     #     joint_names=["joint_left", "joint_right"],
     #     open_command_expr={"joint_left": TaskParams.gripper_open[0], "joint_right": TaskParams.gripper_open[1]},
-    #     close_command_expr={"joint_left": TaskParams.gripper_close[0], "joint_right": TaskParams.gripper_close[1]},
+    #     close_command_expr={"joint_left": TaskParams.gripper_joint_pos_close[0], "joint_right": TaskParams.gripper_joint_pos_close[1]},
     # )
 
     # gripper_action = mdp.JointPositionActionCfg(
@@ -241,7 +241,7 @@ class ObservationsCfg:
         tcp_pose = ObsTerm(
             func=mdp.get_current_tcp_pose,
             params={"gripper_offset": TaskParams.gripper_offset, "robot_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
-            noise=Unoise(n_min=-0.0001, n_max=0.0001),
+            noise=Unoise(n_min=TaskParams.tcp_pose_unoise_min, n_max=TaskParams.tcp_pose_unoise_max),
         )
 
         ee_wrench_b = ObsTerm(
@@ -255,7 +255,7 @@ class ObservationsCfg:
             params={
                 "asset_cfg": SceneEntityCfg("robot"),
                 "hole_cfg": SceneEntityCfg("hole"),
-                "noise_std": 0.0025,  # 2.5 mm
+                "noise_std": TaskParams.noise_std_hole_pose,  # 2.5 mm
             },
         )
 
@@ -302,25 +302,30 @@ class EventCfg:
         func=mdp.randomize_initial_state,
         mode="reset",
         params={
-            "asset_cfg": SceneEntityCfg("robot"),
+            "robot_cfg": SceneEntityCfg("robot"),
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
             "ee_frame_cfg": SceneEntityCfg("ee_frame"),
-            "range_x": (-0.02, 0.02),
-            "range_y": (-0.02, 0.02),
-            "range_z": (0.1, 0.125), # (0.076, 0.076),
-            "range_roll": (0.0, 0.0),
-            "range_pitch": (math.pi, math.pi),
-            "range_yaw": (-3.14, 3.14),
-            "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"],
-            "body_name": "wrist_3_link",
-            "tcp_offset": [0.0, 0.0, 0.15],
-            "default_joint_pos": [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0],
-            "gravity": [0.0, 0.0, -9.81],
-            "object_x_range": (-0.003, 0.003),
-            "object_z_range": (0.005, 0.02),
-            "gripper_close": [-0.025, -0.025],
-            "object_width": 0.008,
+            "tcp_rand_range_x": TaskParams.tcp_rand_range_x,
+            "tcp_rand_range_y": TaskParams.tcp_rand_range_y,
+            "tcp_rand_range_z": TaskParams.tcp_rand_range_z,
+            "tcp_rand_range_roll": TaskParams.tcp_rand_range_roll,
+            "tcp_rand_range_pitch": TaskParams.tcp_rand_range_pitch,
+            "tcp_rand_range_yaw": TaskParams.tcp_rand_range_yaw,
+            "joint_names": TaskParams.joint_names,
+            "ee_body_name": TaskParams.ee_body_name,
+            "tcp_offset": TaskParams.gripper_offset,
+            "ik_max_iters": TaskParams.ik_max_iters,
+            "pos_error_threshold": TaskParams.pos_error_threshold,
+            "angle_error_threshold": TaskParams.angle_error_threshold,
+            "levenberg_marquardt_lambda": TaskParams.levenberg_marquardt_lambda,
+            "default_joint_pos": TaskParams.robot_initial_joint_pos,
+            "gravity": TaskParams.gravity,
+            "object_rand_range_x": TaskParams.object_rand_pos_range_x,
+            "object_rand_range_z": TaskParams.object_rand_pos_range_z,
+            "gripper_joint_names": TaskParams.gripper_joint_names,
+            "gripper_joint_pos_close": TaskParams.gripper_joint_pos_close,
+            "object_width": TaskParams.object_width,
         }
     )
 
@@ -328,13 +333,13 @@ class EventCfg:
         func=mdp.randomize_friction_coefficients,
         mode="reset",
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=["finger_left", "finger_right"]),
-            "static_friction_distribution_params": (1.4, 1.4),
-            "dynamic_friction_distribution_params": (1.4, 1.4),
-            "restitution_distribution_params": (0.1, 0.1), 
-            "operation": "abs",
-            "distribution": "uniform",
-            "make_consistent": True,  # Ensure dynamic friction <= static friction
+            "asset_cfg": SceneEntityCfg("robot", body_names=TaskParams.gripper_body_names),
+            "static_friction_distribution_params": TaskParams.gripper_static_friction_distribution_params,
+            "dynamic_friction_distribution_params": TaskParams.gripper_dynamic_friction_distribution_params,
+            "restitution_distribution_params": TaskParams.gripper_restitution_distribution_params,
+            "operation": TaskParams.gripper_randomize_friction_operation,
+            "distribution": TaskParams.gripper_randomize_friction_distribution,
+            "make_consistent": TaskParams.gripper_randomize_friction_make_consistent,  
         }
     )
 
@@ -343,12 +348,12 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("object", body_names="forge_round_peg_8mm"),
-            "static_friction_distribution_params": (1.4, 1.4), 
-            "dynamic_friction_distribution_params": (1.4, 1.4), 
-            "restitution_distribution_params": (0.2, 0.2), 
-            "operation": "abs",
-            "distribution": "uniform",
-            "make_consistent": True,  # Ensure dynamic friction <= static friction
+            "static_friction_distribution_params": TaskParams.object_static_friction_distribution_params,
+            "dynamic_friction_distribution_params": TaskParams.object_dynamic_friction_distribution_params,
+            "restitution_distribution_params": TaskParams.object_restitution_distribution_params,
+            "operation": TaskParams.object_randomize_friction_operation,
+            "distribution": TaskParams.object_randomize_friction_distribution,
+            "make_consistent": TaskParams.object_randomize_friction_make_consistent,  
         }
     )
 
@@ -377,12 +382,12 @@ class RewardsCfg:
         params={
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
-            "num_keypoints": 4,
-            "object_height": 0.05,
-            "a": 50,
-            "b": 2,
+            "num_keypoints": TaskParams.num_keypoints,
+            "object_height": TaskParams.object_height,
+            "a": TaskParams.coarse_kernel_a,
+            "b": TaskParams.coarse_kernel_b,
         },
-        weight=1.0
+        weight=TaskParams.keypoint_distance_coarse_weight,
     )
 
     keypoint_distance_fine = RewTerm(
@@ -390,12 +395,12 @@ class RewardsCfg:
         params={
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
-            "num_keypoints": 4,
-            "object_height": 0.05,
-            "a": 100,
-            "b": 0,
+            "num_keypoints": TaskParams.num_keypoints,
+            "object_height": TaskParams.object_height,
+            "a": TaskParams.fine_kernel_a,
+            "b": TaskParams.fine_kernel_b,
         },
-        weight=2.0
+        weight=TaskParams.keypoint_distance_fine_weight,
     )
 
     # Sparse rewards
@@ -404,11 +409,11 @@ class RewardsCfg:
         params={
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
-            "object_height": 0.05,
-            "xy_threshold": 0.0025,
-            "z_threshold": 0.08,
+            "object_height": TaskParams.object_height,
+            "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+            "z_threshold": TaskParams.is_peg_centered_z_threshold,
         },
-        weight=1.0,
+        weight=TaskParams.is_peg_centered_weight,
     )
 
     is_peg_inserted = RewTerm(
@@ -416,7 +421,7 @@ class RewardsCfg:
         params={
             "term_keys": "is_peg_inserted", 
         },
-        weight=1.0,
+        weight=TaskParams.is_peg_inserted_weight,
     )
 
 
@@ -443,9 +448,9 @@ class TerminationsCfg:
         params={
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
-            "object_height": 0.05,
-            "xy_threshold": 0.0025,
-            "z_threshold": 0.001,
+            "object_height": TaskParams.object_height,
+            "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+            "z_threshold": TaskParams.is_peg_centered_z_threshold,
         }
     )
 

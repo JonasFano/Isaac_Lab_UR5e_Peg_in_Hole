@@ -210,7 +210,7 @@ class ActionsCfg:
         asset_name="robot",
         joint_names=["joint_left", "joint_right"],
         open_command_expr={"joint_left": TaskParams.gripper_open[0], "joint_right": TaskParams.gripper_open[1]},
-        close_command_expr={"joint_left": TaskParams.gripper_close[0], "joint_right": TaskParams.gripper_close[1]},
+        close_command_expr={"joint_left": TaskParams.gripper_joint_pos_close[0], "joint_right": TaskParams.gripper_joint_pos_close[1]},
     )
 
 

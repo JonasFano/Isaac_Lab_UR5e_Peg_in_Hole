@@ -210,7 +210,7 @@ class ActionsCfg:
         asset_name="robot",
         joint_names=["joint_left", "joint_right"],
         open_command_expr={"joint_left": TaskParams.gripper_open[0], "joint_right": TaskParams.gripper_open[1]},
-        close_command_expr={"joint_left": TaskParams.gripper_close[0], "joint_right": TaskParams.gripper_close[1]},
+        close_command_expr={"joint_left": TaskParams.gripper_joint_pos_close[0], "joint_right": TaskParams.gripper_joint_pos_close[1]},
     )
 
 
@@ -331,9 +331,9 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=["finger_left", "finger_right"]),
-            "static_friction_distribution_params": TaskParams.gripper_randomize_static_friction,
-            "dynamic_friction_distribution_params": TaskParams.gripper_randomize_dynamic_friction,
-            "restitution_distribution_params": TaskParams.gripper_randomize_restitution,
+            "static_friction_distribution_params": TaskParams.gripper_static_friction_distribution_params,
+            "dynamic_friction_distribution_params": TaskParams.gripper_dynamic_friction_distribution_params,
+            "restitution_distribution_params": TaskParams.gripper_restitution_distribution_params,
             "operation": TaskParams.gripper_randomize_friction_operation,
             "distribution": TaskParams.gripper_randomize_friction_distribution,
             "make_consistent": TaskParams.gripper_randomize_friction_make_consistent,  
@@ -345,12 +345,12 @@ class EventCfg:
         mode="reset",
         params={
             "asset_cfg": SceneEntityCfg("object"),
-            "static_friction_distribution_params": TaskParams.gripper_randomize_static_friction,
-            "dynamic_friction_distribution_params": TaskParams.gripper_randomize_dynamic_friction,
-            "restitution_distribution_params": TaskParams.gripper_randomize_restitution,
-            "operation": TaskParams.gripper_randomize_friction_operation,
-            "distribution": TaskParams.gripper_randomize_friction_distribution,
-            "make_consistent": TaskParams.gripper_randomize_friction_make_consistent,  
+            "static_friction_distribution_params": TaskParams.object_static_friction_distribution_params,
+            "dynamic_friction_distribution_params": TaskParams.object_dynamic_friction_distribution_params,
+            "restitution_distribution_params": TaskParams.object_restitution_distribution_params,
+            "operation": TaskParams.object_randomize_friction_operation,
+            "distribution": TaskParams.object_randomize_friction_distribution,
+            "make_consistent": TaskParams.object_randomize_friction_make_consistent,  
         }
     )
 
