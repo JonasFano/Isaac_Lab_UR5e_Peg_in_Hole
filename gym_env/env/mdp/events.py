@@ -332,6 +332,8 @@ def randomize_initial_state(
 
     ik_attempt = 0
 
+    print("Reset Robot")
+
     while True:
         n_bad = bad_envs.shape[0]
 

@@ -51,6 +51,8 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     # Access the robot object from the scene using the provided configuration
     robot: RigidObject | Articulation = env.scene[robot_cfg.name]
 
+    print("Compute current TCP")
+
     # Clone the body states in the world frame to avoid modifying the original tensor
     body_state_w_list = robot.data.body_state_w.clone()
 
@@ -106,6 +108,8 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     """
     # Extract the used quantities (to enable type-hinting)
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
+
+    print("Compute Forces/Torques")
 
     # Obtain the link incoming forces in an unknown frame
     link_incoming_forces = asset.root_physx_view.get_link_incoming_joint_force()[:, asset_cfg.body_ids]
