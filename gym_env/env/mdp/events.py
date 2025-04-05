@@ -330,6 +330,8 @@ def randomize_initial_state(
     tcp_target_pose_b = torch.zeros(env.num_envs, 7, device=env.device)
     bad_envs = env_ids.clone()
 
+    ik_attempt = 0
+
     while True:
         n_bad = bad_envs.shape[0]
 
@@ -402,6 +404,11 @@ def randomize_initial_state(
 
         if len(bad_envs) == 0:
             break
+
+        ik_attempt += 1
+
+        if ik_attempt > 20:
+            print(ik_attempt)
 
         # Set robot to default joint position in all bad_envs
         set_robot_to_default_joint_pos(env, robot, joints=default_joint_pos, env_ids=bad_envs, gripper_width = 0)
