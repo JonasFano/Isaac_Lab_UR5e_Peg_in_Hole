@@ -322,8 +322,6 @@ def randomize_initial_state(
     physics_sim_view: physx.SimulationView = sim_utils.SimulationContext.instance().physics_sim_view
     physics_sim_view.set_gravity(carb.Float3(0.0, 0.0, 0.0))
 
-    print("Start Reset")
-
     robot: RigidObject | Articulation = env.scene[robot_cfg.name]
     object: RigidObject | Articulation = env.scene[object_cfg.name]
     hole: RigidObject | Articulation = env.scene[hole_cfg.name]
@@ -468,8 +466,6 @@ def randomize_initial_state(
 
     # Enable gravity
     physics_sim_view.set_gravity(carb.Float3(*gravity))
-
-    print("Reset done")
 
 
 # ---------------- Helper Functions ---------------------
