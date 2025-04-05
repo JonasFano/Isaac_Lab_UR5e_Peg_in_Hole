@@ -107,12 +107,8 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     # Extract the used quantities (to enable type-hinting)
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
 
-    print("Compute Forces/Torques")
-
     # Obtain the link incoming forces in an unknown frame
     link_incoming_forces = asset.root_physx_view.get_link_incoming_joint_force()[:, asset_cfg.body_ids]
-
-    print("Get forces")
 
     # Get the end-effector transformation (rotation matrix) in the world frame
     ee_transform = asset.data.body_state_w[:, asset_cfg.body_ids[-1], :7]  # Assuming last body is EE
@@ -147,12 +143,9 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     # Concatenate transformed force and torque to return full wrench in world frame
     wrench_world = torch.cat((forces_world, torques_world), dim=-1)
 
-    print("Clamping start")
-
     # Cap wrench values to +/- 10000
     wrench_world = torch.clamp(wrench_world, min=-10000.0, max=10000.0)
 
-    print("Clamping finish")
     # print("World forces: ", forces_world)
 
     # ---------- Logging to disk directly inside the function ----------
@@ -173,9 +166,11 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
         print(f"[Wrench Logging Error] {e}")
     # ------------------------------------------------------------------
 
-    print("Force/Torque calculation finished")
+    w = wrench_world.view(env.num_envs, -1)
 
-    return wrench_world.view(env.num_envs, -1)
+    print("Forces done")
+
+    return w
 
 
 def noisy_hole_pose_estimate(
@@ -201,4 +196,7 @@ def noisy_hole_pose_estimate(
     hole_pos_b[:, :2] += xy_noise
 
     hole_pose_b = torch.cat((hole_pos_b, hole_quat_b), dim=-1)
+
+    print("Hole noise done")
+
     return hole_pose_b
