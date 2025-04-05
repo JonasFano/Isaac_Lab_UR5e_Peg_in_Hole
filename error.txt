@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+  File "/home/jofan/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/train_sb3_wandb_ppo.py", line 134, in <module>
+    main()
+  File "/home/jofan/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/train_sb3_wandb_ppo.py", line 118, in main
+    agent.learn(
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/ppo/ppo.py", line 311, in learn
+    return super().learn(
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/common/on_policy_algorithm.py", line 323, in learn
+    continue_training = self.collect_rollouts(self.env, callback, self.rollout_buffer, n_rollout_steps=self.n_steps)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/common/on_policy_algorithm.py", line 202, in collect_rollouts
+    actions, values, log_probs = self.policy(obs_tensor)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1844, in _call_impl
+    return inner()
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1790, in inner
+    result = forward_call(*args, **kwargs)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/common/policies.py", line 654, in forward
+    distribution = self._get_action_dist_from_latent(latent_pi)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/common/policies.py", line 694, in _get_action_dist_from_latent
+    return self.action_dist.proba_distribution(mean_actions, self.log_std)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/common/distributions.py", line 164, in proba_distribution
+    self.distribution = Normal(mean_actions, action_std)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/distributions/normal.py", line 59, in __init__
+    super().__init__(batch_shape, validate_args=validate_args)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/distributions/distribution.py", line 71, in __init__
+    raise ValueError(
+ValueError: Expected parameter loc (Tensor of shape (1024, 6)) of distribution Normal(loc: torch.Size([1024, 6]), scale: torch.Size([1024, 6])) to satisfy the constraint Real(), but found invalid values:
+tensor([[ 0.2204, -0.0596, -0.8789, -0.1319,  0.2415, -0.1656],
+        [ 0.1859,  0.0045, -1.1349, -0.1467, -0.0764,  0.0573],
+        [-0.1164,  0.2819,  0.1015,  0.3476, -0.1876,  0.3100],
+        ...,
+        [-0.2049, -0.0750, -0.9106, -0.1526,  0.0635, -0.1892],
+        [ 0.1313,  0.2364, -0.9994,  0.0207, -0.1363,  0.1366],
+        [-0.1549,  0.0987, -1.0516, -0.0995, -0.0344,  0.0317]],
+       device='cuda:0')
