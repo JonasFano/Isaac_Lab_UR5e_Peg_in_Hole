@@ -51,8 +51,6 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     # Access the robot object from the scene using the provided configuration
     robot: RigidObject | Articulation = env.scene[robot_cfg.name]
 
-    print("Compute current TCP")
-
     # Clone the body states in the world frame to avoid modifying the original tensor
     body_state_w_list = robot.data.body_state_w.clone()
 
@@ -114,6 +112,8 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     # Obtain the link incoming forces in an unknown frame
     link_incoming_forces = asset.root_physx_view.get_link_incoming_joint_force()[:, asset_cfg.body_ids]
 
+    print("Get forces")
+
     # Get the end-effector transformation (rotation matrix) in the world frame
     ee_transform = asset.data.body_state_w[:, asset_cfg.body_ids[-1], :7]  # Assuming last body is EE
     ee_quat = ee_transform[:, 3:7]  # Extract quaternion (w, x, y, z)
@@ -147,10 +147,12 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     # Concatenate transformed force and torque to return full wrench in world frame
     wrench_world = torch.cat((forces_world, torques_world), dim=-1)
 
+    print("Clamping start")
+
     # Cap wrench values to +/- 10000
     wrench_world = torch.clamp(wrench_world, min=-10000.0, max=10000.0)
 
-
+    print("Clamping finish")
     # print("World forces: ", forces_world)
 
     # ---------- Logging to disk directly inside the function ----------
@@ -170,6 +172,8 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     except Exception as e:
         print(f"[Wrench Logging Error] {e}")
     # ------------------------------------------------------------------
+
+    print("Force/Torque calculation finished")
 
     return wrench_world.view(env.num_envs, -1)
 
