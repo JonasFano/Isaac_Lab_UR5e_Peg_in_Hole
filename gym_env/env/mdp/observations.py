@@ -48,6 +48,9 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     Returns:
         tcp_pose_b: TCP pose in the robot's base frame (position + quaternion).
     """
+
+    print("TCP Pose Start")
+
     # Access the robot object from the scene using the provided configuration
     robot: RigidObject | Articulation = env.scene[robot_cfg.name]
 
@@ -80,6 +83,9 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     # tcp_pose_b = torch.cat((tcp_pos_b, tcp_axis_angle_b), dim=-1)
 
     tcp_pose_b = torch.cat((tcp_pos_b, tcp_quat_b), dim=-1)
+
+    print("TCP Pose Finish")
+
     return tcp_pose_b
 
 
@@ -104,6 +110,9 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     Incoming spatial wrench on bodies of an articulation in the simulation world frame.
     Converts from end-effector frame to world frame and vice versa.
     """
+
+    print("Wrench Start")
+
     # Extract the used quantities (to enable type-hinting)
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
 
@@ -168,6 +177,8 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
 
     w = wrench_world.view(env.num_envs, -1)
 
+    print("Wrench Finish")
+
     return w
 
 
@@ -180,6 +191,8 @@ def noisy_hole_pose_estimate(
     """Provide a noisy estimate of the hole position in the robot's root frame."""
     robot: RigidObject | Articulation = env.scene[asset_cfg.name]
     hole: RigidObject | Articulation = env.scene[hole_cfg.name]
+
+    print("Noisy Hole Start")
 
     # Get hole position in world frame
     hole_pos_w = hole.data.root_pos_w[:, :3]
@@ -194,5 +207,7 @@ def noisy_hole_pose_estimate(
     hole_pos_b[:, :2] += xy_noise
 
     hole_pose_b = torch.cat((hole_pos_b, hole_quat_b), dim=-1)
+
+    print("Noisy Hole Finish")
 
     return hole_pose_b

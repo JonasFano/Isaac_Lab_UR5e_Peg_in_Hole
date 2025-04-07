@@ -41,3 +41,5 @@ Contains all necessary information on how to start training and how to run a tra
     wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_005 config_sb3_ppo.yaml
     wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001 config_sb3_ppo.yaml
     wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v2 config_sb3_ppo.yaml
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v3 config_sb3_ppo.yaml
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v4 config_sb3_ppo.yaml

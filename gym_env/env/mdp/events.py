@@ -332,6 +332,8 @@ def randomize_initial_state(
 
     ik_attempt = 0
 
+    print("Randomize Start")
+
     while True:
         n_bad = bad_envs.shape[0]
 
@@ -466,6 +468,8 @@ def randomize_initial_state(
 
     # Enable gravity
     physics_sim_view.set_gravity(carb.Float3(*gravity))
+
+    print("Randomize Finish")
 
 
 # ---------------- Helper Functions ---------------------
