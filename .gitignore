@@ -6,6 +6,8 @@ __pycache__/
 **/*.pyc
 
 # Ignore outputs folder
-/outputs/
+sb3/outputs/
 
 data/
+
+sb3/output_*.log
