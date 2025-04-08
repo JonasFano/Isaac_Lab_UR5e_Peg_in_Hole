@@ -52,6 +52,7 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
 
     # Access the robot object from the scene using the provided configuration
     robot: RigidObject | Articulation = env.scene[robot_cfg.name]
+    ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
 
     # Clone the body states in the world frame to avoid modifying the original tensor
     body_state_w_list = robot.data.body_state_w.clone()
@@ -94,7 +95,6 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
 
     tcp_pose_b = torch.cat((tcp_pos_b, tcp_quat_b), dim=-1)
 
-    ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
     print("TCP pose b: ", tcp_pose_b)
 
     return tcp_pose_b
