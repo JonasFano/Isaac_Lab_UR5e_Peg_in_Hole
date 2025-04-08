@@ -355,8 +355,8 @@ def randomize_initial_state(
         hole_position_b = hole_position_in_robot_base_frame(robot, hole)[:, :3]
         tcp_target_pose_b[bad_envs, :3] += hole_position_b[bad_envs, :3]
 
-        print("Hole Position: ", hole_position_b)
-        print("Sampled Pose: ", tcp_target_pose_b)
+        print("Hole Position: ", hole_position_b[env_ids, :])
+        print("Sampled Pose: ", tcp_target_pose_b[env_ids, :])
 
         joint_ids, joint_names = robot.find_joints(joint_names)
         num_joints = len(joint_ids)
@@ -390,7 +390,7 @@ def randomize_initial_state(
         # Compute TCP pose error for all env_ids
         tcp_pose_error, _ = get_tcp_pose_error(env, env_ids, robot, body_idx, tcp_target_pose_b, body_offset)
 
-        print("TCP Pose Error: ", tcp_pose_error)
+        print("TCP Pose Error: ", tcp_pose_error[env_ids, :])
 
         # Determine new bad_envs
         pos_error = torch.linalg.norm(tcp_pose_error[:, :3], dim=1) > pos_error_threshold
