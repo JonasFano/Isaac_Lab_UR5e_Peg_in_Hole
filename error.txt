@@ -34,3 +34,178 @@ tensor([[ 0.2204, -0.0596, -0.8789, -0.1319,  0.2415, -0.1656],
         [ 0.1313,  0.2364, -0.9994,  0.0207, -0.1363,  0.1366],
         [-0.1549,  0.0987, -1.0516, -0.0995, -0.0344,  0.0317]],
        device='cuda:0')
+
+
+
+
+
+Traceback (most recent call last):
+  File "/home/jofan/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/train_
+sb3_wandb_ppo.py", line 134, in <module>
+    main()
+  File "/home/jofan/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/train_
+sb3_wandb_ppo.py", line 118, in main
+    agent.learn(
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/ppo/
+ppo.py", line 311, in learn
+    return super().learn(
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/comm
+on/on_policy_algorithm.py", line 323, in learn
+    continue_training = self.collect_rollouts(self.env, callback, self.rollout_b
+uffer, n_rollout_steps=self.n_steps)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/comm
+on/on_policy_algorithm.py", line 202, in collect_rollouts
+    actions, values, log_probs = self.policy(obs_tensor)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/nn/modules/modul
+e.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/nn/modules/modul
+e.py", line 1844, in _call_impl
+    return inner()
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/nn/modules/modul
+e.py", line 1790, in inner
+    result = forward_call(*args, **kwargs)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/comm
+on/policies.py", line 654, in forward
+    distribution = self._get_action_dist_from_latent(latent_pi)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/comm
+on/policies.py", line 694, in _get_action_dist_from_latent
+    return self.action_dist.proba_distribution(mean_actions, self.log_std)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/stable_baselines3/comm
+on/distributions.py", line 164, in proba_distribution
+    self.distribution = Normal(mean_actions, action_std)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/distributions/no
+rmal.py", line 59, in __init__
+    super().__init__(batch_shape, validate_args=validate_args)
+  File "/home/jofan/isaaclab/lib/python3.10/site-packages/torch/distributions/distribution.py", line 71, in __init__
+    raise ValueError(
+ValueError: Expected parameter loc (Tensor of shape (64, 6)) of distribution Normal(loc: torch.Size([64, 6]), scale: torch.Size([64, 6])) to satisfy the constraint Real(), but found invalid values:
+tensor([[-1.4222e-01, -4.6997e-01,  3.1520e-01, -1.1207e+00,  1.6132e-02,
+          1.2713e-02],
+        [ 9.8142e-02, -4.5799e-01,  1.0566e+00, -5.3282e-01,  4.3162e-01,
+         -3.2527e-02],
+        [-2.9558e-01,  6.5920e-01, -2.5612e+00,  8.5947e-01, -3.5421e-01,
+         -1.4048e-01],
+        [-9.5840e-01,  5.8990e-01, -3.9069e+00, -1.5245e-01, -1.0082e+00,
+         -1.6327e-01],
+        [ 1.9087e-01,  5.9520e-01, -8.7617e-01,  1.5872e+00,  2.0455e-01,
+         -2.1227e-01],
+        [ 1.6947e-01,  5.3839e-01, -7.8054e-01,  1.5690e+00,  2.2287e-01,
+         -2.1198e-01],
+        [ 1.0420e+00, -6.4490e-01,  3.7862e+00,  4.1629e-01,  1.3090e+00,
+          5.0488e-02],
+        [-9.7773e-01,  6.3214e-01, -3.9606e+00, -1.3404e-01, -1.0506e+00,
+         -1.7570e-01],
+        [-1.0199e+00,  5.6179e-01, -4.0286e+00,  4.0437e-02, -9.1824e-01,
+         -1.0131e-01],
+        [-6.3872e-01,  6.2902e-01, -3.0980e+00, -2.4809e-01, -6.8745e-01,
+         -4.0705e-01],
+        [-1.0024e+00,  6.3610e-01, -3.9875e+00, -1.2057e-01, -1.0480e+00,
+         -1.6753e-01],
+        [-7.0026e-01,  5.0856e-01, -3.0764e+00,  6.0337e-01, -4.0693e-01,
+         -7.6082e-02],
+        [-6.1172e-01,  5.7574e-01, -3.5341e+00,  1.2574e-01, -8.1077e-01,
+         -1.5654e-01],
+        [-5.1801e-01,  5.8739e-01, -3.1024e+00,  7.7077e-01, -4.3793e-01,
+         -5.8517e-02],
+        [-1.0460e+00,  5.7543e-01, -4.0397e+00, -5.6045e-02, -9.7472e-01,
+         -1.2219e-01],
+        [-1.0067e+00,  6.0727e-01, -3.9892e+00, -1.2659e-01, -1.0495e+00,
+         -1.3228e-01],
+        [-3.0518e-01,  8.0504e-02, -1.4329e+00, -4.0124e-01, -2.6682e-01,
+         -4.1490e-02],
+        [-3.1140e-02,  2.3366e-01, -5.9944e-01,  5.4749e-01,  3.4317e-01,
+         -5.6927e-01],
+        [ 2.1928e-01,  3.1519e-01, -1.9723e-01,  1.3114e+00,  3.4042e-01,
+         -3.7219e-02],
+        [-3.1862e-02,  5.8193e-01, -1.9026e+00,  1.2295e+00, -4.3915e-02,
+         -2.0463e-01],
+        [-8.8200e-01,  6.0897e-01, -3.5976e+00, -1.0730e-01, -7.9422e-01,
+         -2.5842e-01],
+        [-9.4467e-01,  5.6123e-01, -3.7392e+00,  1.9109e-01, -7.8516e-01,
+         -4.3495e-02],
+        [-8.9866e-01,  4.9579e-01, -3.0743e+00,  6.8261e-02, -3.8335e-01,
+         -3.5677e-01],
+        [ 8.1086e-01, -6.9405e-01,  3.0901e+00,  3.1627e-01,  1.1913e+00,
+          9.3102e-02],
+        [-6.7666e-01,  6.2309e-01, -3.6538e+00,  4.5143e-02, -8.8335e-01,
+         -1.9404e-01],
+        [-1.0252e-01,  6.7391e-01, -1.7659e+00,  1.4050e+00, -3.9195e-02,
+         -9.5570e-02],
+        [-8.5977e-01,  6.0267e-01, -3.8881e+00, -2.5618e-02, -9.5968e-01,
+         -1.6044e-01],
+        [-2.7332e-01, -1.9782e-01, -4.2917e-01, -9.4519e-01, -8.8615e-02,
+         -1.0035e-01],
+        [-1.9398e-01,  6.8691e-01, -1.8622e+00,  1.2253e+00, -1.1001e-01,
+         -1.1240e-02],
+        [-8.1779e-01,  5.9152e-01, -3.8603e+00,  9.6686e-02, -9.7933e-01,
+         -5.6568e-02],
+        [-8.6090e-01,  5.3743e-01, -3.5291e+00,  3.9473e-01, -6.5502e-01,
+          8.8334e-03],
+        [-4.7925e-01,  3.9758e-01, -2.1083e+00, -2.1915e-01, -2.0478e-01,
+         -5.1367e-01],
+        [-9.8036e-01,  6.1338e-01, -4.0050e+00, -1.3641e-01, -1.0596e+00,
+         -1.6211e-01],
+        [ 1.1488e-01,  2.0949e-01, -3.2956e-01,  2.4370e-01,  9.7493e-02,
+          1.3218e-01],
+        [-8.3526e-01,  6.4697e-01, -3.2731e+00,  1.4013e-01, -5.7917e-01,
+         -2.8191e-01],
+        [-6.4462e-01,  5.9135e-02, -2.1546e+00, -9.2354e-03, -3.7478e-01,
+          2.1750e-01],
+        [-1.0015e+00,  5.4917e-01, -4.0168e+00,  4.4928e-02, -9.1832e-01,
+         -7.9460e-02],
+        [-5.9634e-01,  6.2814e-01, -3.3328e+00,  2.5407e-02, -7.6798e-01,
+         -2.5681e-01],
+        [-3.8892e-01,  5.8725e-01, -2.4900e+00,  1.3679e-01, -3.2670e-01,
+         -4.5125e-01],
+        [-4.6292e-01,  6.7564e-01, -3.1605e+00,  4.4961e-01, -8.4782e-01,
+         -3.3233e-02],
+        [-8.6646e-01,  5.8269e-01, -3.8687e+00, -8.5415e-02, -9.8338e-01,
+         -1.6268e-01],
+        [ 5.0540e-01, -3.7841e-01,  1.6122e+00,  1.2523e-01,  6.6387e-01,
+         -4.9274e-02],
+        [-6.2303e-01,  5.2073e-01, -2.7763e+00, -4.5112e-01, -5.7048e-01,
+         -4.2403e-01],
+        [ 3.1580e-01, -6.0424e-01,  2.1089e+00, -2.2158e-01,  8.3530e-01,
+         -8.3027e-02],
+        [-5.6600e-01,  5.8439e-01, -2.7410e+00, -3.0652e-01, -5.2120e-01,
+         -4.7773e-01],
+        [-9.1344e-01,  5.9697e-01, -3.9412e+00, -9.8297e-02, -1.0081e+00,
+         -1.6365e-01],
+        [-3.0413e-02, -5.3462e-01,  8.2912e-01, -9.2746e-01,  2.5144e-01,
+         -2.1331e-02],
+        [ 1.0744e+00, -6.3817e-01,  3.5346e+00,  1.5975e-01,  1.0177e+00,
+          2.2979e-02],
+        [-1.0789e+00,  6.2418e-01, -3.6611e+00,  1.1855e-01, -7.1593e-01,
+         -1.7230e-01],
+        [-9.0576e-01,  6.1793e-01, -3.9571e+00, -1.0015e-01, -1.0497e+00,
+         -1.5690e-01],
+        [        nan,         nan,         nan,         nan,         nan,
+                 nan],
+        [-3.6001e-01,  6.4076e-01, -2.2873e+00,  9.5573e-01, -3.3031e-01,
+         -8.7162e-02],
+        [ 1.2139e-01, -5.3853e-01,  1.2599e+00, -7.4644e-01,  4.0956e-01,
+          3.5251e-03],
+        [-4.0149e-01,  6.2364e-01, -2.3977e+00,  1.8005e-01, -3.3357e-01,
+         -5.3803e-01],
+        [-1.0502e+00,  5.6667e-01, -4.0047e+00,  6.8255e-02, -8.7220e-01,
+         -9.8411e-02],
+        [ 2.1318e-02,  4.7078e-01, -1.0351e+00,  1.3330e+00,  1.6473e-01,
+         -1.6561e-01],
+        [-5.1625e-02,  7.2918e-01, -1.6650e+00,  1.3414e+00, -8.4803e-02,
+         -7.4189e-02],
+        [-9.2269e-01,  6.1288e-01, -3.9574e+00, -3.7091e-02, -1.0001e+00,
+         -1.4743e-01],
+        [-9.4906e-01,  5.8205e-01, -3.9832e+00, -1.5822e-01, -1.0485e+00,
+         -1.5892e-01],
+        [ 2.5604e-01, -5.3022e-01,  1.5700e+00, -4.1570e-01,  5.9275e-01,
+         -1.0411e-01],
+        [-5.0024e-01,  5.9033e-01, -2.5814e+00,  7.9626e-01, -3.9235e-01,
+         -9.9867e-02],
+        [-2.6576e-01, -4.3291e-01,  1.3875e-02, -1.0707e+00, -2.3765e-02,
+         -7.3142e-02],
+        [-9.5694e-01,  5.2961e-01, -3.2854e+00,  1.8192e-01, -5.5087e-01,
+         -2.2589e-01],
+        [-8.8250e-01,  6.5306e-01, -3.6349e+00, -2.6696e-02, -8.3160e-01,
+         -2.2516e-01]], device='cuda:0')
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.

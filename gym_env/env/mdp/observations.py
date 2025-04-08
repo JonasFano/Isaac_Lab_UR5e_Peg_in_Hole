@@ -60,25 +60,16 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     # Extract the pose of the end-effector (position + orientation) in the world frame
     ee_pose_w = body_state_w_list[:, robot_cfg.body_ids[0], :7]
 
-    print("EE Pose w: ", ee_pose_w)
+    print("EE Pose w: ", ee_pose_w[50, :])
 
     # Define the offset from the end-effector frame to the TCP in the end-effector frame
     offset_ee = torch.tensor(gripper_offset, dtype=torch.float32, device="cuda").unsqueeze(0).repeat(env.scene.num_envs, 1)
-    
-    print("Offset ee: ", offset_ee)
 
     # Rotate the offset from the end-effector frame to the world frame
     offset_w = quat_rotate_vector(ee_pose_w[:, 3:7], offset_ee)
 
-    print("Offset w: ", offset_w)
-
     # Compute the TCP pose in the world frame by adding the offset to the end-effector's position
     tcp_pose_w = torch.cat((ee_pose_w[:, :3] + offset_w, ee_pose_w[:, 3:7]), dim=-1)
-
-    print("TCP pose w: ", tcp_pose_w)
-    print("Frame pose: ", ee_frame.data.target_pos_w[..., 0, :])
-
-    print("Robot Root: ", robot.data.root_state_w)
 
     # Transform the TCP pose from the world frame to the robot's base frame
     tcp_pos_b, tcp_quat_b = subtract_frame_transforms(
@@ -94,8 +85,6 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     # tcp_pose_b = torch.cat((tcp_pos_b, tcp_axis_angle_b), dim=-1)
 
     tcp_pose_b = torch.cat((tcp_pos_b, tcp_quat_b), dim=-1)
-
-    print("TCP pose b: ", tcp_pose_b)
 
     return tcp_pose_b
 
