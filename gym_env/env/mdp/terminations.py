@@ -61,8 +61,6 @@ def is_peg_inserted(
     xy_threshold: float = 0.0025,
     z_threshold: float = 0.001,
 ) -> torch.Tensor:
-    
-    print("Termination Start")
 
     """ Check if peg is in the hole. Returns a binary tensor: 1 if success, 0 otherwise. """
     object: RigidObject | Articulation = env.scene[object_cfg.name]
@@ -82,7 +80,5 @@ def is_peg_inserted(
 
     # Combine both
     success = (xy_ok & z_ok).bool()  # Returns true if both true, else false
-
-    print("Termination Finish")
 
     return success  # shape: [N]

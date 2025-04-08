@@ -9,6 +9,7 @@ import torch
 from typing import TYPE_CHECKING, List
 from isaaclab.assets import RigidObject, Articulation
 from isaaclab.managers import SceneEntityCfg
+from isaaclab.sensors import FrameTransformer
 from isaaclab.utils.math import subtract_frame_transforms, quat_apply, matrix_from_quat
 from pathlib import Path
 import numpy as np
@@ -37,7 +38,7 @@ def quat_rotate_vector(quat: torch.Tensor, vec: torch.Tensor) -> torch.Tensor:
     return rotated_vec
 
 
-def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], robot_cfg: SceneEntityCfg) -> torch.Tensor:
+def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], robot_cfg: SceneEntityCfg, ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame")) -> torch.Tensor:
     """
     Compute the current TCP pose in both the base frame and world frame.
     
@@ -49,8 +50,6 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
         tcp_pose_b: TCP pose in the robot's base frame (position + quaternion).
     """
 
-    print("TCP Pose Start")
-
     # Access the robot object from the scene using the provided configuration
     robot: RigidObject | Articulation = env.scene[robot_cfg.name]
 
@@ -60,14 +59,25 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     # Extract the pose of the end-effector (position + orientation) in the world frame
     ee_pose_w = body_state_w_list[:, robot_cfg.body_ids[0], :7]
 
+    print("EE Pose w: ", ee_pose_w)
+
     # Define the offset from the end-effector frame to the TCP in the end-effector frame
     offset_ee = torch.tensor(gripper_offset, dtype=torch.float32, device="cuda").unsqueeze(0).repeat(env.scene.num_envs, 1)
+    
+    print("Offset ee: ", offset_ee)
 
     # Rotate the offset from the end-effector frame to the world frame
     offset_w = quat_rotate_vector(ee_pose_w[:, 3:7], offset_ee)
 
+    print("Offset w: ", offset_w)
+
     # Compute the TCP pose in the world frame by adding the offset to the end-effector's position
     tcp_pose_w = torch.cat((ee_pose_w[:, :3] + offset_w, ee_pose_w[:, 3:7]), dim=-1)
+
+    print("TCP pose w: ", tcp_pose_w)
+    print("Frame pose: ", ee_frame.data.target_pos_w[..., 0, :])
+
+    print("Robot Root: ", robot.data.root_state_w)
 
     # Transform the TCP pose from the world frame to the robot's base frame
     tcp_pos_b, tcp_quat_b = subtract_frame_transforms(
@@ -84,7 +94,8 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
 
     tcp_pose_b = torch.cat((tcp_pos_b, tcp_quat_b), dim=-1)
 
-    print("TCP Pose Finish")
+    ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
+    print("TCP pose b: ", tcp_pose_b)
 
     return tcp_pose_b
 
@@ -192,8 +203,6 @@ def noisy_hole_pose_estimate(
     robot: RigidObject | Articulation = env.scene[asset_cfg.name]
     hole: RigidObject | Articulation = env.scene[hole_cfg.name]
 
-    print("Noisy Hole Start")
-
     # Get hole position in world frame
     hole_pos_w = hole.data.root_pos_w[:, :3]
 
@@ -207,7 +216,5 @@ def noisy_hole_pose_estimate(
     hole_pos_b[:, :2] += xy_noise
 
     hole_pose_b = torch.cat((hole_pos_b, hole_quat_b), dim=-1)
-
-    print("Noisy Hole Finish")
 
     return hole_pose_b

@@ -91,8 +91,6 @@ def keypoint_distance(
     Hole keypoints: from 0 (base) to +object_height (top).
     """
 
-    print("Keypoint Distance Start")
-
     # Extract assets
     object: RigidObject | Articulation = env.scene[object_cfg.name]
     hole: RigidObject | Articulation = env.scene[hole_cfg.name]
@@ -137,8 +135,6 @@ def keypoint_distance(
 
     reward = squashing_fn(avg_kp_distance, a, b)
 
-    print("Keypoint Distance Finish")
-
     return reward
 
 
@@ -151,8 +147,6 @@ def is_peg_centered(
         z_threshold: float = 0.08,
 ) -> torch.Tensor:
     """Reward if peg is centered above the hole and is inserted below a Z height threshold."""
-
-    print("Is Peg Inserted Start")
     
     # Extract assets
     object: RigidObject | Articulation = env.scene[object_cfg.name]
@@ -182,9 +176,6 @@ def is_peg_centered(
         torch.ones_like(xy_dist, dtype=torch.float32),
         torch.zeros_like(xy_dist, dtype=torch.float32)
     )
-
-    print("Is Peg Inserted Finish")
-
 
     return reward
 

@@ -2,7 +2,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-OBS_LOG_PATH = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/data/obs_log_v2.npy"
+# OBS_LOG_PATH = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/data/obs_log_v2.npy"
+OBS_LOG_PATH = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/data/obs_log_v5.npy"
 
 def load_logged_obs(filepath):
     obs = []
@@ -35,14 +36,22 @@ def check_obs_stats(obs: np.ndarray):
         if has_nan or has_inf or min_val < -1e3 or max_val > 1e3:
             print(f"[Env {env_idx}] min: {min_val:.3f}, max: {max_val:.3f}, NaN: {has_nan}, Inf: {has_inf}")
 
+def identify_nan_categories(obs: np.ndarray):
+    """
+    Print which observation category (TCP pose, hole pose, previous action) contains NaN values, per env.
+    """
+    _, num_envs, obs_dim = obs.shape
+    obs_labels = ["TCP pose"] * 7 + ["Hole pose"] * 7 + ["Previous action"] * 6
+
+    for env_idx in range(num_envs):
+        env_obs = obs[:, env_idx, :]
+        for dim in range(obs_dim):
+            if np.isnan(env_obs[:, dim]).any():
+                print(f"[Env {env_idx}] NaN in obs dim {dim} ({obs_labels[dim]})")
+
 def plot_obs_range_per_env(obs: np.ndarray):
-    """
-    Plot the min and max obs values for each environment.
-    Args:
-        obs: np.ndarray of shape (timesteps, num_envs, obs_dim)
-    """
-    env_mins = np.min(obs, axis=(0, 2))  # (num_envs,)
-    env_maxs = np.max(obs, axis=(0, 2))  # (num_envs,)
+    env_mins = np.min(obs, axis=(0, 2))
+    env_maxs = np.max(obs, axis=(0, 2))
 
     plt.figure(figsize=(14, 6))
     plt.plot(env_mins, label="Min obs per env", color='blue')
@@ -56,13 +65,7 @@ def plot_obs_range_per_env(obs: np.ndarray):
     plt.show()
 
 def plot_env_obs(obs: np.ndarray, env_idx: int = 0):
-    """
-    Plot each observation dimension over time for a given environment index.
-    Args:
-        obs: np.ndarray of shape (timesteps, num_envs, obs_dim)
-        env_idx: Index of the environment to plot (int)
-    """
-    env_obs = obs[:, env_idx, :]  # (timesteps, obs_dim)
+    env_obs = obs[:, env_idx, :]
     obs_dim = env_obs.shape[1]
 
     plt.figure(figsize=(12, 6))
@@ -78,7 +81,9 @@ def plot_env_obs(obs: np.ndarray, env_idx: int = 0):
 
 if __name__ == "__main__":
     obs = load_logged_obs(OBS_LOG_PATH)
-    print(obs)
+    print(obs[22026, 50, :])
+    print(obs[22027, 50, :])
     check_obs_stats(obs)
+    identify_nan_categories(obs)
     plot_obs_range_per_env(obs)
-    plot_env_obs(obs, env_idx=0)  # Change env_idx as needed
+    # plot_env_obs(obs, env_idx=50)
