@@ -133,7 +133,7 @@ def keypoint_distance(
 
     # Reward function
     def squashing_fn(x, a, b):
-        return 1 / (torch.exp(a * x) + b + torch.exp(-a * x))
+        return 1 / (torch.exp(a * x) + b + torch.exp(-a * x)) # If x (mean keypoint distance) is very small, reward = 1 / (2 + b)
 
     reward = squashing_fn(avg_kp_distance, a, b)
 
