@@ -60,8 +60,6 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     # Extract the pose of the end-effector (position + orientation) in the world frame
     ee_pose_w = body_state_w_list[:, robot_cfg.body_ids[0], :7]
 
-    print("EE Pose w: ", ee_pose_w[50, :])
-
     # Define the offset from the end-effector frame to the TCP in the end-effector frame
     offset_ee = torch.tensor(gripper_offset, dtype=torch.float32, device="cuda").unsqueeze(0).repeat(env.scene.num_envs, 1)
 

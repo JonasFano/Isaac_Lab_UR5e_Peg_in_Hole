@@ -2,6 +2,9 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
 # LOG_PATH = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/data/action_log_v2.npy"
 LOG_PATH = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/data/action_log_v5.npy"
 
@@ -92,9 +95,53 @@ def plot_env_actions(actions: np.ndarray, env_idx: int = 0):
     plt.tight_layout()
     plt.show()
 
+
+def plot_actions_xyz_for_env_plotly(ac  : np.ndarray, env_idx: int = 50, start: int = 0, end: int = None):
+    """
+    Plot TCP position (x, y, z) over time for a specific environment using Plotly in separate subplots.
+
+    Args:
+        ac  : np.ndarray of shape (timesteps, num_envs, action_dim)
+        env_idx: which environment to plot
+        start: starting timestep
+        end: ending timestep (exclusive)
+    """
+    max_timesteps = actions.shape[0]
+    if end is None or end > max_timesteps:
+        end = max_timesteps
+    if start >= end:
+        raise ValueError(f"Start timestep ({start}) must be less than end timestep ({end}).")
+
+    tcp_pose = actions[start:end, env_idx, 0:3]  # Only x, y, z
+    timesteps = np.arange(start, end)
+    labels = ['x', 'y', 'z']
+
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
+                        subplot_titles=[f'{label} position' for label in labels])
+
+    for i in range(3):
+        fig.add_trace(go.Scatter(
+            x=timesteps,
+            y=tcp_pose[:, i],
+            mode='lines',
+            name=labels[i],
+        ), row=i+1, col=1)
+
+        fig.update_yaxes(title_text=f"{labels[i]} (m)", row=i+1, col=1)
+
+    fig.update_xaxes(title_text="Timestep", row=3, col=1)
+    fig.update_layout(height=1400, width=3000,
+                      xaxis_title='Timestep',
+                      yaxis_title='Position (m)',
+                      showlegend=False,
+                      hovermode="x unified",)
+    fig.show()
+
 if __name__ == "__main__":
     actions = load_logged_actions(LOG_PATH)
     print(actions)
     check_action_stats(actions)
-    plot_action_range_per_env(actions)
+    # plot_action_range_per_env(actions)
     # plot_env_actions(actions, env_idx=0)  # Optional: plot details for one env
+
+    plot_actions_xyz_for_env_plotly(actions, env_idx=50, start=20000, end=actions.shape[0])

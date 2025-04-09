@@ -150,58 +150,58 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         checkpoint_callback = None
     
     # train the agent
-    agent.learn(total_timesteps=n_timesteps, callback=checkpoint_callback)
+    # agent.learn(total_timesteps=n_timesteps, callback=checkpoint_callback)
 
 
 
 
 
-    # # Initialize the environment and variables
-    # obs = env.reset()
-    # total_timesteps = n_timesteps
-    # timestep = 0
-    # rollout_buffer = []  # Buffer to collect rollouts for training
+    # Initialize the environment and variables
+    obs = env.reset()
+    total_timesteps = n_timesteps
+    timestep = 0
+    rollout_buffer = []  # Buffer to collect rollouts for training
 
-    # while timestep < total_timesteps:
-    #     # Predict the action using the policy
-    #     action, _states = agent.predict(obs, deterministic=False)
+    while timestep < total_timesteps:
+        # Predict the action using the policy
+        action, _states = agent.predict(obs, deterministic=False)
 
-    #     # print(f"Timestep: {timestep}, Action: {action}")
+        # print(f"Timestep: {timestep}, Action: {action}")
 
-    #     # action = torch.tensor([0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-    #     # action = torch.tensor([0.0, 0.0, -0.1, 0.0, 0.0, 0.0])
-    #     # action = action.unsqueeze(0).repeat(env.num_envs, 1)  # Shape: [num_envs, 7]
-    #     action = np.zeros_like(action)
+        # action = torch.tensor([0.0, 0.0, -0.1, 0.0, 0.0, 0.0])
+        action = torch.tensor([0.0, 0.0, -1, 0.0, 0.0, 0.0])
+        action = action.unsqueeze(0).repeat(env.num_envs, 1)  # Shape: [num_envs, 7]
+        # action = np.zeros_like(action)
 
-    #     # Take the action in the environment
-    #     new_obs, reward, done, info = env.step(action)
+        # Take the action in the environment
+        new_obs, reward, done, info = env.step(action)
 
-    #     # Print the reward for this timestep
-    #     print(f"Timestep: {timestep}, Reward: {reward}")
-    #     # print(f"Timestep: {timestep}, Obs: {obs}")
-
-
-    #     # Collect data for learning
-    #     rollout_buffer.append((obs, action, reward, new_obs, done))
-
-    #     # Update observation
-    #     obs = new_obs
-
-    #     # If any of the environments are done, reset them
-    #     if np.any(done):  # This resets *all* envs if *any* is done
-    #         obs = env.reset()
+        # Print the reward for this timestep
+        # print(f"Timestep: {timestep}, Reward: {reward}")
+        print(f"Timestep: {timestep}, Obs: {obs}")
 
 
-    #     # Increment the timestep
-    #     timestep += 1
+        # Collect data for learning
+        rollout_buffer.append((obs, action, reward, new_obs, done))
 
-    #     # Periodically train the agent using the collected rollouts
-    #     if len(rollout_buffer) >= agent.n_steps:  # `agent.n_steps` is the number of steps per update
-    #         for experience in rollout_buffer:
-    #             obs, action, reward, new_obs, done = experience
-    #             agent.policy.optimizer.zero_grad()
-    #             agent.policy.optimizer.step()  # Perform the training step
-    #         rollout_buffer.clear()  # Clear buffer after training
+        # Update observation
+        obs = new_obs
+
+        # If any of the environments are done, reset them
+        if np.any(done):  # This resets *all* envs if *any* is done
+            obs = env.reset()
+
+
+        # Increment the timestep
+        timestep += 1
+
+        # Periodically train the agent using the collected rollouts
+        if len(rollout_buffer) >= agent.n_steps:  # `agent.n_steps` is the number of steps per update
+            for experience in rollout_buffer:
+                obs, action, reward, new_obs, done = experience
+                agent.policy.optimizer.zero_grad()
+                agent.policy.optimizer.step()  # Perform the training step
+            rollout_buffer.clear()  # Clear buffer after training
 
 
 

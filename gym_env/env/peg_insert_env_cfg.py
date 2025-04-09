@@ -244,11 +244,11 @@ class ObservationsCfg:
             noise=Unoise(n_min=TaskParams.tcp_pose_unoise_min, n_max=TaskParams.tcp_pose_unoise_max),
         )
 
-        # ee_wrench_b = ObsTerm(
-        #     func=mdp.body_incoming_wrench_transform,
-        #     params={"asset_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
-        #     # noise=Unoise(n_min=-0.1, n_max=0.1),
-        # ) # Small force/torque if not in contact, small but noticeable changes when moving, gets big when in contact
+        ee_wrench_b = ObsTerm(
+            func=mdp.body_incoming_wrench_transform,
+            params={"asset_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
+            # noise=Unoise(n_min=-0.1, n_max=0.1),
+        ) # Small force/torque if not in contact, small but noticeable changes when moving, gets big when in contact
 
         noisy_hole_pose_estimate = ObsTerm(
             func=mdp.noisy_hole_pose_estimate,

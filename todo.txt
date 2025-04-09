@@ -1,7 +1,8 @@
 TODO:
 
-1. Check if error is related to reward func or to num_envs
-2. Check reward weights
+1. Check if error is related to reward func or to num_envs - It is related to get_current_TCP_pose() well yes but it was GPU memory issues due to too many parallel environments
+2. Solve error
+3. Check reward weights
 
 
 
