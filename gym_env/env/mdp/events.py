@@ -390,7 +390,7 @@ def randomize_initial_state(
         # Compute TCP pose error for all env_ids
         tcp_pose_error, _ = get_tcp_pose_error(env, env_ids, robot, body_idx, tcp_target_pose_b, body_offset)
 
-        print("TCP Pose Error: ", tcp_pose_error[env_ids, :])
+        print("TCP Pose Error: ", tcp_pose_error)
 
         # Determine new bad_envs
         pos_error = torch.linalg.norm(tcp_pose_error[:, :3], dim=1) > pos_error_threshold
