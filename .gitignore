@@ -8,6 +8,4 @@ __pycache__/
 # Ignore outputs folder
 sb3/outputs/
 
-data/
-
 sb3/output_*.log
