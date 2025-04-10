@@ -58,10 +58,10 @@ class TaskParams:
     # Is peg centered
     is_peg_centered_xy_threshold = 0.0025 # 2.5 mm
     is_peg_centered_z_threshold = 0.08 # 8 cm
-    is_peg_centered_weight = 5.0
+    is_peg_centered_weight = 15.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 10.0
+    is_peg_inserted_weight = 30.0
 
 
     ###################
