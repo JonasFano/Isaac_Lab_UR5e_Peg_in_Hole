@@ -49,11 +49,11 @@ class TaskParams:
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
-    keypoint_distance_coarse_weight = 1.0
+    keypoint_distance_coarse_weight = 10.0
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 1.0
+    keypoint_distance_fine_weight = 10.0
 
     # Is peg centered
     is_peg_centered_xy_threshold = 0.0025 # 2.5 mm
