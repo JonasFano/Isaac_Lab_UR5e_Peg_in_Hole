@@ -109,8 +109,6 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     Converts from end-effector frame to world frame and vice versa.
     """
 
-    print("Wrench Start")
-
     # Extract the used quantities (to enable type-hinting)
     asset: RigidObject | Articulation = env.scene[asset_cfg.name]
 
@@ -174,8 +172,6 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     # ------------------------------------------------------------------
 
     w = wrench_world.view(env.num_envs, -1)
-
-    print("Wrench Finish")
 
     return w
 

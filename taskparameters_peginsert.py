@@ -49,11 +49,11 @@ class TaskParams:
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
-    keypoint_distance_coarse_weight = 10.0
+    keypoint_distance_coarse_weight = 5.0
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 10.0
+    keypoint_distance_fine_weight = 5.0
 
     # Is peg centered
     is_peg_centered_xy_threshold = 0.0025 # 2.5 mm
@@ -109,9 +109,9 @@ class TaskParams:
     robot_reset_joints_vel_range = (0.0, 0.0)
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
-    tcp_rand_range_x = (-0.02, 0.02)
-    tcp_rand_range_y = (-0.02, 0.02)
-    tcp_rand_range_z = (0.1, 0.125) # (0.076, 0.076)
+    tcp_rand_range_x = (-0.01, 0.01) # was +/- 2 cm before
+    tcp_rand_range_y = (-0.01, 0.01) # was +/- 2 cm before
+    tcp_rand_range_z = (0.1, 0.1) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)
     tcp_rand_range_pitch = (math.pi, math.pi)
     tcp_rand_range_yaw = (-3.14, 3.14)
@@ -169,7 +169,7 @@ class TaskParams:
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
-    object_rand_pos_range_x = (-0.003, 0.003)
+    object_rand_pos_range_x = (-0.001, 0.001) # was +/- 3 mm before
     object_rand_pos_range_z = (0.005, 0.02)
     object_width = 0.008 # 8 mm
     object_height = 0.05 # 5 cm
