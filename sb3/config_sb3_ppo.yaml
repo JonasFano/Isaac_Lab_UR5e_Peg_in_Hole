@@ -13,7 +13,7 @@ parameters:
     value: 32 #32 #1024
 
   n_timesteps: # Total number of environment interactions: iteration * n_steps * num_envs: 1000 * 64 * 2048 = 131072000
-    value: 786432000
+    value: 20480000
 
   policy:
     value: 'MlpPolicy'
