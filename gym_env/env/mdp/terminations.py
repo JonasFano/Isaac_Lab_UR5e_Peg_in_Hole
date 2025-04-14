@@ -59,7 +59,7 @@ def is_peg_inserted(
     object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
     object_height: float = 0.05,
     xy_threshold: float = 0.0025,
-    z_threshold: float = 0.001,
+    z_variability: float = 0.002,
 ) -> torch.Tensor:
 
     """ Check if peg is in the hole. Returns a binary tensor: 1 if success, 0 otherwise. """
@@ -76,7 +76,7 @@ def is_peg_inserted(
     xy_ok = torch.linalg.vector_norm(delta[:, :2], dim=1) <= xy_threshold
 
     # Condition 2: Z error is in predefined range
-    z_ok = (delta[:, 2] >= object_height - z_threshold) & (delta[:, 2] <= object_height + z_threshold)
+    z_ok = (delta[:, 2] >= object_height - z_variability) & (delta[:, 2] <= object_height + z_variability)
 
     # Combine both
     success = (xy_ok & z_ok).bool()  # Returns true if both true, else false

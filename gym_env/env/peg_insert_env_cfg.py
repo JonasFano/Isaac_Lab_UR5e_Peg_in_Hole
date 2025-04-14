@@ -412,6 +412,7 @@ class RewardsCfg:
             "object_height": TaskParams.object_height,
             "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
             "z_threshold": TaskParams.is_peg_centered_z_threshold,
+            "z_variability": TaskParams.is_peg_centered_z_variability,
         },
         weight=TaskParams.is_peg_centered_weight,
     )
@@ -450,7 +451,7 @@ class TerminationsCfg:
             "object_cfg": SceneEntityCfg("object"),
             "object_height": TaskParams.object_height,
             "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
-            "z_threshold": TaskParams.is_peg_centered_z_threshold,
+            "z_variability": TaskParams.is_peg_centered_z_variability,
         }
     )
 
@@ -458,14 +459,14 @@ class TerminationsCfg:
 @configclass
 class CurriculumCfg:
     """Curriculum terms for the MDP."""
-    action_rate = CurrTerm(
-        func=mdp.modify_reward_weight, 
-        params={
-            "term_name": "action_rate", 
-            "weight": TaskParams.action_rate_curriculum_weight, 
-            "num_steps": TaskParams.action_rate_curriculum_num_steps,
-        },
-    )
+    # action_rate = CurrTerm(
+    #     func=mdp.modify_reward_weight, 
+    #     params={
+    #         "term_name": "action_rate", 
+    #         "weight": TaskParams.action_rate_curriculum_weight, 
+    #         "num_steps": TaskParams.action_rate_curriculum_num_steps,
+    #     },
+    # )
 
 
 ##

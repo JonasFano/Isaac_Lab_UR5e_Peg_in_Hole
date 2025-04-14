@@ -145,6 +145,7 @@ def is_peg_centered(
         object_height: float = 0.05,
         xy_threshold: float = 0.0025,
         z_threshold: float = 0.08,
+        z_variability: float = 0.002,
 ) -> torch.Tensor:
     """Reward if peg is centered above the hole and is inserted below a Z height threshold."""
     
@@ -166,7 +167,7 @@ def is_peg_centered(
 
     # Check if object is inserted below the Z threshold
     z_disp = object_pos_w[:, 2] - hole_pos_w[:, 2]
-    is_low_enough = (z_disp <= z_threshold) & (z_disp >= object_height - 0.0008) # If the peg is fully inserted, its height is sometimes 0.8 mm below its height
+    is_low_enough = (z_disp <= z_threshold) & (z_disp >= object_height - z_variability) # If the peg is fully inserted, its height is sometimes 1 mm below its height
 
     # print(z_disp)
 
