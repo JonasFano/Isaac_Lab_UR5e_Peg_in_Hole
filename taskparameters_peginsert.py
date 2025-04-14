@@ -62,7 +62,7 @@ class TaskParams:
     is_peg_centered_weight = 25.0
 
     # Is peg inserted
-    is_peg_inserted_weight 50.0
+    is_peg_inserted_weight = 50.0
 
 
     ###################
