@@ -6,7 +6,7 @@ class TaskParams:
     ### General Simulation Params ###
     #################################
     decimation = 2
-    episode_length_s = 1.0 # 10.0  # 10.0 # 0.5 # 5.0
+    episode_length_s = 5.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 0.01
     gravity = [0.0, 0.0, -9.81]
 
