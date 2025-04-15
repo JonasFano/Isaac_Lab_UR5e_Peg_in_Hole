@@ -452,7 +452,7 @@ def randomize_initial_state(
     object.reset()
 
     # Close gripper
-    # Set gripper_offset = 0.025 to fully open the gripper
+    # gripper_joint_pos_offset = 0.025 # Set gripper_joint_pos_offset = 0.025 to fully open the gripper
     gripper_joint_pos_offset = (object_width - 0.001) / 2 # or 0.0005 
     adjusted_gripper_joint_pos_close = [v + gripper_joint_pos_offset for v in gripper_joint_pos_close]
 

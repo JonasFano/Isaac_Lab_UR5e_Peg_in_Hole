@@ -47,21 +47,13 @@ Contains all necessary information on how to start training and how to run a tra
 ## Peg Insert Task
     source isaaclab/bin/activate
     cd /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_005 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v2 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v3 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v4 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v5 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v6 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v7 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v8 config_sb3_ppo.yaml
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v9 config_sb3_ppo.yaml # With force torque reward: 1.0 1.0 5.0 10.0
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v10 config_sb3_ppo.yaml # With force torque reward: 10.0 10.0 5.0 10.0
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v11 config_sb3_ppo.yaml # With force torque reward: 10.0 10.0 15.0 30.0
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v12 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 15.0 30.0
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v13 config_sb3_ppo.yaml # With force torque reward: 10.0 10.0 50.0 100.0
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v14 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v15 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Exact hole estimate
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v16 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Exact hole estimate # Change position iteration count from 192 to 4
-    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v17 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Exact hole estimate # Change position iteration count back to 192 
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v9 config_sb3_ppo.yaml # With force torque reward: 1.0 1.0 5.0 10.0 # Clamping force/torque +/- 5000 
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v10 config_sb3_ppo.yaml # With force torque reward: 10.0 10.0 5.0 10.0 # Clamping force/torque +/- 5000 
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v11 config_sb3_ppo.yaml # With force torque reward: 10.0 10.0 15.0 30.0 # Clamping force/torque +/- 5000 
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v12 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 15.0 30.0 # Clamping force/torque +/- 5000 # From here curriculum-based reward shaping
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v13 config_sb3_ppo.yaml # With force torque reward: 10.0 10.0 50.0 100.0 # Clamping force/torque +/- 5000 
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v14 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Clamping force/torque +/- 5000 
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v15 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Clamping force/torque +/- 5000 # Exact hole estimate
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v16 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Clamping force/torque +/- 5000 # Exact hole estimate # Change position iteration count from 192 to 4
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v17 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Clamping force/torque +/- 5000 # Exact hole estimate # Change position iteration count back to 192 
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v18 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # No clamping # Exact hole estimate # Less randomization

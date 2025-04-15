@@ -149,13 +149,13 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
     wrench_world = torch.cat((forces_world, torques_world), dim=-1)
 
     # Cap wrench values to +/- 10000
-    wrench_world = torch.clamp(wrench_world, min=-5000.0, max=5000.0)
+    # wrench_world = torch.clamp(wrench_world, min=-5000.0, max=5000.0)
 
     # print("World forces: ", forces_world)
 
     # ---------- Logging to disk directly inside the function ----------
     try:
-        log_path = Path(__file__).resolve().parents[3] / "data" / "wrench_log_minmax.bin"
+        log_path = Path(__file__).resolve().parents[3] / "data" / "wrench_log_minmax_v18.bin"
         log_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Compute min and max over all environments

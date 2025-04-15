@@ -4,8 +4,9 @@ from pathlib import Path
 
 # Path to your binary wrench min/max log file
 # log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax.bin" # Without force/torque clamping
-log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v1.bin" # Without force/torque clamping
+# log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v1.bin" # Without force/torque clamping
 # log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v2.bin" # With force/torque clamping to +/- 10000
+log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v9.bin" # With force/torque clamping to +/- 10000
 
 # Load the binary file as float32 and reshape
 data = np.fromfile(log_path, dtype=np.float32)

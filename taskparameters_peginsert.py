@@ -6,7 +6,7 @@ class TaskParams:
     ### General Simulation Params ###
     #################################
     decimation = 2
-    episode_length_s = 5.0 # 10.0  # 10.0 # 0.5 # 5.0
+    episode_length_s = 1.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 0.01
     gravity = [0.0, 0.0, -9.81]
 
@@ -110,9 +110,9 @@ class TaskParams:
     robot_reset_joints_vel_range = (0.0, 0.0)
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
-    tcp_rand_range_x = (-0.01, 0.01) # was +/- 2 cm before
-    tcp_rand_range_y = (-0.01, 0.01) # was +/- 2 cm before
-    tcp_rand_range_z = (0.1, 0.1) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
+    tcp_rand_range_x = (-0.005, 0.005) # was +/- 2 cm before
+    tcp_rand_range_y = (-0.005, 0.005) # was +/- 2 cm before
+    tcp_rand_range_z = (0.07, 0.07) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)
     tcp_rand_range_pitch = (math.pi, math.pi)
     tcp_rand_range_yaw = (-3.14, 3.14)
@@ -156,7 +156,7 @@ class TaskParams:
     # Object parameters
     object_scale = (0.92, 0.92, 1.0)
     object_init_mass = 0.5
-    object_randomize_mass_range = (0.1, 1.0)
+    object_randomize_mass_range = (0.5, 0.5) # (0.1, 1.0)
     object_randomize_mass_operation = "abs"
     object_randomize_mass_distribution = "uniform"
     object_randomize_mass_recompute_inertia = True
@@ -170,8 +170,8 @@ class TaskParams:
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
-    object_rand_pos_range_x = (-0.001, 0.001) # was +/- 3 mm before
-    object_rand_pos_range_z = (0.005, 0.02)
+    object_rand_pos_range_x = (-0.00, 0.00) # was +/- 3 mm before
+    object_rand_pos_range_z = (0.01, 0.01) # was (0.005, 0.02) before
     object_width = 0.008 # 8 mm
     object_height = 0.05 # 5 cm
 
@@ -181,7 +181,7 @@ class TaskParams:
     # Hole parameters
     hole_init_mass = 10
     hole_init_pos = (-0.2, 0.2, 0.0025)
-    hole_randomize_mass_range = (10, 15)
+    hole_randomize_mass_range = (10, 10) # (10, 15)
     hole_randomize_mass_operation = "abs"
     hole_randomize_mass_distribution = "uniform"
     hole_randomize_mass_recompute_inertia = True
