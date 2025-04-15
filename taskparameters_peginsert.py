@@ -26,7 +26,7 @@ class TaskParams:
     tcp_pose_unoise_min = -0.0001 # 0.1 mm
     tcp_pose_unoise_max = 0.0001 # 0.1 mm
 
-    noise_std_hole_pose = 0.0025 # 2.5 mm
+    noise_std_hole_pose = 0.0 # 0.0025 # 2.5 mm
 
 
     #########

@@ -62,3 +62,6 @@ Contains all necessary information on how to start training and how to run a tra
     wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v12 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 15.0 30.0
     wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v13 config_sb3_ppo.yaml # With force torque reward: 10.0 10.0 50.0 100.0
     wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v14 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v15 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Exact hole estimate
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v16 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Exact hole estimate # Change position iteration count from 192 to 4
+    wandb sweep --project rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v17 config_sb3_ppo.yaml # With force torque reward: 5.0 5.0 25.0 50.0 # Exact hole estimate # Change position iteration count back to 192 

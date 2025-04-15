@@ -1,6 +1,6 @@
 program: train_sb3_wandb_ppo.py
 method: grid
-name: rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v14
+name: rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v17
 metric:
   goal: maximize
   name: rollout/ep_rew_mean

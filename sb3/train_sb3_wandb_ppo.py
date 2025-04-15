@@ -44,7 +44,7 @@ def main():
         config = yaml.load(file, Loader=yaml.FullLoader)
 
     run = wandb.init(
-        project="rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v14",
+        project="rel_ik_sb3_ppo_ur5e_peg_insert_0_001_v17",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=False,  # auto-upload the videos of agents playing the game
@@ -118,7 +118,7 @@ def main():
     agent.learn(
         total_timesteps=wandb.config["n_timesteps"],
         callback=WandbCallback(
-            gradient_save_freq=10000,
+            gradient_save_freq=1000,
             model_save_path=f"models/{run.id}",
             verbose=2,
         ),
