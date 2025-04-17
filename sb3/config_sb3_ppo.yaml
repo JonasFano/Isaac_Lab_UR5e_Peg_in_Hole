@@ -22,7 +22,7 @@ parameters:
     value: 64
 
   batch_size: # Data is divided into minibatches of size batch_size. = number of samples used for one gradient update during training
-    value: 16384
+    value: 1024
 
   gae_lambda:
     value: 0.95
