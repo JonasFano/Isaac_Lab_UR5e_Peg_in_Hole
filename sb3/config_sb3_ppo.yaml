@@ -10,7 +10,7 @@ parameters:
     value: 42 # values: [24, 42] #[42, 24]
 
   num_envs:
-    value: 32 #32 #1024
+    value: 16 #32 #1024
 
   n_timesteps: # Total number of environment interactions: iteration * n_steps * num_envs: 1000 * 64 * 2048 = 131072000
     value: 15360000 #20480000
