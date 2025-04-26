@@ -13,7 +13,7 @@ parameters:
     value: 64 #32 #1024
 
   n_timesteps: # Total number of environment interactions: iteration * n_steps * num_envs: 1000 * 64 * 2048 = 131072000
-    value: 10240000 #20480000
+    value: 15360000 #20480000
 
   policy:
     value: 'MlpPolicy'
@@ -22,7 +22,7 @@ parameters:
     value: 64
 
   batch_size: # Data is divided into minibatches of size batch_size. = number of samples used for one gradient update during training
-    value: 16384
+    value: 1024
 
   gae_lambda:
     value: 0.95
