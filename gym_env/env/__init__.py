@@ -1,5 +1,5 @@
 import gymnasium as gym
-from . import agents, ik_rel_env_cfg, ik_rel_env_cfg_domain_rand, ik_rel_peg_insert_env_cfg
+from . import agents, ik_rel_env_cfg, ik_rel_env_cfg_domain_rand, ik_rel_peg_insert_env_cfg, ik_rel_peg_insert_env_cfg_franka
 
 # Register Gym environments.
 
@@ -31,6 +31,17 @@ gym.register(
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": ik_rel_peg_insert_env_cfg.RelIK_UR5e_PegInsertEnvCfg,
+        "sb3_ppo_cfg_entry_point": f"{agents.__name__}:sb3_ppo_cfg.yaml",
+    },
+)
+
+
+gym.register(
+    id="Franka-Peg-Insert-IK",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": ik_rel_peg_insert_env_cfg_franka.RelIK_Franka_PegInsertEnvCfg,
         "sb3_ppo_cfg_entry_point": f"{agents.__name__}:sb3_ppo_cfg.yaml",
     },
 )

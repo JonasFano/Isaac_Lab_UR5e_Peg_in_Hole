@@ -663,8 +663,8 @@ def jacobian_w(robot: RigidObject | Articulation, jacobi_body_idx, jacobi_joint_
 
 def set_robot_to_default_joint_pos(env: ManagerBasedRLEnv, robot: RigidObject | Articulation, joints, env_ids, gripper_width = 0):
     joint_pos = robot.data.default_joint_pos[env_ids]
-    joint_pos[:, 7:] = gripper_width
-    joint_pos[:, :9] = torch.tensor(joints, device=env.device)[None, :]
+    joint_pos[:, 6:] = gripper_width
+    joint_pos[:, :8] = torch.tensor(joints, device=env.device)[None, :]
     joint_vel = torch.zeros_like(joint_pos)
     joint_effort = torch.zeros_like(joint_pos)
 

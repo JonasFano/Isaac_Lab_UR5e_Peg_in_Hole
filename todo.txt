@@ -1,9 +1,10 @@
 TODO:
 
-1. Check if error is related to reward func or to num_envs - It is related to get_current_TCP_pose() well yes but it was GPU memory issues due to too many parallel environments
-2. Solve error
-3. Check reward weights
-
+1. Run Reach Target Pose Task for PPO, DDPG and TD3
+2. Try using Franka on custom implemented peg insertion task
+3. Try using link_incoming_forces as observation term in built-in peg insertion factory task
+4. Write result section for Reach Target Pose Task and Discussion for this part
+5. Write result section for Lift Cube Task
 
 
 

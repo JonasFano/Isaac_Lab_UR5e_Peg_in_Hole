@@ -171,13 +171,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         # action = torch.tensor([0.0, 0.0, -0.1, 0.0, 0.0, 0.0])
         # action = torch.tensor([0.0, 0.0, -1, 0.0, 0.0, 0.0])
         # action = action.unsqueeze(0).repeat(env.num_envs, 1)  # Shape: [num_envs, 7]
-        action = np.zeros_like(action)
+        # action = np.zeros_like(action)
 
         # Take the action in the environment
         new_obs, reward, done, info = env.step(action)
 
         # Print the reward for this timestep
-        print(f"Timestep: {timestep}, Reward: {reward}")
+        # print(f"Timestep: {timestep}, Reward: {reward}")
         # print(f"Timestep: {timestep}, Obs: {obs}")
 
 
