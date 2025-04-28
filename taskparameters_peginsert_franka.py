@@ -6,7 +6,7 @@ class TaskParams:
     ### General Simulation Params ###
     #################################
     decimation = 2
-    episode_length_s = 5.0 # 10.0  # 10.0 # 0.5 # 5.0
+    episode_length_s = 10.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 0.01
     gravity = [0.0, 0.0, -9.81]
 
@@ -17,7 +17,7 @@ class TaskParams:
     command_type = "pose"
     use_relative_mode = True
     ik_method = "dls"
-    action_scale= 0.001 # 0.005 # 0.0
+    action_scale= 0.0002 # 0.005 # 0.0
 
 
     ################
@@ -32,7 +32,7 @@ class TaskParams:
     #########
     # Event #
     #########
-    ik_max_iters = 20
+    ik_max_iters = 30
     pos_error_threshold = 1e-3
     angle_error_threshold = 1e-3
     levenberg_marquardt_lambda = 0.01
@@ -59,10 +59,10 @@ class TaskParams:
     is_peg_centered_xy_threshold = 0.0025 # 2.5 mm
     is_peg_centered_z_threshold = 0.09 # 8 cm
     is_peg_centered_z_variability = 0.002 # 2 mm
-    is_peg_centered_weight = 25.0
+    is_peg_centered_weight = 20.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 50.0
+    is_peg_inserted_weight = 100.0
 
 
     ###################

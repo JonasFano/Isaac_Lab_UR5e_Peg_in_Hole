@@ -453,7 +453,7 @@ def randomize_initial_state(
 
     # Close gripper
     # gripper_joint_pos_offset = 0.025 # Set gripper_joint_pos_offset = 0.025 to fully open the gripper
-    gripper_joint_pos_offset = (object_width - 0.001) / 2 # or 0.0005 
+    gripper_joint_pos_offset = 0.002 # (object_width - 0.0005) / 2 # or 0.0005 
     adjusted_gripper_joint_pos_close = [v + gripper_joint_pos_offset for v in gripper_joint_pos_close]
 
     joint_pos = robot.data.joint_pos[env_ids, :].clone()

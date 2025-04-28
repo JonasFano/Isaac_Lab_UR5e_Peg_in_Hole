@@ -92,7 +92,6 @@ class UR5e_PegInsertSceneCfg(InteractiveSceneCfg):
                     "joint_left": TaskParams.gripper_effort_limit,
                     "joint_right": TaskParams.gripper_effort_limit,
                 },
-                ############### Stiffness 10000000 ###############
                 stiffness = {
                     "shoulder_pan_joint": TaskParams.robot_stiffness,
                     "shoulder_lift_joint": TaskParams.robot_stiffness,
