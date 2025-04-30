@@ -48,6 +48,20 @@ Contains all necessary information on how to start training and how to run a tra
 
 
 
+
+#####################
+# Impedance Control #
+#####################
+    source isaaclab/bin/activate
+    cd isaaclab/IsaacLab
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/train_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl
+
+
+
+
+
+
+
 #################################################
 # IK Relative Control with domain randomization #
 #################################################
@@ -82,4 +96,4 @@ Contains all necessary information on how to start training and how to run a tra
 
 
 ## Franka
-    wandb sweep --project rel_ik_sb3_ppo_franka_peg_insert_0_001 config_sb3_ppo.yaml
+    wandb sweep --project rel_ik_sb3_ppo_franka_peg_insert config_sb3_ppo.yaml

@@ -20,7 +20,7 @@ import os
 import math
 from gym_env.env.mdp.actions.actions_cfg import ImpedanceControllerActionCfg
 
-from taskparameters_peginsert_franka import TaskParams
+from taskparameters_peginsert_impedance import TaskParams
 
 ##
 # Scene definition
@@ -29,13 +29,13 @@ from taskparameters_peginsert_franka import TaskParams
 MODEL_PATH = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")), "scene_models")
 
 @configclass
-class Franka_PegInsertSceneCfg(InteractiveSceneCfg):
+class UR5e_PegInsertSceneCfg(InteractiveSceneCfg):
     """Configuration for the lift scene with a robot and a object."""
     # articulation
     robot = ArticulationCfg(
         prim_path="{ENV_REGEX_NS}/robot", 
         spawn=sim_utils.UsdFileCfg(
-            usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Factory/franka_mimic.usd",
+            usd_path=os.path.join(MODEL_PATH, "ur5e_robotiq_hand_e.usd"),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 disable_gravity=False,
                 max_depenetration_velocity=5.0,
@@ -57,50 +57,64 @@ class Franka_PegInsertSceneCfg(InteractiveSceneCfg):
             collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
         ),  
         init_state=ArticulationCfg.InitialStateCfg(
-            joint_pos={
-                "panda_joint1": 1.8,
-                "panda_joint2": -0.2,
-                "panda_joint3": 0.0,
-                "panda_joint4": -2.4,
-                "panda_joint5": 0.35,
-                "panda_joint6": 2.3,
-                "panda_joint7": 0.8,
-                "panda_finger_joint2": 0.04,
-            },
             pos=(0.3, -0.1, 0.0), 
-            rot=(1.0, 0.0, 0.0, 0.0),
+            joint_pos={
+                "shoulder_pan_joint": TaskParams.robot_initial_joint_pos[0], 
+                "shoulder_lift_joint": TaskParams.robot_initial_joint_pos[1], 
+                "elbow_joint": TaskParams.robot_initial_joint_pos[2], 
+                "wrist_1_joint": TaskParams.robot_initial_joint_pos[3], 
+                "wrist_2_joint": TaskParams.robot_initial_joint_pos[4], 
+                "wrist_3_joint": TaskParams.robot_initial_joint_pos[5], 
+                "joint_left": TaskParams.robot_initial_joint_pos[6],
+                "joint_right": TaskParams.robot_initial_joint_pos[7],
+            }
         ),
         actuators={
-            "panda_arm1": ImplicitActuatorCfg(
-                joint_names_expr=["panda_joint[1-4]"],
-                stiffness=40000000.0,
-                damping=50000.0,
-                friction=0.75,
-                armature=0.0,
-                effort_limit=87,
-                velocity_limit=124.6,
-            ),
-            "panda_arm2": ImplicitActuatorCfg(
-                joint_names_expr=["panda_joint[5-7]"],
-                stiffness=40000000.0,
-                damping=50000.0,
-                friction=0.75,
-                armature=0.0,
-                effort_limit=12,
-                velocity_limit=149.5,
-            ),
-            "panda_hand": ImplicitActuatorCfg(
-                joint_names_expr=["panda_finger_joint[1-2]"],
-                effort_limit=40.0,
-                velocity_limit=0.04,
-                stiffness=10000000.0,
-                damping=50000.0,
-                friction=0.1,
-                armature=0.0,
-            ),
-        },
+            "all_joints": ImplicitActuatorCfg(
+                joint_names_expr=[".*"],  # Match all joints
+                velocity_limit={
+                    "shoulder_pan_joint": TaskParams.robot_vel_limit,
+                    "shoulder_lift_joint": TaskParams.robot_vel_limit,
+                    "elbow_joint": TaskParams.robot_vel_limit,
+                    "wrist_1_joint": TaskParams.robot_vel_limit,
+                    "wrist_2_joint": TaskParams.robot_vel_limit,
+                    "wrist_3_joint": TaskParams.robot_vel_limit,
+                    "joint_left": TaskParams.gripper_vel_limit,
+                    "joint_right": TaskParams.gripper_vel_limit,
+                },
+                effort_limit={
+                    "shoulder_pan_joint": TaskParams.robot_effort_limit,
+                    "shoulder_lift_joint": TaskParams.robot_effort_limit,
+                    "elbow_joint": TaskParams.robot_effort_limit,
+                    "wrist_1_joint": TaskParams.robot_effort_limit,
+                    "wrist_2_joint": TaskParams.robot_effort_limit,
+                    "wrist_3_joint": TaskParams.robot_effort_limit,
+                    "joint_left": TaskParams.gripper_effort_limit,
+                    "joint_right": TaskParams.gripper_effort_limit,
+                },
+                stiffness = {
+                    "shoulder_pan_joint": TaskParams.robot_stiffness,
+                    "shoulder_lift_joint": TaskParams.robot_stiffness,
+                    "elbow_joint": TaskParams.robot_stiffness,
+                    "wrist_1_joint": TaskParams.robot_stiffness,
+                    "wrist_2_joint": TaskParams.robot_stiffness,
+                    "wrist_3_joint": TaskParams.robot_stiffness,
+                    "joint_left": TaskParams.gripper_stiffness,
+                    "joint_right": TaskParams.gripper_stiffness,
+                },
+                damping = {
+                    "shoulder_pan_joint": TaskParams.shoulder_pan_damping,
+                    "shoulder_lift_joint": TaskParams.shoulder_lift_damping,
+                    "elbow_joint": TaskParams.elbow_damping,
+                    "wrist_1_joint": TaskParams.wrist_1_damping,
+                    "wrist_2_joint": TaskParams.wrist_2_damping,
+                    "wrist_3_joint": TaskParams.wrist_3_damping,
+                    "joint_left": TaskParams.gripper_damping,
+                    "joint_right": TaskParams.gripper_damping,
+                }
+            )
+        }
     )
-
 
     # Add peg and hole objects on the table
     hole: ArticulationCfg = ArticulationCfg(
@@ -225,13 +239,13 @@ class ObservationsCfg:
 
         tcp_pose = ObsTerm(
             func=mdp.get_current_tcp_pose,
-            params={"gripper_offset": TaskParams.gripper_offset, "robot_cfg": SceneEntityCfg("robot", body_names=["panda_hand"])},
-            noise=Unoise(n_min=TaskParams.tcp_pose_unoise_min, n_max=TaskParams.tcp_pose_unoise_max),
+            params={"gripper_offset": TaskParams.gripper_offset, "robot_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
+            # noise=Unoise(n_min=TaskParams.tcp_pose_unoise_min, n_max=TaskParams.tcp_pose_unoise_max),
         )
 
         ee_wrench_b = ObsTerm(
             func=mdp.body_incoming_wrench_transform,
-            params={"asset_cfg": SceneEntityCfg("robot", body_names=["force_sensor"])},
+            params={"asset_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
             # noise=Unoise(n_min=-0.1, n_max=0.1),
         ) # Small force/torque if not in contact, small but noticeable changes when moving, gets big when in contact
 
@@ -282,6 +296,18 @@ class EventCfg:
     #         "asset_cfg": SceneEntityCfg("object"),
     #     },
     # )
+
+    specify_gripper_mass = EventTerm(
+        func=mdp.randomize_rigid_body_mass, 
+        mode="reset",
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names="hand_base"),
+            "mass_distribution_params": (1.07, 1.07),
+            "operation": "abs",
+            "distribution": "uniform",
+            "recompute_inertia": True,
+        }
+    )
 
     randomize_initial_robot_state = EventTerm(
         func=mdp.randomize_initial_state,
@@ -459,10 +485,10 @@ class CurriculumCfg:
 ##
 
 @configclass
-class Franka_PegInsertEnvCfg(ManagerBasedRLEnvCfg):
+class UR5e_PegInsertEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the lifting environment."""
     # Scene settings
-    scene: Franka_PegInsertSceneCfg = Franka_PegInsertSceneCfg(num_envs=4, env_spacing=2.5)
+    scene: UR5e_PegInsertSceneCfg = UR5e_PegInsertSceneCfg(num_envs=4, env_spacing=2.5)
 
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()

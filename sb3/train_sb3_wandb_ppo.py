@@ -44,7 +44,7 @@ def main():
         config = yaml.load(file, Loader=yaml.FullLoader)
 
     run = wandb.init(
-        project="rel_ik_sb3_ppo_franka_peg_insert_0_001",
+        project="rel_ik_sb3_ppo_franka_peg_insert",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=False,  # auto-upload the videos of agents playing the game

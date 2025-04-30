@@ -453,7 +453,7 @@ def randomize_initial_state(
 
     # Close gripper
     # gripper_joint_pos_offset = 0.025 # Set gripper_joint_pos_offset = 0.025 to fully open the gripper
-    gripper_joint_pos_offset = (object_width - 0.001) / 2 # or 0.0005 
+    gripper_joint_pos_offset = 0.002 # (object_width - 0.0005) / 2 # or 0.0005 
     adjusted_gripper_joint_pos_close = [v + gripper_joint_pos_offset for v in gripper_joint_pos_close]
 
     joint_pos = robot.data.joint_pos[env_ids, :].clone()
@@ -663,8 +663,8 @@ def jacobian_w(robot: RigidObject | Articulation, jacobi_body_idx, jacobi_joint_
 
 def set_robot_to_default_joint_pos(env: ManagerBasedRLEnv, robot: RigidObject | Articulation, joints, env_ids, gripper_width = 0):
     joint_pos = robot.data.default_joint_pos[env_ids]
-    joint_pos[:, 6:] = gripper_width
-    joint_pos[:, :8] = torch.tensor(joints, device=env.device)[None, :]
+    joint_pos[:, 7:] = gripper_width
+    joint_pos[:, :9] = torch.tensor(joints, device=env.device)[None, :]
     joint_vel = torch.zeros_like(joint_pos)
     joint_effort = torch.zeros_like(joint_pos)
 

@@ -1,19 +1,19 @@
 program: train_sb3_wandb_ppo.py
 method: grid
-name: rel_ik_sb3_ppo_franka_peg_insert_0_0005_1024_envs
+name: rel_ik_sb3_ppo_franka_peg_insert_0_0002_512_envs
 metric:
   goal: maximize
   name: rollout/ep_rew_mean
 
 parameters:
   seed:
-    value: 42 # values: [24, 42] #[42, 24]
+    values: [24, 42] #[42, 24]
 
   num_envs:
-    value: 1024 #32 #1024
+    value: 512 #32 #1024
 
   n_timesteps: # Total number of environment interactions: iteration * n_steps * num_envs: 1000 * 64 * 2048 = 131072000
-    value: 131072000 #15360000 #20480000
+    value: 98304000 #15360000 #20480000
 
   policy:
     value: 'MlpPolicy'
@@ -22,7 +22,7 @@ parameters:
     value: 64
 
   batch_size: # Data is divided into minibatches of size batch_size. = number of samples used for one gradient update during training
-    value: 1024
+    value: 16384
 
   gae_lambda:
     value: 0.95

@@ -154,7 +154,7 @@ def body_incoming_wrench_transform(env: ManagerBasedRLEnv, asset_cfg: SceneEntit
         # Cap wrench values to +/- 10000
         # wrench_world = torch.clamp(wrench_world, min=-5000.0, max=5000.0)
 
-        # print("World forces: ", forces_world)
+        print("World forces: ", forces_world)
 
         # ---------- Logging to disk directly inside the function ----------
         # try:

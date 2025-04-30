@@ -164,28 +164,35 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     while timestep < total_timesteps:
         # Predict the action using the policy
-        action, _states = agent.predict(obs, deterministic=False)
+        # action, _states = agent.predict(obs, deterministic=False)
+
+
+        ###########################################
+        # Impedance control
+        action = np.array([[0, 0, -0.005]])
+        ###########################################
+
 
         # print(f"Timestep: {timestep}, Action: {action}")
 
         # action = torch.tensor([0.0, 0.0, -0.1, 0.0, 0.0, 0.0])
         # action = torch.tensor([0.0, 0.0, -1, 0.0, 0.0, 0.0])
         # action = action.unsqueeze(0).repeat(env.num_envs, 1)  # Shape: [num_envs, 7]
-        action = np.zeros_like(action)
+        # action = np.zeros_like(action)
 
         # Take the action in the environment
         new_obs, reward, done, info = env.step(action)
 
         # Print the reward for this timestep
         # print(f"Timestep: {timestep}, Reward: {reward}")
-        # print(f"Timestep: {timestep}, Obs: {obs}")
+        print(f"Timestep: {timestep}, Obs: {obs}")
 
 
-        # Collect data for learning
-        rollout_buffer.append((obs, action, reward, new_obs, done))
+        # # Collect data for learning
+        # rollout_buffer.append((obs, action, reward, new_obs, done))
 
-        # Update observation
-        obs = new_obs
+        # # Update observation
+        # obs = new_obs
 
         # If any of the environments are done, reset them
         if np.any(done):  # This resets *all* envs if *any* is done
@@ -195,13 +202,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         # Increment the timestep
         timestep += 1
 
-        # Periodically train the agent using the collected rollouts
-        if len(rollout_buffer) >= agent.n_steps:  # `agent.n_steps` is the number of steps per update
-            for experience in rollout_buffer:
-                obs, action, reward, new_obs, done = experience
-                agent.policy.optimizer.zero_grad()
-                agent.policy.optimizer.step()  # Perform the training step
-            rollout_buffer.clear()  # Clear buffer after training
+        # # Periodically train the agent using the collected rollouts
+        # if len(rollout_buffer) >= agent.n_steps:  # `agent.n_steps` is the number of steps per update
+        #     for experience in rollout_buffer:
+        #         obs, action, reward, new_obs, done = experience
+        #         agent.policy.optimizer.zero_grad()
+        #         agent.policy.optimizer.step()  # Perform the training step
+        #     rollout_buffer.clear()  # Clear buffer after training
 
 
 
