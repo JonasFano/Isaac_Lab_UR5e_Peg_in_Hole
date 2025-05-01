@@ -117,7 +117,10 @@ def main():
             # agent stepping
             actions, _ = agent.predict(obs, deterministic=True)
             # env stepping
-            obs, _, _, _ = env.step(actions)
+            obs, rew, _, _ = env.step(actions)
+
+            print(rew)
+
         if args_cli.video:
             timestep += 1
             # Exit the play loop after recording one video

@@ -52,13 +52,27 @@ Contains all necessary information on how to start training and how to run a tra
 #####################
 # Impedance Control #
 #####################
+## UR5e
+### Train
     source isaaclab/bin/activate
     cd isaaclab/IsaacLab
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/train_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl
 
+### Wandb
+    wandb sweep --project impedance_ctrl_peg_insert config_sb3_ppo.yaml # stiffness=[10, 10, 50, 20, 20, 20]
+
+### Play
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ms518sqi/model.zip
 
 
+## Franka
+### Train
+    source isaaclab/bin/activate
+    cd isaaclab/IsaacLab
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/train_sb3_ppo.py --num_envs 1 --task Franka-Peg-Insert-Impedance-Ctrl
 
+### Play
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task Franka-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ms518sqi/model.zip
 
 
 

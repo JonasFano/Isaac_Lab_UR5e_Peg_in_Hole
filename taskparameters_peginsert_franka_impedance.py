@@ -5,9 +5,11 @@ class TaskParams:
     #################################
     ### General Simulation Params ###
     #################################
-    decimation = 20 #2
+    # decimation = 2
+    decimation = 20 # 50 Hz control frequency
     episode_length_s = 10.0 # 10.0  # 10.0 # 0.5 # 5.0
-    dt = 1/1000 # 0.01
+    # dt = 1/100
+    dt = 1/1000 # 500 Hz simulation frequency
     render_interval = 2
     gravity = [0.0, 0.0, -9.81]
 
@@ -18,13 +20,13 @@ class TaskParams:
     command_type = "pose"
     use_relative_mode = True
     ik_method = "dls"
-    action_scale= 0.01 # 0.005 # 0.0
+    action_scale= 0.1 # 0.005 # 0.0
 
     gravity_compensation = True
     coriolis_centrifugal_compensation = True
     inertial_dynamics_decoupling = True
-    max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None - [150.0, 150.0, 150.0, 28.0, 28.0, 28.0] for physical UR5e
-    stiffness = [20, 20, 100, 50, 50, 50] # Array of Kd stiffness for x y z rx ry rz
+    max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None
+    stiffness = [10, 10, 150, 30, 30, 30] # Array of Kd stiffness for x y z rx ry rz
     damping = None # None = Critically damped
 
 
@@ -40,7 +42,7 @@ class TaskParams:
     #########
     # Event #
     #########
-    ik_max_iters = 15
+    ik_max_iters = 30
     pos_error_threshold = 1e-3
     angle_error_threshold = 1e-3
     levenberg_marquardt_lambda = 0.01
@@ -53,7 +55,7 @@ class TaskParams:
     action_rate_curriculum_weight = -1e-1
     action_rate_curriculum_num_steps = 50000
 
-    # Keypoint distance
+    # Keypoint distance/
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
@@ -83,21 +85,24 @@ class TaskParams:
     ### Robot ###
     #############
     # Robot parameters/gains
-    joint_names = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
-    ee_body_name = "wrist_3_link"
+    joint_names = ["panda_joint1", "panda_joint2", "panda_joint3", "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"]
+    ee_body_name = "panda_hand"
 
-    robot_vel_limit = 180.0
-    robot_effort_limit = 87.0
-    robot_stiffness = 0.0
-    robot_damping = 0.0
+    panda_arm_stiffness = 0.0
+    panda_arm_damping = 0.0
+    panda_arm_friction = 0.75
+    panda_arm_amature = 0.0
+    panda_arm1_effort_limit = 87
+    panda_arm2_effort_limit = 12
+    panda_arm1_velocity_limit = 124.6
+    panda_arm2_velocity_limit = 149.5
 
-    robot_initial_joint_pos = [2.5, -2.0, 2.0, -1.5, -1.5, 0.0, 0.0, 0.0] # With gripper joint pos set to 0.0
-    robot_reset_joints_pos_range = (1.0, 1.0)
-    robot_reset_joints_vel_range = (0.0, 0.0)
-    robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
+    robot_initial_joint_pos = [1.8, -0.2, 0.0, -2.4, 0.35, 2.3, 0.8, 0.04] # With gripper joint pos set to 0.0
+    robot_init_pos = (0.3, -0.1, 0.0)
+    robot_init_rot = (1.0, 0.0, 0.0, 0.0)
 
-    tcp_rand_range_x = (-0.01, 0.01) # (0.0, 0.0) # was +/- 2 cm before
-    tcp_rand_range_y = (-0.01, 0.01) # (0.005, 0.005) # was +/- 2 cm before
+    tcp_rand_range_x = (-0.01, 0.01) # was +/- 2 cm before
+    tcp_rand_range_y = (-0.01, 0.01) #(-0.005, 0.005) # was +/- 2 cm before
     tcp_rand_range_z = (0.07, 0.07) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)
     tcp_rand_range_pitch = (math.pi, math.pi)
@@ -108,20 +113,15 @@ class TaskParams:
     ### Gripper ###
     ###############
     # Gripper parameters/gains
-    gripper_joint_names = ["joint_left", "joint_right"]
-    gripper_body_names = ["finger_left", "finger_right"]
-    gripper_vel_limit = 1000000.0
-    gripper_effort_limit = 200.0
-    gripper_stiffness = 10000000.0
-    gripper_damping = 50000.0
+    gripper_joint_names = ["panda_finger_joint1", "panda_finger_joint2"]
+    gripper_body_names = ["panda_leftfinger", "panda_rightfinger"]
 
-    # Domain randomize gripper stiffness and damping
-    gripper_randomize_stiffness = (0.5, 2.5),
-    gripper_randomize_damping = (0.5, 2.5),
-    gripper_randomize_stiffness_operation = "scale",
-    gripper_randomize_damping_operation = "scale"
-    gripper_randomize_stiffness_distribution = "uniform"
-    gripper_randomize_damping_distribution = "uniform"
+    gripper_effort_limit = 40.0
+    gripper_velocity_limit = 0.04
+    gripper_stiffness = 100000000.0
+    gripper_damping = 50000.0
+    gripper_friction = 0.1
+    gripper_armature = 0.0
 
     # Randomize gripper finger friction
     gripper_static_friction_distribution_params = (1.4, 1.4)
@@ -131,9 +131,9 @@ class TaskParams:
     gripper_randomize_friction_distribution = "uniform"
     gripper_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
-    gripper_offset = [0.0, 0.0, 0.15] # or [0, 0, 0.135]
-    gripper_open = [0.0, 0.0]
-    gripper_joint_pos_close = [-0.025, -0.025]
+    gripper_offset = [0.0, 0.0, 0.107]
+    gripper_open = [0.04, 0.04]
+    gripper_joint_pos_close = [0.0, 0.0]
 
 
     ##############
@@ -142,16 +142,12 @@ class TaskParams:
     # Object parameters
     object_scale = (0.92, 0.92, 1.0)
     object_init_mass = 0.2
-    object_randomize_mass_range = (0.5, 0.5) # (0.1, 1.0)
-    object_randomize_mass_operation = "abs"
-    object_randomize_mass_distribution = "uniform"
-    object_randomize_mass_recompute_inertia = True
     object_init_pos = (-0.2, 0.0, 0.1)
 
     # Domain randomize object friction
-    object_static_friction_distribution_params = (1.4, 1.4)
+    object_static_friction_distribution_params = (0.4, 0.4)
     object_dynamic_friction_distribution_params = (1.4, 1.4)
-    object_restitution_distribution_params = (0.3, 0.3)
+    object_restitution_distribution_params = (0.2, 0.2)
     object_randomize_friction_operation = "abs"
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
@@ -167,11 +163,7 @@ class TaskParams:
     # Hole parameters
     hole_init_mass = 10
     hole_init_pos = (-0.2, 0.2, 0.0025)
-    hole_randomize_mass_range = (10, 10) # (10, 15)
-    hole_randomize_mass_operation = "abs"
-    hole_randomize_mass_distribution = "uniform"
-    hole_randomize_mass_recompute_inertia = True
-    hole_randomize_pose_range_x = (0.0, 0.0) # (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
-    hole_randomize_pose_range_y = (0.0, 0.0) # (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
+    hole_randomize_pose_range_x = (0.0, 0.0) #(-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
+    hole_randomize_pose_range_y = (0.0, 0.0) #(-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
     hole_randomize_pose_range_z = (0.0, 0.0)
     # hole_randomize_pose_range_yaw = (-math.pi, math.pi)

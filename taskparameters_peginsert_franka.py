@@ -77,19 +77,19 @@ class TaskParams:
     # Robot parameters/gains
     joint_names = ["panda_joint1", "panda_joint2", "panda_joint3", "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"]
     ee_body_name = "panda_hand"
-    
-    # Domain randomize robot stiffness and damping
-    robot_randomize_stiffness = (0.5, 1.5),
-    robot_randomize_damping = (0.5, 1.5),
-    robot_randomize_stiffness_operation = "scale",
-    robot_randomize_damping_operation = "scale"
-    robot_randomize_stiffness_distribution = "uniform"
-    robot_randomize_damping_distribution = "uniform"
 
-    robot_initial_joint_pos = [1.8, -0.2, 0.0, -2.4, 0.35, 2.3, 0.8, 0.04, 0.04] # With gripper joint pos set to 0.0
-    robot_reset_joints_pos_range = (1.0, 1.0)
-    robot_reset_joints_vel_range = (0.0, 0.0)
-    robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["panda_hand"])
+    panda_arm_stiffness = 40000000.0
+    panda_arm_damping = 50000.0
+    panda_arm_friction = 0.75
+    panda_arm_amature = 0.0
+    panda_arm1_effort_limit = 87
+    panda_arm2_effort_limit = 12
+    panda_arm1_velocity_limit = 124.6
+    panda_arm2_velocity_limit = 149.5
+
+    robot_initial_joint_pos = [1.8, -0.2, 0.0, -2.4, 0.35, 2.3, 0.8, 0.04] # With gripper joint pos set to 0.0
+    robot_init_pos = (0.3, -0.1, 0.0)
+    robot_init_rot = (1.0, 0.0, 0.0, 0.0)
 
     tcp_rand_range_x = (-0.005, 0.005) # was +/- 2 cm before
     tcp_rand_range_y = (-0.005, 0.005) # was +/- 2 cm before
@@ -106,13 +106,12 @@ class TaskParams:
     gripper_joint_names = ["panda_finger_joint1", "panda_finger_joint2"]
     gripper_body_names = ["panda_leftfinger", "panda_rightfinger"]
 
-    # Domain randomize gripper stiffness and damping
-    gripper_randomize_stiffness = (0.5, 2.5),
-    gripper_randomize_damping = (0.5, 2.5),
-    gripper_randomize_stiffness_operation = "scale",
-    gripper_randomize_damping_operation = "scale"
-    gripper_randomize_stiffness_distribution = "uniform"
-    gripper_randomize_damping_distribution = "uniform"
+    gripper_effort_limit = 40.0
+    gripper_velocity_limit = 0.04
+    gripper_stiffness = 10000000.0
+    gripper_damping = 50000.0
+    gripper_friction = 0.1
+    gripper_armature = 0.0
 
     # Randomize gripper finger friction
     gripper_static_friction_distribution_params = (1.4, 1.4)
@@ -133,10 +132,6 @@ class TaskParams:
     # Object parameters
     object_scale = (0.92, 0.92, 1.0)
     object_init_mass = 0.5
-    object_randomize_mass_range = (0.5, 0.5) # (0.1, 1.0)
-    object_randomize_mass_operation = "abs"
-    object_randomize_mass_distribution = "uniform"
-    object_randomize_mass_recompute_inertia = True
     object_init_pos = (-0.2, 0.0, 0.1)
 
     # Domain randomize object friction
@@ -158,10 +153,6 @@ class TaskParams:
     # Hole parameters
     hole_init_mass = 10
     hole_init_pos = (-0.2, 0.2, 0.0025)
-    hole_randomize_mass_range = (10, 10) # (10, 15)
-    hole_randomize_mass_operation = "abs"
-    hole_randomize_mass_distribution = "uniform"
-    hole_randomize_mass_recompute_inertia = True
     hole_randomize_pose_range_x = (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
     hole_randomize_pose_range_y = (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
     hole_randomize_pose_range_z = (0.0, 0.0)

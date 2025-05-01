@@ -19,7 +19,7 @@ class ImpedanceController:
 
         self.Kp = torch.tensor(cfg.stiffness, device=self.device).view(1, 6).repeat(self.num_envs, 1)
         if cfg.damping is None:
-            self.Kd = 2 * torch.sqrt(self.Kp)
+            self.Kd = 2 * torch.sqrt(self.Kp) # 2 # 6
         else:
             self.Kd = torch.tensor(cfg.damping, device=self.device).view(1, 6).repeat(self.num_envs, 1)
 
@@ -41,7 +41,7 @@ class ImpedanceController:
         """Set desired EE pose using a relative 3D position command and fixed orientation."""
         self.desired_ee_pose_b[:, :3] = current_pos_b + command
         # Fixed orientation (w, x, y, z) = (0, 1, 0, 0)
-        self.desired_ee_pose_b[:, 3:] = torch.tensor([0.0, -1.0, 0.0, 0.0], device=self.device).repeat(self.num_envs, 1)
+        self.desired_ee_pose_b[:, 3:] = torch.tensor([0.0, 0.0, 1.0, 0.0], device=self.device).repeat(self.num_envs, 1)
 
 
     def compute(

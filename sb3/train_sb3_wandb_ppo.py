@@ -44,7 +44,7 @@ def main():
         config = yaml.load(file, Loader=yaml.FullLoader)
 
     run = wandb.init(
-        project="rel_ik_sb3_ppo_franka_peg_insert",
+        project="impedance_ctrl_peg_insert", #"rel_ik_sb3_ppo_franka_peg_insert",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=False,  # auto-upload the videos of agents playing the game
@@ -52,7 +52,7 @@ def main():
     )
 
     # Load env cfg
-    task = "UR5e-Peg-Insert-IK"
+    task = "UR5e-Peg-Insert-Impedance-Ctrl" #"UR5e-Peg-Insert-IK"
     num_envs = wandb.config["num_envs"]
     device = "cuda"
     env_cfg = parse_env_cfg(task, device=device, num_envs=num_envs)

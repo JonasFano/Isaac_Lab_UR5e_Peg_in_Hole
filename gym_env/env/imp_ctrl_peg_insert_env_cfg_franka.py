@@ -5,12 +5,12 @@ from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
 from gym_env.env.controller.impedance_control_cfg import ImpedanceControllerCfg
 from gym_env.env.mdp.actions.actions_cfg import ImpedanceControllerActionCfg
 
-from . import peg_insert_env_cfg_impedance
+from . import peg_insert_env_cfg_franka_impedance
 
-from taskparameters_peginsert_impedance import TaskParams
+from taskparameters_peginsert_franka_impedance import TaskParams
 
 @configclass
-class ImpCtrl_UR5e_PegInsertEnvCfg(peg_insert_env_cfg_impedance.UR5e_PegInsertEnvCfg):
+class ImpCtrl_Franka_PegInsertEnvCfg(peg_insert_env_cfg_franka_impedance.Franka_PegInsertEnvCfg):
     def __post_init__(self):
         super().__post_init__()
 
@@ -18,14 +18,13 @@ class ImpCtrl_UR5e_PegInsertEnvCfg(peg_insert_env_cfg_impedance.UR5e_PegInsertEn
         base_marker_cfg = FRAME_MARKER_CFG.copy()
         base_marker_cfg.markers["frame"].scale = (0.15, 0.15, 0.25)
         base_marker_cfg.prim_path = "/Visuals/BaseFrame"
-
         self.scene.world_frame = FrameTransformerCfg(
-            prim_path="{ENV_REGEX_NS}/robot/base_link",
+            prim_path="{ENV_REGEX_NS}/robot/panda_link0",
             debug_vis=True,
             visualizer_cfg=base_marker_cfg,
             target_frames=[  # Add at least one target frame
                 FrameTransformerCfg.FrameCfg(
-                    prim_path="{ENV_REGEX_NS}/robot/base_link",
+                    prim_path="{ENV_REGEX_NS}/robot/panda_link0",
                     name="base_frame",
                     offset=OffsetCfg(
                         pos=[0.0, 0.0, 0.0],
@@ -39,12 +38,12 @@ class ImpCtrl_UR5e_PegInsertEnvCfg(peg_insert_env_cfg_impedance.UR5e_PegInsertEn
         marker_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
         marker_cfg.prim_path = "/Visuals/FrameTransformer"
         self.scene.ee_frame = FrameTransformerCfg(
-            prim_path="{ENV_REGEX_NS}/robot/base_link",
+            prim_path="{ENV_REGEX_NS}/robot/force_sensor",
             debug_vis=False, # True to visualize ee frame or False
             visualizer_cfg=marker_cfg,
             target_frames=[
                 FrameTransformerCfg.FrameCfg(
-                    prim_path="{ENV_REGEX_NS}/robot/wrist_3_link",
+                    prim_path="{ENV_REGEX_NS}/robot/force_sensor",
                     name="end_effector",
                     offset=OffsetCfg(
                         pos=TaskParams.gripper_offset,
@@ -72,9 +71,8 @@ class ImpCtrl_UR5e_PegInsertEnvCfg(peg_insert_env_cfg_impedance.UR5e_PegInsertEn
             tcp_offset=TaskParams.gripper_offset,
         )
 
-
 @configclass
-class ImpCtrl_UR5e_PegInsertEnvCfg_PLAY(ImpCtrl_UR5e_PegInsertEnvCfg):
+class ImpCtrl_Franka_PegInsertEnvCfg_PLAY(ImpCtrl_Franka_PegInsertEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
