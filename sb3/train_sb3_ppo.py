@@ -169,7 +169,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
         ###########################################
         # Impedance control
-        action = np.array([[0, 0, -5]])
+        action = np.array([[0, 0, -0.5]])
         ###########################################
 
 
@@ -178,7 +178,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         # action = torch.tensor([0.0, 0.0, -0.1, 0.0, 0.0, 0.0])
         # action = torch.tensor([0.0, 0.0, -1, 0.0, 0.0, 0.0])
         # action = action.unsqueeze(0).repeat(env.num_envs, 1)  # Shape: [num_envs, 7]
-        action = np.zeros_like(action)
+        # action = np.zeros_like(action)
 
         # Take the action in the environment
         new_obs, reward, done, info = env.step(action)

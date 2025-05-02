@@ -8,7 +8,7 @@ class TaskParams:
     decimation = 20 #2
     episode_length_s = 10.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 1/1000 # 0.01
-    render_interval = 2
+    render_interval = 20
     gravity = [0.0, 0.0, -9.81]
 
 
@@ -24,7 +24,7 @@ class TaskParams:
     coriolis_centrifugal_compensation = True
     inertial_dynamics_decoupling = True
     max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None - [150.0, 150.0, 150.0, 28.0, 28.0, 28.0] for physical UR5e
-    stiffness = [20, 20, 100, 50, 50, 50] # Array of Kd stiffness for x y z rx ry rz
+    stiffness = [300, 300, 300, 100, 100, 100] # Array of Kd stiffness for x y z rx ry rz
     damping = None # None = Critically damped
 
 
@@ -98,6 +98,7 @@ class TaskParams:
 
     tcp_rand_range_x = (-0.01, 0.01) # (0.0, 0.0) # was +/- 2 cm before
     tcp_rand_range_y = (-0.01, 0.01) # (0.005, 0.005) # was +/- 2 cm before
+    # tcp_rand_range_z = (0.27, 0.27) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_z = (0.07, 0.07) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)
     tcp_rand_range_pitch = (math.pi, math.pi)
@@ -149,7 +150,7 @@ class TaskParams:
     object_init_pos = (-0.2, 0.0, 0.1)
 
     # Domain randomize object friction
-    object_static_friction_distribution_params = (1.4, 1.4)
+    object_static_friction_distribution_params = (0.4, 0.4)
     object_dynamic_friction_distribution_params = (1.4, 1.4)
     object_restitution_distribution_params = (0.3, 0.3)
     object_randomize_friction_operation = "abs"
@@ -171,7 +172,7 @@ class TaskParams:
     hole_randomize_mass_operation = "abs"
     hole_randomize_mass_distribution = "uniform"
     hole_randomize_mass_recompute_inertia = True
-    hole_randomize_pose_range_x = (0.0, 0.0) # (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
-    hole_randomize_pose_range_y = (0.0, 0.0) # (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
+    hole_randomize_pose_range_x = (-0.05, 0.05) # (0.0, 0.0) # (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
+    hole_randomize_pose_range_y = (-0.05, 0.05) # (0.0, 0.0) # (-0.05, 0.05) #(0.0, 0.0) #(-0.01, 0.01)
     hole_randomize_pose_range_z = (0.0, 0.0)
     # hole_randomize_pose_range_yaw = (-math.pi, math.pi)

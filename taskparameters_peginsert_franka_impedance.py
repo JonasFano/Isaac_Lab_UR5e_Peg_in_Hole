@@ -7,10 +7,10 @@ class TaskParams:
     #################################
     # decimation = 2
     decimation = 20 # 50 Hz control frequency
-    episode_length_s = 10.0 # 10.0  # 10.0 # 0.5 # 5.0
+    episode_length_s = 100.0 # 10.0  # 10.0 # 0.5 # 5.0
     # dt = 1/100
     dt = 1/1000 # 500 Hz simulation frequency
-    render_interval = 2
+    render_interval = 10
     gravity = [0.0, 0.0, -9.81]
 
 
@@ -20,13 +20,13 @@ class TaskParams:
     command_type = "pose"
     use_relative_mode = True
     ik_method = "dls"
-    action_scale= 0.1 # 0.005 # 0.0
+    action_scale= 0.8 # 0.005 # 0.0
 
     gravity_compensation = True
     coriolis_centrifugal_compensation = True
     inertial_dynamics_decoupling = True
     max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None
-    stiffness = [10, 10, 150, 30, 30, 30] # Array of Kd stiffness for x y z rx ry rz
+    stiffness = [400, 400, 500, 300, 300, 300] # Array of Kd stiffness for x y z rx ry rz
     damping = None # None = Critically damped
 
 
@@ -101,8 +101,9 @@ class TaskParams:
     robot_init_pos = (0.3, -0.1, 0.0)
     robot_init_rot = (1.0, 0.0, 0.0, 0.0)
 
-    tcp_rand_range_x = (-0.01, 0.01) # was +/- 2 cm before
-    tcp_rand_range_y = (-0.01, 0.01) #(-0.005, 0.005) # was +/- 2 cm before
+    tcp_rand_range_x = (-0.0, 0.0) # was +/- 2 cm before
+    tcp_rand_range_y = (-0.001, -0.001) #(-0.005, 0.005) # was +/- 2 cm before
+    # tcp_rand_range_z = (0.27, 0.27) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_z = (0.07, 0.07) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)
     tcp_rand_range_pitch = (math.pi, math.pi)
@@ -118,9 +119,9 @@ class TaskParams:
 
     gripper_effort_limit = 40.0
     gripper_velocity_limit = 0.04
-    gripper_stiffness = 100000000.0
-    gripper_damping = 50000.0
-    gripper_friction = 0.1
+    gripper_stiffness = 10000000.0
+    gripper_damping = 5000.0
+    gripper_friction = 0.9
     gripper_armature = 0.0
 
     # Randomize gripper finger friction
