@@ -52,7 +52,7 @@ class UR5e_PegInsertSceneCfg(InteractiveSceneCfg):
                 solver_position_iteration_count=192,
                 solver_velocity_iteration_count=1,
             ),
-            activate_contact_sensors=True,
+            activate_contact_sensors=False,
             collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
         ),  
         init_state=ArticulationCfg.InitialStateCfg(
@@ -205,19 +205,6 @@ class ActionsCfg:
     # Set actions
     arm_action: mdp.JointPositionActionCfg | mdp.DifferentialInverseKinematicsActionCfg | ImpedanceControllerActionCfg = MISSING
 
-    # gripper_action = mdp.BinaryJointPositionActionCfg(
-    #     asset_name="robot",
-    #     joint_names=["joint_left", "joint_right"],
-    #     open_command_expr={"joint_left": TaskParams.gripper_open[0], "joint_right": TaskParams.gripper_open[1]},
-    #     close_command_expr={"joint_left": TaskParams.gripper_joint_pos_close[0], "joint_right": TaskParams.gripper_joint_pos_close[1]},
-    # )
-
-    # gripper_action = mdp.JointPositionActionCfg(
-    #     asset_name="robot",
-    #     joint_names=["joint_left", "joint_right"],
-    #     scale=1.0,
-    # )
-
 
 @configclass
 class ObservationsCfg:
@@ -229,11 +216,6 @@ class ObservationsCfg:
         # object_pos = ObsTerm(
         #     mdp.object_position_in_robot_root_frame,
         #     params={"asset_cfg": SceneEntityCfg("robot"), "object_cfg": SceneEntityCfg("object"),}
-        # )
-
-        # gripper_joint_pos = ObsTerm(
-        #     func=mdp.joint_pos, 
-        #     params={"asset_cfg": SceneEntityCfg("robot", joint_names=["joint_left", "joint_right"]),},
         # )
 
         tcp_pose = ObsTerm(
@@ -371,21 +353,6 @@ class EventCfg:
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
-    # hole_ee_distance = RewTerm(
-    #     func=mdp.hole_ee_distance, 
-    #     params={"std": TaskParams.hole_ee_distance_std}, 
-    #     weight=TaskParams.hole_ee_distance_weight,
-    # )
-
-    # orientation_tracking = RewTerm(
-    #     func=mdp.object_hole_orientation_error, 
-    #     params={
-    #         "hole_cfg": SceneEntityCfg("hole"),
-    #         "object_cfg": SceneEntityCfg("object"),
-    #     }, 
-    #     weight=TaskParams.orientation_tracking_weight
-    # )
-
     # Dense keypoint distance rewards
     keypoint_distance_coarse = RewTerm(
         func=mdp.keypoint_distance,

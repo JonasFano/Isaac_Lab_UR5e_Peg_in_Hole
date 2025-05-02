@@ -59,7 +59,10 @@ Contains all necessary information on how to start training and how to run a tra
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/train_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl
 
 ### Wandb
-    wandb sweep --project impedance_ctrl_peg_insert config_sb3_ppo.yaml # stiffness=[10, 10, 50, 20, 20, 20]
+    wandb sweep --project impedance_ctrl_peg_insert config_sb3_ppo.yaml 
+    
+    # impedance_ctrl_peg_insert_128_envs # stiffness=[10, 10, 50, 20, 20, 20]
+    # impedance_ctrl_peg_insert_512_envs # stiffness=[10, 10, 50, 20, 20, 20] damping_ratio = 4
 
 ### Play
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ms518sqi/model.zip
