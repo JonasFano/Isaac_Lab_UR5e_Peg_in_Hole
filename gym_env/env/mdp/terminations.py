@@ -72,11 +72,15 @@ def is_peg_inserted(
     # Compute position delta
     delta = object_pos_w - hole_pos_w       # shape: [N, 3]
 
+    # print("XY L2 Norm: ", torch.linalg.vector_norm(delta[:, :2], dim=1))
+
     # Condition 1: L2 norm in XY is less than predefined threshold
     xy_ok = torch.linalg.vector_norm(delta[:, :2], dim=1) <= xy_threshold
 
     # Condition 2: Z error is in predefined range
     z_ok = (delta[:, 2] >= object_height - z_variability) & (delta[:, 2] <= object_height + z_variability)
+
+    # print("Height: ", delta[:, 2])
 
     # Combine both
     success = (xy_ok & z_ok).bool()  # Returns true if both true, else false

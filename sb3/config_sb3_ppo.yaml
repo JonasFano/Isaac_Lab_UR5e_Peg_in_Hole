@@ -1,6 +1,6 @@
 program: train_sb3_wandb_ppo.py
 method: grid
-name: impedance_ctrl_peg_insert_512_envs
+name: impedance_ctrl_peg_insert_1024_envs
 metric:
   goal: maximize
   name: rollout/ep_rew_mean
@@ -10,7 +10,7 @@ parameters:
     values: [24, 42] #[42, 24]
 
   num_envs:
-    value: 512 #32 #1024
+    value: 1024 #32 #1024
 
   n_timesteps: # Total number of environment interactions: iteration * n_steps * num_envs: 1000 * 64 * 2048 = 131072000
     value: 32768000 #15360000 #20480000
@@ -19,7 +19,7 @@ parameters:
     value: 'MlpPolicy'
 
   n_steps: # Number of steps each environment runs before the collected data is used for policy update
-    value: 64
+    value: 32
 
   batch_size: # Data is divided into minibatches of size batch_size. = number of samples used for one gradient update during training
     value: 16384

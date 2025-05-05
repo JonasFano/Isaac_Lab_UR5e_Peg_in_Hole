@@ -6,9 +6,9 @@ class TaskParams:
     ### General Simulation Params ###
     #################################
     decimation = 20 #2
-    episode_length_s = 10.0 # 10.0  # 10.0 # 0.5 # 5.0
+    episode_length_s = 5.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 1/1000 # 0.01
-    render_interval = 20
+    render_interval = 5
     gravity = [0.0, 0.0, -9.81]
 
 
@@ -24,7 +24,7 @@ class TaskParams:
     coriolis_centrifugal_compensation = True
     inertial_dynamics_decoupling = True
     max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None - [150.0, 150.0, 150.0, 28.0, 28.0, 28.0] for physical UR5e
-    stiffness = [300, 300, 300, 100, 100, 100] # Array of Kd stiffness for x y z rx ry rz
+    stiffness = [300, 300, 300, 100, 100, 100] # [300, 300, 300, 100, 100, 100] # [400, 400, 400, 50, 50, 50] # Array of Kd stiffness for x y z rx ry rz
     damping = None # None = Critically damped
 
 
@@ -34,7 +34,7 @@ class TaskParams:
     tcp_pose_unoise_min = -0.0001 # 0.1 mm
     tcp_pose_unoise_max = 0.0001 # 0.1 mm
 
-    noise_std_hole_pose = 0.0 # 0.0025 # 2.5 mm
+    noise_std_hole_pose = 0.001 # 0.0025 # 2.5 mm
 
 
     #########
@@ -57,17 +57,17 @@ class TaskParams:
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
-    keypoint_distance_coarse_weight = 5.0
+    keypoint_distance_coarse_weight = 20.0
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 5.0
+    keypoint_distance_fine_weight = 20.0
 
     # Is peg centered
-    is_peg_centered_xy_threshold = 0.0025 # 2.5 mm
+    is_peg_centered_xy_threshold = 0.003 # 2.5 mm l2 norm
     is_peg_centered_z_threshold = 0.09 # 8 cm
-    is_peg_centered_z_variability = 0.002 # 2 mm
-    is_peg_centered_weight = 20.0
+    is_peg_centered_z_variability = 0.005 # 2 mm
+    is_peg_centered_weight = 10.0
 
     # Is peg inserted
     is_peg_inserted_weight = 100.0
@@ -97,11 +97,11 @@ class TaskParams:
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
     # tcp_rand_range_x = (0.004, 0.004) 
-    tcp_rand_range_x = (-0.01, 0.01) # (0.0, 0.0) # was +/- 2 cm before
+    tcp_rand_range_x = (-0.007, 0.007) # (0.0, 0.0) # was +/- 2 cm before
     # tcp_rand_range_y = (-0.004, -0.004)
-    tcp_rand_range_y = (-0.01, 0.01) # (0.005, 0.005) # was +/- 2 cm before
+    tcp_rand_range_y = (-0.007, 0.007) # (0.005, 0.005) # was +/- 2 cm before
     # tcp_rand_range_z = (0.27, 0.27)
-    tcp_rand_range_z = (0.07, 0.07) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
+    tcp_rand_range_z = (0.068, 0.068) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)
     tcp_rand_range_pitch = (math.pi, math.pi)
     tcp_rand_range_yaw = (0.0, 0.0) # (-3.14, 3.14)
@@ -154,7 +154,7 @@ class TaskParams:
     # Domain randomize object friction
     object_static_friction_distribution_params = (0.4, 0.4)
     object_dynamic_friction_distribution_params = (1.4, 1.4)
-    object_restitution_distribution_params = (0.3, 0.3)
+    object_restitution_distribution_params = (0.1, 0.1)
     object_randomize_friction_operation = "abs"
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
