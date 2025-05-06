@@ -64,6 +64,7 @@ Contains all necessary information on how to start training and how to run a tra
     # impedance_ctrl_peg_insert_128_envs # stiffness=[10, 10, 50, 20, 20, 20]
     # impedance_ctrl_peg_insert_512_envs # stiffness=[300, 300, 300, 100, 100, 100] damping_ratio = 4
     # impedance_ctrl_peg_insert_1024_envs # stiffness=[400, 400, 400, 50, 50, 50] damping_ratio = 4
+    # impedance_ctrl_peg_insert_2048_envs # stiffness=[300, 300, 300, 1000, 1000, 1000] damping_ratio = 4 (damping ratio 8 for z position)
 
 ### Play
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/ms518sqi/model.zip # 128 envs - stiffness=[10, 10, 50, 20, 20, 20] - damping_ratio = 1
