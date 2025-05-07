@@ -169,7 +169,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
         ###########################################
         # Impedance control
-        action = np.array([[0, 0, -0.5]])
+        action = np.array([[0, 0, 0.0]])
         ###########################################
 
 

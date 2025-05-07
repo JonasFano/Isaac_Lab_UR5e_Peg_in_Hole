@@ -144,7 +144,7 @@ class TaskParams:
     ##############
     # Object parameters
     object_scale = (0.92, 0.92, 1.0)
-    object_init_mass = 0.2
+    object_init_mass = 0.02
     object_randomize_mass_range = (0.5, 0.5) # (0.1, 1.0)
     object_randomize_mass_operation = "abs"
     object_randomize_mass_distribution = "uniform"
