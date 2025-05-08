@@ -19,7 +19,7 @@ class ImpedanceController:
 
         self.Kp = torch.tensor(cfg.stiffness, device=self.device).view(1, 6).repeat(self.num_envs, 1)
         if cfg.damping is None:
-            self.Kd = 4.0 * 2.0 * torch.sqrt(self.Kp)
+            self.Kd = 6.0 * 2.0 * torch.sqrt(self.Kp)
             self.Kd[:, 2] = 8.0 * 2.0 * torch.sqrt(self.Kp[:, 2])
         else:
             self.Kd = torch.tensor(cfg.damping, device=self.device).view(1, 6).repeat(self.num_envs, 1)

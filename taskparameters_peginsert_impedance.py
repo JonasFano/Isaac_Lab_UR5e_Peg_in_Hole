@@ -24,7 +24,7 @@ class TaskParams:
     coriolis_centrifugal_compensation = True
     inertial_dynamics_decoupling = True
     max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None - [150.0, 150.0, 150.0, 28.0, 28.0, 28.0] for physical UR5e
-    stiffness = [300, 300, 300, 1000, 1000, 1000] # [300, 300, 300, 100, 100, 100] # [400, 400, 400, 50, 50, 50] # Array of Kd stiffness for x y z rx ry rz
+    stiffness = [400, 400, 400, 1000, 1000, 1000] # [300, 300, 300, 100, 100, 100] # [400, 400, 400, 50, 50, 50] # Array of Kd stiffness for x y z rx ry rz
     damping = None # None = Critically damped
 
 
@@ -70,7 +70,7 @@ class TaskParams:
     is_peg_centered_weight = 10.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 100.0
+    is_peg_inserted_weight = 200.0
 
 
     ###################
@@ -144,7 +144,7 @@ class TaskParams:
     ##############
     # Object parameters
     object_scale = (0.92, 0.92, 1.0)
-    object_init_mass = 0.02
+    object_init_mass = 0.0025
     object_randomize_mass_range = (0.5, 0.5) # (0.1, 1.0)
     object_randomize_mass_operation = "abs"
     object_randomize_mass_distribution = "uniform"
@@ -152,7 +152,7 @@ class TaskParams:
     object_init_pos = (-0.2, 0.0, 0.1)
 
     # Domain randomize object friction
-    object_static_friction_distribution_params = (0.4, 0.4)
+    object_static_friction_distribution_params = (0.2, 0.2)
     object_dynamic_friction_distribution_params = (1.4, 1.4)
     object_restitution_distribution_params = (0.1, 0.1)
     object_randomize_friction_operation = "abs"
