@@ -24,7 +24,7 @@ class TaskParams:
     coriolis_centrifugal_compensation = True
     inertial_dynamics_decoupling = True
     max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None - [150.0, 150.0, 150.0, 28.0, 28.0, 28.0] for physical UR5e
-    stiffness = [400, 400, 400, 1000, 1000, 1000] # [300, 300, 300, 100, 100, 100] # [400, 400, 400, 50, 50, 50] # Array of Kd stiffness for x y z rx ry rz
+    stiffness = [400, 400, 400, 750, 750, 750] # [300, 300, 300, 100, 100, 100] # [400, 400, 400, 50, 50, 50] # Array of Kd stiffness for x y z rx ry rz
     damping = None # None = Critically damped
 
 
@@ -57,17 +57,17 @@ class TaskParams:
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
-    keypoint_distance_coarse_weight = 20.0
+    keypoint_distance_coarse_weight = 25.0
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 20.0
+    keypoint_distance_fine_weight = 25.0
 
     # Is peg centered
     is_peg_centered_xy_threshold = 0.00275 # 2.5 mm l2 norm
     is_peg_centered_z_threshold = 0.09 # 8 cm
     is_peg_centered_z_variability = 0.005 # 2 mm
-    is_peg_centered_weight = 10.0
+    is_peg_centered_weight = 15.0
 
     # Is peg inserted
     is_peg_inserted_weight = 200.0
