@@ -180,3 +180,18 @@ def is_peg_centered(
 
     return reward
 
+
+def penalize_contact_forces(
+        env: ManagerBasedRLEnv,
+    ) -> torch.Tensor:
+    obs = env.observation_manager.compute_group("policy") # (Fx, Fy, Fz)
+    forces = obs[:, 7:10]   # Fx, Fy, Fz
+    return torch.norm(forces, dim=-1)
+
+
+def penalize_contact_torque(
+        env: ManagerBasedRLEnv,
+    ) -> torch.Tensor:
+    obs = env.observation_manager.compute_group("policy")
+    torques = obs[:, 10:13] # Tx, Ty, Tz
+    return torch.norm(torques, dim=-1)

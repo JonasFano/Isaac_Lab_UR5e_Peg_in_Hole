@@ -402,9 +402,19 @@ class RewardsCfg:
         weight=TaskParams.is_peg_inserted_weight,
     )
 
-
     # Action penalty
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=TaskParams.action_rate_weight)
+
+    # Contact Wrench Penalty
+    force_penalty = RewTerm(
+        func=mdp.penalize_contact_forces,
+        weight=TaskParams.force_penalty_weight,
+    )
+
+    torque_penalty = RewTerm(
+        func=mdp.penalize_contact_torque,
+        weight=TaskParams.torque_penalty_weight,
+    )
 
 
 

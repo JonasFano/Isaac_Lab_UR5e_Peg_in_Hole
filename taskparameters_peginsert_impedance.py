@@ -57,20 +57,24 @@ class TaskParams:
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
-    keypoint_distance_coarse_weight = 25.0
+    keypoint_distance_coarse_weight = 30.0
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 25.0
+    keypoint_distance_fine_weight = 30.0
 
     # Is peg centered
     is_peg_centered_xy_threshold = 0.00275 # 2.5 mm l2 norm
     is_peg_centered_z_threshold = 0.09 # 8 cm
     is_peg_centered_z_variability = 0.005 # 2 mm
-    is_peg_centered_weight = 15.0
+    is_peg_centered_weight = 20.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 200.0
+    is_peg_inserted_weight = 250.0
+
+    # Contact wrench penalty
+    force_penalty_weight = -0.005
+    torque_penalty_weight = -0.025
 
 
     ###################
