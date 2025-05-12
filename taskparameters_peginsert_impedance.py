@@ -36,15 +36,10 @@ class TaskParams:
     # damping_ratio = 6
     # damping_ratio_z = 8
 
-    # impedance_ctrl_peg_insert_2048_envs_v3
-    stiffness = [400, 400, 400, 750, 750, 750]
-    damping_ratio = 6
-    damping_ratio_z = 8
-
-    # # impedance_ctrl_peg_insert_2048_envs_v4
+    # # impedance_ctrl_peg_insert_2048_envs_v3
     # stiffness = [400, 400, 400, 750, 750, 750]
-    # damping_ratio = 5
-    # damping_ratio_z = 6
+    # damping_ratio = 6
+    # damping_ratio_z = 8
 
     # impedance_ctrl_peg_insert_2048_envs_v5
     stiffness = [350, 350, 350, 900, 900, 900]
@@ -106,9 +101,8 @@ class TaskParams:
     is_peg_centered_weight_bottom = 50.0
 
     # Contact wrench penalty
-    force_penalty_weight = -0.001
-    torque_penalty_weight = -0.01
-
+    force_penalty_weight = -0.005
+    torque_penalty_weight = -0.025
     ###################
     ### Termination ###
     ###################
