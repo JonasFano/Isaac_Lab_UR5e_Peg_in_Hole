@@ -380,8 +380,21 @@ class RewardsCfg:
         weight=TaskParams.keypoint_distance_fine_weight,
     )
 
-    # Sparse rewards
-    is_peg_centered = RewTerm(
+    # # Sparse rewards
+    # is_peg_centered = RewTerm(
+    #     func=mdp.is_peg_centered,
+    #     params={
+    #         "hole_cfg": SceneEntityCfg("hole"),
+    #         "object_cfg": SceneEntityCfg("object"),
+    #         "object_height": TaskParams.object_height,
+    #         "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+    #         "z_threshold": TaskParams.is_peg_centered_z_threshold,
+    #         "z_variability": TaskParams.is_peg_centered_z_variability,
+    #     },
+    #     weight=TaskParams.is_peg_centered_weight,
+    # )
+
+    is_peg_centered_top = RewTerm(
         func=mdp.is_peg_centered,
         params={
             "hole_cfg": SceneEntityCfg("hole"),
@@ -389,10 +402,37 @@ class RewardsCfg:
             "object_height": TaskParams.object_height,
             "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
             "z_threshold": TaskParams.is_peg_centered_z_threshold,
-            "z_variability": TaskParams.is_peg_centered_z_variability,
+            "z_variability": TaskParams.is_peg_centered_z_variability_top,
         },
-        weight=TaskParams.is_peg_centered_weight,
+        weight=TaskParams.is_peg_centered_weight_top,
     )
+
+    is_peg_centered_middle = RewTerm(
+        func=mdp.is_peg_centered,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "object_height": TaskParams.object_height,
+            "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+            "z_threshold": TaskParams.is_peg_centered_z_threshold,
+            "z_variability": TaskParams.is_peg_centered_z_variability_middle,
+        },
+        weight=TaskParams.is_peg_centered_weight_middle,
+    )
+
+    is_peg_centered_bottom = RewTerm(
+        func=mdp.is_peg_centered,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "object_height": TaskParams.object_height,
+            "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+            "z_threshold": TaskParams.is_peg_centered_z_threshold,
+            "z_variability": TaskParams.is_peg_centered_z_variability_bottom,
+        },
+        weight=TaskParams.is_peg_centered_weight_bottom,
+    )
+
 
     is_peg_inserted = RewTerm(
         func=mdp.is_terminated_term,

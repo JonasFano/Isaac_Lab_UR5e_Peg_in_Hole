@@ -24,7 +24,33 @@ class TaskParams:
     coriolis_centrifugal_compensation = True
     inertial_dynamics_decoupling = True
     max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None - [150.0, 150.0, 150.0, 28.0, 28.0, 28.0] for physical UR5e
-    stiffness = [400, 400, 400, 750, 750, 750] # [300, 300, 300, 100, 100, 100] # [400, 400, 400, 50, 50, 50] # Array of Kd stiffness for x y z rx ry rz
+
+
+    # # impedance_ctrl_peg_insert_2048_envs
+    # stiffness = [300, 300, 300, 1000, 1000, 1000]
+    # damping_ratio = 4
+    # damping_ratio_z = 8
+
+    # # impedance_ctrl_peg_insert_2048_envs_v2
+    # stiffness = [400, 400, 400, 1000, 1000, 1000]
+    # damping_ratio = 6
+    # damping_ratio_z = 8
+
+    # impedance_ctrl_peg_insert_2048_envs_v3
+    stiffness = [400, 400, 400, 750, 750, 750]
+    damping_ratio = 6
+    damping_ratio_z = 8
+
+    # # impedance_ctrl_peg_insert_2048_envs_v4
+    # stiffness = [400, 400, 400, 750, 750, 750]
+    # damping_ratio = 5
+    # damping_ratio_z = 6
+
+    # impedance_ctrl_peg_insert_2048_envs_v5
+    stiffness = [350, 350, 350, 900, 900, 900]
+    damping_ratio = 6
+    damping_ratio_z = 8
+
     damping = None # None = Critically damped
 
 
@@ -57,11 +83,11 @@ class TaskParams:
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
-    keypoint_distance_coarse_weight = 30.0
+    keypoint_distance_coarse_weight = 50.0
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 30.0
+    keypoint_distance_fine_weight = 50.0
 
     # Is peg centered
     is_peg_centered_xy_threshold = 0.00275 # 2.5 mm l2 norm
@@ -72,10 +98,16 @@ class TaskParams:
     # Is peg inserted
     is_peg_inserted_weight = 250.0
 
-    # Contact wrench penalty
-    force_penalty_weight = -0.005
-    torque_penalty_weight = -0.025
+    is_peg_centered_z_variability_top = -0.015
+    is_peg_centered_z_variability_middle = -0.012
+    is_peg_centered_z_variability_bottom = -0.009
+    is_peg_centered_weight_top = 20.0
+    is_peg_centered_weight_middle = 35.0
+    is_peg_centered_weight_bottom = 50.0
 
+    # Contact wrench penalty
+    force_penalty_weight = -0.001
+    torque_penalty_weight = -0.01
 
     ###################
     ### Termination ###

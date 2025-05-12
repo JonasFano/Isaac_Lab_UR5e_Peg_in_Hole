@@ -28,6 +28,8 @@ class TaskParams:
     max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None
     stiffness = [400, 400, 500, 300, 300, 300] # Array of Kd stiffness for x y z rx ry rz
     damping = None # None = Critically damped
+    damping_ratio = 1
+    damping_ratio_z = 1
 
 
     ################

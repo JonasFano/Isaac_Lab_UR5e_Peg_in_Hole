@@ -17,3 +17,5 @@ class ImpedanceControllerCfg:
     max_torque_clamping: list[float] = None # For each joint one max torque 
     stiffness: list[float] = None  # 6D stiffness: [x, y, z, rx, ry, rz]
     damping: list[float] | None = None  # Optional 6D damping
+    damping_ratio: int | float = 1 # Critical damping
+    damping_ratio_z: int | float = 1 # Critical damping
