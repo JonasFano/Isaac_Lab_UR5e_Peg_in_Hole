@@ -86,3 +86,37 @@ def is_peg_inserted(
     success = (xy_ok & z_ok).bool()  # Returns true if both true, else false
 
     return success  # shape: [N]
+
+
+
+def peg_missed_hole(
+    env: ManagerBasedRLEnv,
+    hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
+    object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
+    termination_height: float = 0.07,    # ~2cm above table
+    xy_margin: float = 0.0125,           # half-size buffer beyond the hole's bounding box
+) -> torch.Tensor:
+    """
+    Check if the peg has slipped off the hole area and touched the table.
+    Uses axis-aligned bounding box check for rectangular hole layout.
+    """
+    object: RigidObject | Articulation = env.scene[object_cfg.name]
+    hole: RigidObject | Articulation = env.scene[hole_cfg.name]
+
+    hole_pos_w = hole.data.root_pos_w.clone()        # [N, 3]
+    object_pos_w = object.data.root_pos_w.clone()    # [N, 3]
+
+    delta_xy = object_pos_w[:, :2] - hole_pos_w[:, :2]  # [N, 2]
+    
+    # Condition 1: Z height indicates peg is on table
+    z_missed = object_pos_w[:, 2] < termination_height  # [N]
+
+    # Condition 2: Peg's XY position is outside rectangular margin
+    x_outside = torch.abs(delta_xy[:, 0]) > xy_margin
+    y_outside = torch.abs(delta_xy[:, 1]) > xy_margin
+    xy_outside = x_outside | y_outside  # outside along either axis
+
+    missed = (z_missed & xy_outside).bool()  # [N]
+
+    return missed
+

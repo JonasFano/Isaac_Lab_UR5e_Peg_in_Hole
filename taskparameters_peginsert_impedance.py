@@ -41,7 +41,7 @@ class TaskParams:
     # damping_ratio = 6
     # damping_ratio_z = 8
 
-    # impedance_ctrl_peg_insert_2048_envs_v5
+    # impedance_ctrl_peg_insert_2048_envs_v4/ impedance_ctrl_peg_insert_2048_envs_v5
     stiffness = [350, 350, 350, 900, 900, 900]
     damping_ratio = 6
     damping_ratio_z = 8
@@ -78,20 +78,23 @@ class TaskParams:
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
-    keypoint_distance_coarse_weight = 50.0
+    keypoint_distance_coarse_weight = 40.0
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 50.0
+    keypoint_distance_fine_weight = 40.0
 
     # Is peg centered
     is_peg_centered_xy_threshold = 0.00275 # 2.5 mm l2 norm
     is_peg_centered_z_threshold = 0.09 # 8 cm
     is_peg_centered_z_variability = 0.005 # 2 mm
-    is_peg_centered_weight = 20.0
+    is_peg_centered_weight = 25.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 250.0
+    is_peg_inserted_weight = 200.0
+
+    # Peg falls of hole edge
+    peg_missed_hole_weight = -100
 
     is_peg_centered_z_variability_top = -0.015
     is_peg_centered_z_variability_middle = -0.012
@@ -107,6 +110,9 @@ class TaskParams:
     ### Termination ###
     ###################
     object_dropping_min_height = -0.05 
+
+    termination_height = 0.07
+    xy_margin = 0.016 # half-size buffer beyond the hole's bounding box
 
 
     #############
