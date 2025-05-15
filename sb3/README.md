@@ -92,6 +92,10 @@ Contains all necessary information on how to start training and how to run a tra
 
 
     # impedance_ctrl_peg_insert_2048_envs_v5  # Weights: 40.0 - 40.0 - 25.0 - 250.0 - -100 - -0.005 - -0.025
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/9svff3q2/model.zip
+
+    # impedance_ctrl_peg_insert_2048_envs_v6 # Weights: 20.0 - 20.0 - 50.0 - 200.0 - -50.0 - -0.01 - -0.05
+
 
 
 ## Franka

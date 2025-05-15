@@ -14,7 +14,7 @@ class ImpCtrl_Franka_PegInsertEnvCfg(peg_insert_env_cfg_franka_impedance.Franka_
     def __post_init__(self):
         super().__post_init__()
 
-        # Visualize TCP/End-effector frame
+        # Visualize Base frame
         base_marker_cfg = FRAME_MARKER_CFG.copy()
         base_marker_cfg.markers["frame"].scale = (0.15, 0.15, 0.25)
         base_marker_cfg.prim_path = "/Visuals/BaseFrame"
@@ -33,7 +33,7 @@ class ImpCtrl_Franka_PegInsertEnvCfg(peg_insert_env_cfg_franka_impedance.Franka_
             ],
         )
 
-        # Listens to the required transforms
+        # Visualize TCP frame
         marker_cfg = FRAME_MARKER_CFG.copy()
         marker_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
         marker_cfg.prim_path = "/Visuals/FrameTransformer"
