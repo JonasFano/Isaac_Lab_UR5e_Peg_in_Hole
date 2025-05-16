@@ -18,7 +18,7 @@ class TaskParams:
     command_type = "pose"
     use_relative_mode = True
     ik_method = "dls"
-    action_scale= 0.01 # 0.005 # 0.0
+    action_scale= 0.005 # 0.005 # 0.0
 
     gravity_compensation = True
     coriolis_centrifugal_compensation = True
