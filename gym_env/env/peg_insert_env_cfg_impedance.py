@@ -497,6 +497,7 @@ class TerminationsCfg:
             "object_cfg": SceneEntityCfg("object"),
             "termination_height": TaskParams.termination_height,
             "xy_margin": TaskParams.xy_margin,
+            "xy_threshold": TaskParams.xy_threshold,
         }
     )
 

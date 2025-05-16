@@ -93,30 +93,35 @@ def peg_missed_hole(
     env: ManagerBasedRLEnv,
     hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
     object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
-    termination_height: float = 0.07,    # ~2cm above table
-    xy_margin: float = 0.0125,           # half-size buffer beyond the hole's bounding box
+    termination_height: float = 0.07,     # ~2cm above table
+    xy_margin: float = 0.0125,            # margin for contact-based failure
+    xy_threshold: float = 0.02            # max allowed XY offset, independent of contact
 ) -> torch.Tensor:
     """
-    Check if the peg has slipped off the hole area and touched the table.
-    Uses axis-aligned bounding box check for rectangular hole layout.
+    Check if the peg either slipped off the hole area and touched the table,
+    or is horizontally misaligned beyond a defined threshold.
+
+    Returns a boolean tensor [N], where True indicates a missed hole.
     """
     object: RigidObject | Articulation = env.scene[object_cfg.name]
     hole: RigidObject | Articulation = env.scene[hole_cfg.name]
 
-    hole_pos_w = hole.data.root_pos_w.clone()        # [N, 3]
-    object_pos_w = object.data.root_pos_w.clone()    # [N, 3]
+    hole_pos_w = hole.data.root_pos_w.clone()         # [N, 3]
+    object_pos_w = object.data.root_pos_w.clone()     # [N, 3]
 
     delta_xy = object_pos_w[:, :2] - hole_pos_w[:, :2]  # [N, 2]
-    
-    # Condition 1: Z height indicates peg is on table
-    z_missed = object_pos_w[:, 2] < termination_height  # [N]
 
-    # Condition 2: Peg's XY position is outside rectangular margin
+    # Condition 1: Z height too low AND XY offset too large
+    z_missed = object_pos_w[:, 2] < termination_height  # [N]
     x_outside = torch.abs(delta_xy[:, 0]) > xy_margin
     y_outside = torch.abs(delta_xy[:, 1]) > xy_margin
-    xy_outside = x_outside | y_outside  # outside along either axis
+    contact_missed = z_missed & (x_outside | y_outside)  # [N]
 
-    missed = (z_missed & xy_outside).bool()  # [N]
+    # Condition 2: XY position exceeds general threshold (regardless of height)
+    xy_offset = torch.norm(delta_xy, dim=-1)            # [N]
+    xy_misaligned = xy_offset > xy_threshold            # [N]
 
-    return missed
+    missed = contact_missed | xy_misaligned             # [N]
+    return missed.bool()
+
 
