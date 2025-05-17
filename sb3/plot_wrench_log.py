@@ -4,9 +4,9 @@ from pathlib import Path
 
 # Path to your binary wrench min/max log file
 # log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax.bin" # Without force/torque clamping
-# log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v1.bin" # Without force/torque clamping
+log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v1.bin" # Without force/torque clamping
 # log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v2.bin" # With force/torque clamping to +/- 10000
-log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v9.bin" # With force/torque clamping to +/- 10000
+# log_path = Path(__file__).resolve().parents[0] / "../data/wrench_log_minmax_v9.bin" # With force/torque clamping to +/- 10000
 
 # Load the binary file as float32 and reshape
 data = np.fromfile(log_path, dtype=np.float32)
@@ -21,7 +21,7 @@ min_torques = wrench_data[:, 3:6]  # Tx, Ty, Tz (min)
 max_forces = wrench_data[:, 6:9]   # Fx, Fy, Fz (max)
 max_torques = wrench_data[:, 9:12] # Tx, Ty, Tz (max)
 
-do_not_plot = 1000
+do_not_plot = 950
 
 # Time axis (just indices)
 timesteps = np.arange(len(wrench_data) - do_not_plot)
@@ -75,5 +75,22 @@ plt.ylabel("Torque (Nm)")
 plt.legend()
 plt.grid(True)
 
+plt.tight_layout()
+plt.show()
+
+
+
+# Compute max absolute force per axis at each timestep
+abs_forces = np.maximum(np.abs(min_forces), np.abs(max_forces))  # shape [T, 3]
+
+# Plot max absolute forces
+plt.figure(figsize=(10, 4))
+plt.plot(timesteps, abs_forces[:, 0], label="|Fx| max")
+plt.plot(timesteps, abs_forces[:, 1], label="|Fy| max")
+plt.plot(timesteps, abs_forces[:, 2], label="|Fz| max")
+plt.ylabel("Force (N)")
+plt.xlabel("Timestep")
+plt.legend()
+plt.grid(True)
 plt.tight_layout()
 plt.show()

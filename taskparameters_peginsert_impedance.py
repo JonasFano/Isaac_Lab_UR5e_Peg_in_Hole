@@ -46,7 +46,7 @@ class TaskParams:
     # damping_ratio = 6
     # damping_ratio_z = 8
 
-    # impedance_ctrl_peg_insert_2048_envs_v7
+    # impedance_ctrl_peg_insert_2048_envs_v7 # impedance_ctrl_peg_insert_2048_envs_v8
     stiffness = [300, 300, 300, 900, 900, 900]
     damping_ratio = 6
     damping_ratio_z = 8
@@ -83,20 +83,20 @@ class TaskParams:
     num_keypoints = 4
     coarse_kernel_a = 50
     coarse_kernel_b = 2
-    keypoint_distance_coarse_weight = 25.0
+    keypoint_distance_coarse_weight = 20.0
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 25.0
+    keypoint_distance_fine_weight = 20.0
 
     # Is peg centered
     is_peg_centered_xy_threshold = 0.00275 # 2.5 mm l2 norm
     is_peg_centered_z_threshold = 0.09 # 8 cm
     is_peg_centered_z_variability = 0.005 # 2 mm
-    is_peg_centered_weight = 100.0
+    is_peg_centered_weight = 500.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 500.0
+    is_peg_inserted_weight = 1000.0
 
     # Peg falls of hole edge
     peg_missed_hole_weight = -50
@@ -109,8 +109,8 @@ class TaskParams:
     is_peg_centered_weight_bottom = 50.0
 
     # Contact wrench penalty
-    force_penalty_weight = -0.01
-    torque_penalty_weight = -0.05
+    force_penalty_weight = -0.005
+    torque_penalty_weight = -0.025
     ###################
     ### Termination ###
     ###################
