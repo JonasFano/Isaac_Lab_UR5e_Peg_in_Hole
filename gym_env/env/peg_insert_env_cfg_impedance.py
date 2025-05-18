@@ -450,7 +450,7 @@ class RewardsCfg:
     #     weight=TaskParams.peg_missed_hole_weight,
     # )
 
-    peg_missed_hole = DoneTerm(
+    penalize_peg_missed_hole = DoneTerm(
         func=mdp.penalize_peg_missed_hole,
         params={
             "hole_cfg": SceneEntityCfg("hole"),
