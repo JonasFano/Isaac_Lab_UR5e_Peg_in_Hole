@@ -235,7 +235,7 @@ class ObservationsCfg:
             params={
                 "asset_cfg": SceneEntityCfg("robot"),
                 "hole_cfg": SceneEntityCfg("hole"),
-                "noise_std": TaskParams.noise_std_hole_pose,  # 2.5 mm
+                "noise_std": TaskParams.noise_std_hole_pose, 
             },
         )
 
@@ -442,12 +442,23 @@ class RewardsCfg:
         weight=TaskParams.is_peg_inserted_weight,
     )
 
-    peg_missed_hole = RewTerm(
-        func=mdp.is_terminated_term,
+    # peg_missed_hole = RewTerm(
+    #     func=mdp.is_terminated_term,
+    #     params={
+    #         "term_keys": "peg_missed_hole", 
+    #     },
+    #     weight=TaskParams.peg_missed_hole_weight,
+    # )
+
+    peg_missed_hole = DoneTerm(
+        func=mdp.penalize_peg_missed_hole,
         params={
-            "term_keys": "peg_missed_hole", 
-        },
-        weight=TaskParams.peg_missed_hole_weight,
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "termination_height": TaskParams.termination_height,
+            "xy_margin": TaskParams.xy_margin,
+            "xy_threshold": TaskParams.xy_threshold,
+        }
     )
 
     # Action penalty
@@ -490,16 +501,16 @@ class TerminationsCfg:
         }
     )
 
-    peg_missed_hole = DoneTerm(
-        func=mdp.peg_missed_hole,
-        params={
-            "hole_cfg": SceneEntityCfg("hole"),
-            "object_cfg": SceneEntityCfg("object"),
-            "termination_height": TaskParams.termination_height,
-            "xy_margin": TaskParams.xy_margin,
-            "xy_threshold": TaskParams.xy_threshold,
-        }
-    )
+    # peg_missed_hole = DoneTerm(
+    #     func=mdp.peg_missed_hole,
+    #     params={
+    #         "hole_cfg": SceneEntityCfg("hole"),
+    #         "object_cfg": SceneEntityCfg("object"),
+    #         "termination_height": TaskParams.termination_height,
+    #         "xy_margin": TaskParams.xy_margin,
+    #         "xy_threshold": TaskParams.xy_threshold,
+    #     }
+    # )
 
 
 @configclass

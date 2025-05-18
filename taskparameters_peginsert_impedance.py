@@ -87,16 +87,16 @@ class TaskParams:
 
     fine_kernel_a = 100
     fine_kernel_b = 0
-    keypoint_distance_fine_weight = 20.0
+    keypoint_distance_fine_weight = 50.0
 
     # Is peg centered
     is_peg_centered_xy_threshold = 0.00275 # 2.5 mm l2 norm
     is_peg_centered_z_threshold = 0.09 # 8 cm
     is_peg_centered_z_variability = 0.005 # 2 mm
-    is_peg_centered_weight = 500.0
+    is_peg_centered_weight = 200.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 1000.0
+    is_peg_inserted_weight = 10000.0
 
     # Peg falls of hole edge
     peg_missed_hole_weight = -50
@@ -111,6 +111,7 @@ class TaskParams:
     # Contact wrench penalty
     force_penalty_weight = -0.005
     torque_penalty_weight = -0.025
+    
     ###################
     ### Termination ###
     ###################
@@ -139,9 +140,9 @@ class TaskParams:
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
     # tcp_rand_range_x = (0.004, 0.004) 
-    tcp_rand_range_x = (-0.007, 0.007) # (0.0, 0.0) # was +/- 2 cm before
+    tcp_rand_range_x = (-0.006, 0.006) # (0.0, 0.0) # was +/- 2 cm before
     # tcp_rand_range_y = (-0.004, -0.004)
-    tcp_rand_range_y = (-0.007, 0.007) # (0.005, 0.005) # was +/- 2 cm before
+    tcp_rand_range_y = (-0.006, 0.006) # (0.005, 0.005) # was +/- 2 cm before
     # tcp_rand_range_z = (0.27, 0.27)
     tcp_rand_range_z = (0.068, 0.068) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)

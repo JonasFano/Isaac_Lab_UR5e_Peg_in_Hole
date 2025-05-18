@@ -1,6 +1,6 @@
 program: train_sb3_wandb_ppo.py
 method: grid
-name: impedance_ctrl_peg_insert_2048_envs_v8
+name: impedance_ctrl_peg_insert_2048_envs_v9
 metric:
   goal: maximize
   name: rollout/ep_rew_mean
@@ -37,7 +37,7 @@ parameters:
     value: 0.01
 
   vf_coef:
-    value: 0.1
+    value: 0.5
 
   learning_rate:
     value: !!float 3e-4
