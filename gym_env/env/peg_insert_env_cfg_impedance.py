@@ -450,7 +450,7 @@ class RewardsCfg:
     #     weight=TaskParams.peg_missed_hole_weight,
     # )
 
-    penalize_peg_missed_hole = DoneTerm(
+    penalize_peg_missed_hole = RewTerm(
         func=mdp.penalize_peg_missed_hole,
         params={
             "hole_cfg": SceneEntityCfg("hole"),
@@ -458,7 +458,8 @@ class RewardsCfg:
             "termination_height": TaskParams.termination_height,
             "xy_margin": TaskParams.xy_margin,
             "xy_threshold": TaskParams.xy_threshold,
-        }
+        },
+        weight=TaskParams.peg_missed_hole_weight,
     )
 
     # Action penalty

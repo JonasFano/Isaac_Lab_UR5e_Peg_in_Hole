@@ -230,6 +230,6 @@ def penalize_peg_missed_hole(
     xy_misaligned = xy_offset > xy_threshold            # [N]
 
     missed = contact_missed | xy_misaligned             # [N]
-    return missed.bool()
+    return missed
 
 
