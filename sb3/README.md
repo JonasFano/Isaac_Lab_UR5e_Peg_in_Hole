@@ -77,35 +77,36 @@ Contains all necessary information on how to start training and how to run a tra
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/wmkv2euq/model.zip # 512 envs - stiffness=[300, 300, 300, 100, 100, 100] - damping_ratio = 4
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/wmkv2euq/model.zip # 512 envs - stiffness=[400, 400, 400, 50, 50, 50] - damping_ratio = 4
 
-    # impedance_ctrl_peg_insert_2048_envs
+    # impedance_ctrl_peg_insert_2048_envs # Action Scale: 0.01
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs/cvdhh2cg/model.zip
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs/r9x5uvm1/model.zip 
 
-    # impedance_ctrl_peg_insert_2048_envs_v2
+    # impedance_ctrl_peg_insert_2048_envs_v2 # Action Scale: 0.01
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v2/hrure71c/model.zip
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v2/s9io8zqc/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v3 # Weights: 20.0 - 20.0 - 15.0 - 200.0
+    # impedance_ctrl_peg_insert_2048_envs_v3 # Weights: 20.0 - 20.0 - 15.0 - 200.0 # Action Scale: 0.01
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v3/ecwzweqi/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v4  # Weights: 50.0 - 50.0 - 20.0 - 35.0 - 50.0 - 250.0 - -0.005 - -0.025
+    # impedance_ctrl_peg_insert_2048_envs_v4  # Weights: 50.0 - 50.0 - 20.0 - 35.0 - 50.0 - 250.0 - -0.005 - -0.025 # Action Scale: 0.01
 
 
-    # impedance_ctrl_peg_insert_2048_envs_v5  # Weights: 40.0 - 40.0 - 25.0 - 250.0 - -100 - -0.005 - -0.025
+    # impedance_ctrl_peg_insert_2048_envs_v5  # Weights: 40.0 - 40.0 - 25.0 - 250.0 - -100 - -0.005 - -0.025 # Action Scale: 0.01
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/9svff3q2/model.zip
 
     # impedance_ctrl_peg_insert_2048_envs_v6 # Weights: 20.0 - 20.0 - 50.0 - 200.0 - -50.0 - -0.01 - -0.05
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v6/po5be5ca/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v7 # Weights: 25.0 - 25.0 - 100.0 - 500.0 - -50.0 - -0.01 - -0.05
+    # impedance_ctrl_peg_insert_2048_envs_v7 # Weights: 25.0 - 25.0 - 100.0 - 500.0 - -50.0 - -0.01 - -0.05 # Action Scale: 0.01
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v7/ls6utfi9/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v8 # Weights: 20.0 - 20.0 - 500.0 - 1000.0 - -50.0 - -0.005 - -0.025
+    # impedance_ctrl_peg_insert_2048_envs_v8 # Weights: 20.0 - 20.0 - 500.0 - 1000.0 - -50.0 - -0.005 - -0.025 # Action Scale: 0.005
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v8/b9ifeoyf/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v9
-
+    # impedance_ctrl_peg_insert_2048_envs_v9 # Weights: 20.0 - 50.0 - 200.0 - 10000.0 - -50.0 - -0.005 - -0.025 # Action scale: 0.005 # Without reset if outside of hole
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v9/oq7xgaas/model.zip
     
+    # impedance_ctrl_peg_insert_2048_envs_v10 # Weights: 
 
 ## Franka
 ### Train
