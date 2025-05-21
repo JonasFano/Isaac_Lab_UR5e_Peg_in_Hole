@@ -106,7 +106,12 @@ Contains all necessary information on how to start training and how to run a tra
     # impedance_ctrl_peg_insert_2048_envs_v9 # Weights: 20.0 - 50.0 - 200.0 - 10000.0 - -50.0 - -0.005 - -0.025 # Action scale: 0.005 # Without reset if outside of hole
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v9/oq7xgaas/model.zip
     
-    # impedance_ctrl_peg_insert_2048_envs_v10 # Weights: 
+    # impedance_ctrl_peg_insert_2048_envs_v10 # Weights: 50.0 - 100.0 - 200.0 - 5000.0 - -250.0 - -0.005 - -0.025 # Without reset if outside of hole
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint 
+
+    # impedance_ctrl_peg_insert_2048_envs_v11 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.005 - -0.025 # Added sequential_keypoint_distance reward
+
+
 
 ## Franka
 ### Train

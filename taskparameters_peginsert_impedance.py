@@ -46,7 +46,7 @@ class TaskParams:
     # damping_ratio = 6
     # damping_ratio_z = 8
 
-    # impedance_ctrl_peg_insert_2048_envs_v7 # impedance_ctrl_peg_insert_2048_envs_v8
+    # impedance_ctrl_peg_insert_2048_envs_v7 # impedance_ctrl_peg_insert_2048_envs_v8 # impedance_ctrl_peg_insert_2048_envs_v9 # impedance_ctrl_peg_insert_2048_envs_v10
     stiffness = [300, 300, 300, 900, 900, 900]
     damping_ratio = 6
     damping_ratio_z = 8
@@ -60,7 +60,7 @@ class TaskParams:
     tcp_pose_unoise_min = -0.0001 # 0.1 mm
     tcp_pose_unoise_max = 0.0001 # 0.1 mm
 
-    noise_std_hole_pose = 0.001 # 0.0025 # 2.5 mm
+    noise_std_hole_pose = 0.00 # 0.0025 # 2.5 mm
 
 
     #########
@@ -93,20 +93,20 @@ class TaskParams:
     is_peg_centered_xy_threshold = 0.003 # 2.5 mm l2 norm
     is_peg_centered_z_threshold = 0.09 # 8 cm
     is_peg_centered_z_variability = 0.005 # 2 mm
-    is_peg_centered_weight = 200.0
+    is_peg_centered_weight = 100.0
 
     # Is peg inserted
     is_peg_inserted_weight = 5000.0
 
     # Peg falls of hole edge
-    peg_missed_hole_weight = -250
+    peg_missed_hole_weight = -50
 
-    is_peg_centered_z_variability_top = -0.015
-    is_peg_centered_z_variability_middle = -0.012
-    is_peg_centered_z_variability_bottom = -0.009
-    is_peg_centered_weight_top = 20.0
-    is_peg_centered_weight_middle = 35.0
-    is_peg_centered_weight_bottom = 50.0
+    # is_peg_centered_z_variability_top = -0.015
+    # is_peg_centered_z_variability_middle = -0.012
+    # is_peg_centered_z_variability_bottom = -0.009
+    # is_peg_centered_weight_top = 20.0
+    # is_peg_centered_weight_middle = 35.0
+    # is_peg_centered_weight_bottom = 50.0
 
     # Contact wrench penalty
     force_penalty_weight = -0.005
@@ -213,6 +213,7 @@ class TaskParams:
     # Hole parameters
     hole_init_mass = 10
     hole_init_pos = (-0.2, 0.2, 0.0025)
+    hole_height = 0.0275
     hole_randomize_mass_range = (10, 10) # (10, 15)
     hole_randomize_mass_operation = "abs"
     hole_randomize_mass_distribution = "uniform"

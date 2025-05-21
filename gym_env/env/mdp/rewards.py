@@ -233,3 +233,87 @@ def penalize_peg_missed_hole(
     return missed
 
 
+def sequential_keypoint_distance(
+        env: ManagerBasedRLEnv,
+        hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
+        object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
+        num_keypoints: int = 4,
+        object_height: float = 0.05,
+        keypoint_start_height: float = 0.0275,
+        a: float = 50,
+        b: float = 2,
+        check_centered: bool = False,
+        xy_threshold: float = 0.0025,
+        z_threshold: float = 0.08,
+        z_variability: float = 0.002,
+) -> torch.Tensor:
+    """
+    Reward based on keypoint distance between object and hole using keypoints from base to top.
+    """
+
+    # Extract assets
+    object: RigidObject | Articulation = env.scene[object_cfg.name]
+    hole: RigidObject | Articulation = env.scene[hole_cfg.name]
+
+    # Get root poses
+    object_pos_w = object.data.root_pos_w.clone()      # (N, 3)
+    object_quat_w = object.data.root_quat_w.clone()    # (N, 4)
+    hole_pos_w = hole.data.root_pos_w.clone()
+    hole_quat_w = hole.data.root_quat_w.clone()
+
+    # Object keypoints: bottom to top (negative Z to 0)
+    z_vals_object = torch.linspace(-object_height, 0.0, num_keypoints, device=env.device)
+    keypoint_offsets_object = torch.zeros((num_keypoints, 3), device=env.device)
+    keypoint_offsets_object[:, 2] = z_vals_object
+
+    # Hole keypoints: bottom to top (0 to positive Z)
+    z_vals_hole = torch.linspace(keypoint_start_height, keypoint_start_height + object_height, num_keypoints, device=env.device)
+    keypoint_offsets_hole = torch.zeros((num_keypoints, 3), device=env.device)
+    keypoint_offsets_hole[:, 2] = z_vals_hole
+
+    object_quat_batch = object_quat_w.unsqueeze(1).repeat(1, num_keypoints, 1)     # (N, K, 4)
+    hole_quat_batch = hole_quat_w.unsqueeze(1).repeat(1, num_keypoints, 1)   # (N, K, 4)
+
+    # Batch for all envs
+    kp_offsets_object_batch = keypoint_offsets_object.unsqueeze(0).repeat(env.num_envs, 1, 1)
+    kp_offsets_hole_batch = keypoint_offsets_hole.unsqueeze(0).repeat(env.num_envs, 1, 1)
+
+    # Transform to world frame
+    object_keypoints_w = quat_apply(object_quat_batch, kp_offsets_object_batch) + object_pos_w.unsqueeze(1)
+    hole_keypoints_w = quat_apply(hole_quat_batch, kp_offsets_hole_batch) + hole_pos_w.unsqueeze(1)
+
+    # print(object_keypoints_w)
+    # print(hole_keypoints_w)
+
+    # Compute distances and average
+    kp_distances = torch.norm(object_keypoints_w - hole_keypoints_w, dim=-1)  # (N, K)
+    avg_kp_distance = kp_distances.mean(dim=1)
+
+    # Reward function
+    def squashing_fn(x, a, b):
+        return 1 / (torch.exp(a * x) + b + torch.exp(-a * x)) # If x (mean keypoint distance) is very small, reward = 1 / (2 + b)
+
+    reward = squashing_fn(avg_kp_distance, a, b)
+
+    if check_centered:
+        # Compute 2D XY distance
+        xy_dist = torch.linalg.vector_norm(hole_pos_w[:, 0:2] - object_pos_w[:, 0:2], dim=1)
+
+        # print(xy_dist)
+
+        # Check if XY distance is below threshold
+        is_centered = xy_dist <= xy_threshold
+
+        # Check if object is inserted below the Z threshold
+        z_disp = object_pos_w[:, 2] - hole_pos_w[:, 2]
+        is_low_enough = (z_disp <= z_threshold) & (z_disp >= object_height - z_variability) # If the peg is fully inserted, its height is sometimes 1 mm below its height
+
+        centered_envs = torch.where(
+            torch.logical_and(is_centered, is_low_enough),
+            torch.ones_like(xy_dist, dtype=torch.float32),
+            torch.zeros_like(xy_dist, dtype=torch.float32)
+        )
+
+        reward *= centered_envs
+
+    return reward

@@ -353,33 +353,109 @@ class EventCfg:
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
+    ######################################################
     # Dense keypoint distance rewards
+    # keypoint_distance_coarse = RewTerm(
+    #     func=mdp.keypoint_distance,
+    #     params={
+    #         "hole_cfg": SceneEntityCfg("hole"),
+    #         "object_cfg": SceneEntityCfg("object"),
+    #         "num_keypoints": TaskParams.num_keypoints,
+    #         "object_height": TaskParams.object_height,
+    #         "a": TaskParams.coarse_kernel_a,
+    #         "b": TaskParams.coarse_kernel_b,
+    #     },
+    #     weight=TaskParams.keypoint_distance_coarse_weight,
+    # )
+
+    # keypoint_distance_fine = RewTerm(
+    #     func=mdp.keypoint_distance,
+    #     params={
+    #         "hole_cfg": SceneEntityCfg("hole"),
+    #         "object_cfg": SceneEntityCfg("object"),
+    #         "num_keypoints": TaskParams.num_keypoints,
+    #         "object_height": TaskParams.object_height,
+    #         "a": TaskParams.fine_kernel_a,
+    #         "b": TaskParams.fine_kernel_b,
+    #     },
+    #     weight=TaskParams.keypoint_distance_fine_weight,
+    # )
+
     keypoint_distance_coarse = RewTerm(
-        func=mdp.keypoint_distance,
+        func=mdp.sequential_keypoint_distance,
         params={
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
             "num_keypoints": TaskParams.num_keypoints,
             "object_height": TaskParams.object_height,
+            "keypoint_start_height": TaskParams.hole_height,
             "a": TaskParams.coarse_kernel_a,
             "b": TaskParams.coarse_kernel_b,
+            "check_centered": False,
+            "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+            "z_threshold": TaskParams.is_peg_centered_z_threshold,
+            "z_variability": TaskParams.is_peg_centered_z_variability,
         },
         weight=TaskParams.keypoint_distance_coarse_weight,
     )
 
     keypoint_distance_fine = RewTerm(
-        func=mdp.keypoint_distance,
+        func=mdp.sequential_keypoint_distance,
         params={
             "hole_cfg": SceneEntityCfg("hole"),
             "object_cfg": SceneEntityCfg("object"),
             "num_keypoints": TaskParams.num_keypoints,
             "object_height": TaskParams.object_height,
+            "keypoint_start_height": TaskParams.hole_height,
             "a": TaskParams.fine_kernel_a,
-            "b": TaskParams.fine_kernel_b,
+            "b": TaskParams.fine_kernel_b,            
+            "check_centered": False,
+            "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+            "z_threshold": TaskParams.is_peg_centered_z_threshold,
+            "z_variability": TaskParams.is_peg_centered_z_variability,
         },
         weight=TaskParams.keypoint_distance_fine_weight,
     )
 
+    keypoint_distance_inside_hole_coarse = RewTerm(
+        func=mdp.sequential_keypoint_distance,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "num_keypoints": TaskParams.num_keypoints,
+            "object_height": TaskParams.object_height,
+            "keypoint_start_height": 0.0025,
+            "a": TaskParams.coarse_kernel_a,
+            "b": TaskParams.coarse_kernel_b,
+            "check_centered": True,
+            "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+            "z_threshold": TaskParams.is_peg_centered_z_threshold,
+            "z_variability": TaskParams.is_peg_centered_z_variability,
+        },
+        weight=TaskParams.keypoint_distance_coarse_weight,
+    )
+
+    keypoint_distance_inside_hole_fine = RewTerm(
+        func=mdp.sequential_keypoint_distance,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "num_keypoints": TaskParams.num_keypoints,
+            "object_height": TaskParams.object_height,
+            "keypoint_start_height": 0.0025,
+            "a": TaskParams.fine_kernel_a,
+            "b": TaskParams.fine_kernel_b,
+            "check_centered": True,
+            "xy_threshold": TaskParams.is_peg_centered_xy_threshold,
+            "z_threshold": TaskParams.is_peg_centered_z_threshold,
+            "z_variability": TaskParams.is_peg_centered_z_variability,
+        },
+        weight=TaskParams.keypoint_distance_fine_weight,
+    )
+    ######################################################
+
+
+    ######################################################
     # Sparse rewards
     is_peg_centered = RewTerm(
         func=mdp.is_peg_centered,
@@ -432,7 +508,7 @@ class RewardsCfg:
     #     },
     #     weight=TaskParams.is_peg_centered_weight_bottom,
     # )
-
+    ######################################################
 
     is_peg_inserted = RewTerm(
         func=mdp.is_terminated_term,
@@ -442,25 +518,28 @@ class RewardsCfg:
         weight=TaskParams.is_peg_inserted_weight,
     )
 
-    # peg_missed_hole = RewTerm(
-    #     func=mdp.is_terminated_term,
-    #     params={
-    #         "term_keys": "peg_missed_hole", 
-    #     },
-    #     weight=TaskParams.peg_missed_hole_weight,
-    # )
 
-    penalize_peg_missed_hole = RewTerm(
-        func=mdp.penalize_peg_missed_hole,
+    ######################################################
+    peg_missed_hole = RewTerm(
+        func=mdp.is_terminated_term,
         params={
-            "hole_cfg": SceneEntityCfg("hole"),
-            "object_cfg": SceneEntityCfg("object"),
-            "termination_height": TaskParams.termination_height,
-            "xy_margin": TaskParams.xy_margin,
-            "xy_threshold": TaskParams.xy_threshold,
+            "term_keys": "peg_missed_hole", 
         },
         weight=TaskParams.peg_missed_hole_weight,
     )
+
+    # penalize_peg_missed_hole = RewTerm(
+    #     func=mdp.penalize_peg_missed_hole,
+    #     params={
+    #         "hole_cfg": SceneEntityCfg("hole"),
+    #         "object_cfg": SceneEntityCfg("object"),
+    #         "termination_height": TaskParams.termination_height,
+    #         "xy_margin": TaskParams.xy_margin,
+    #         "xy_threshold": TaskParams.xy_threshold,
+    #     },
+    #     weight=TaskParams.peg_missed_hole_weight,
+    # )
+    ######################################################
 
     # Action penalty
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=TaskParams.action_rate_weight)
@@ -502,16 +581,16 @@ class TerminationsCfg:
         }
     )
 
-    # peg_missed_hole = DoneTerm(
-    #     func=mdp.peg_missed_hole,
-    #     params={
-    #         "hole_cfg": SceneEntityCfg("hole"),
-    #         "object_cfg": SceneEntityCfg("object"),
-    #         "termination_height": TaskParams.termination_height,
-    #         "xy_margin": TaskParams.xy_margin,
-    #         "xy_threshold": TaskParams.xy_threshold,
-    #     }
-    # )
+    peg_missed_hole = DoneTerm(
+        func=mdp.peg_missed_hole,
+        params={
+            "hole_cfg": SceneEntityCfg("hole"),
+            "object_cfg": SceneEntityCfg("object"),
+            "termination_height": TaskParams.termination_height,
+            "xy_margin": TaskParams.xy_margin,
+            "xy_threshold": TaskParams.xy_threshold,
+        }
+    )
 
 
 @configclass
