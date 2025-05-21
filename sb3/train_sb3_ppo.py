@@ -164,12 +164,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     while timestep < total_timesteps:
         # Predict the action using the policy
-        # action, _states = agent.predict(obs, deterministic=False)
+        action, _states = agent.predict(obs, deterministic=False)
 
 
         ###########################################
         # Impedance control
-        action = np.array([[0, 0, 0.0]])
+        # action = np.array([[0, 0, 0.0]])
         ###########################################
 
 

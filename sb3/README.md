@@ -71,11 +71,11 @@ Contains all necessary information on how to start training and how to run a tra
     # impedance_ctrl_peg_insert_2048_envs_v5 # stiffness=[350, 350, 350, 900, 900, 900] damping_ratio = 6 (damping ratio 8 for z position) - with contact wrench penalty (force weight: -0.005, torque weight: -0.025)
 
 ### Play
-    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/ms518sqi/model.zip # 128 envs - stiffness=[10, 10, 50, 20, 20, 20] - damping_ratio = 1
-    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/r61ror63/model.zip # 128 envs - stiffness=[10, 10, 50, 20, 20, 20] - damping_ratio = 1
+     # impedance_ctrl_peg_insert_128_envs - stiffness=[10, 10, 50, 20, 20, 20] - damping_ratio = 1
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_128_envs/ms518sqi/model.zip
 
-    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/wmkv2euq/model.zip # 512 envs - stiffness=[300, 300, 300, 100, 100, 100] - damping_ratio = 4
-    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/wmkv2euq/model.zip # 512 envs - stiffness=[400, 400, 400, 50, 50, 50] - damping_ratio = 4
+    # impedance_ctrl_peg_insert_512_envs
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_512_envs/wmkv2euq/model.zip
 
     # impedance_ctrl_peg_insert_2048_envs # Action Scale: 0.01
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs/cvdhh2cg/model.zip
@@ -89,27 +89,28 @@ Contains all necessary information on how to start training and how to run a tra
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v3/ecwzweqi/model.zip
 
     # impedance_ctrl_peg_insert_2048_envs_v4  # Weights: 50.0 - 50.0 - 20.0 - 35.0 - 50.0 - 250.0 - -0.005 - -0.025 # Action Scale: 0.01
-
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v4/pmeecsm4/model.zip
 
     # impedance_ctrl_peg_insert_2048_envs_v5  # Weights: 40.0 - 40.0 - 25.0 - 250.0 - -100 - -0.005 - -0.025 # Action Scale: 0.01
-    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/9svff3q2/model.zip
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v5/9svff3q2/model.zip
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v5/34m8b4cp/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v6 # Weights: 20.0 - 20.0 - 50.0 - 200.0 - -50.0 - -0.01 - -0.05
+    # impedance_ctrl_peg_insert_2048_envs_v6 # Weights: 20.0 - 20.0 - 50.0 - 200.0 - -50.0 - -0.01 - -0.05 # With reset once below height threshold
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v6/po5be5ca/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v7 # Weights: 25.0 - 25.0 - 100.0 - 500.0 - -50.0 - -0.01 - -0.05 # Action Scale: 0.01
+    # impedance_ctrl_peg_insert_2048_envs_v7 # Weights: 25.0 - 25.0 - 100.0 - 500.0 - -50.0 - -0.01 - -0.05 # Action Scale: 0.01 # With reset once below height threshold
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v7/ls6utfi9/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v8 # Weights: 20.0 - 20.0 - 500.0 - 1000.0 - -50.0 - -0.005 - -0.025 # Action Scale: 0.005
+    # impedance_ctrl_peg_insert_2048_envs_v8 # Weights: 20.0 - 20.0 - 500.0 - 1000.0 - -50.0 - -0.005 - -0.025 # Action Scale: 0.005 # With reset once below height threshold
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v8/b9ifeoyf/model.zip
 
     # impedance_ctrl_peg_insert_2048_envs_v9 # Weights: 20.0 - 50.0 - 200.0 - 10000.0 - -50.0 - -0.005 - -0.025 # Action scale: 0.005 # Without reset if outside of hole
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v9/oq7xgaas/model.zip
     
-    # impedance_ctrl_peg_insert_2048_envs_v10 # Weights: 50.0 - 100.0 - 200.0 - 5000.0 - -250.0 - -0.005 - -0.025 # Without reset if outside of hole
-    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint 
+    # impedance_ctrl_peg_insert_2048_envs_v10 # Weights: 50.0 - 100.0 - 200.0 - 5000.0 - -250.0 - -0.005 - -0.025 # Action scale: 0.005 # Without reset if outside of hole
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v10/sz0r69mn/model.zip
 
-    # impedance_ctrl_peg_insert_2048_envs_v11 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.005 - -0.025 # Added sequential_keypoint_distance reward
+    # impedance_ctrl_peg_insert_2048_envs_v11 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.005 - -0.025 # Action scale: 0.005 # Added sequential_keypoint_distance reward 
 
 
 

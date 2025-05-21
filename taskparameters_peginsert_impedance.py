@@ -6,7 +6,7 @@ class TaskParams:
     ### General Simulation Params ###
     #################################
     decimation = 20 #2
-    episode_length_s = 5.0 # 10.0  # 10.0 # 0.5 # 5.0
+    episode_length_s = 5.0 # 5.0 # 10.0  # 10.0 # 0.5 # 5.0
     dt = 1/1000 # 0.01
     render_interval = 5
     gravity = [0.0, 0.0, -9.81]
@@ -25,13 +25,17 @@ class TaskParams:
     inertial_dynamics_decoupling = True
     max_torque_clamping = None # Array of max torques to clamp computed torques - no clamping if None - [150.0, 150.0, 150.0, 28.0, 28.0, 28.0] for physical UR5e
 
+    # # impedance_ctrl_peg_insert_512_envs
+    # stiffness = [300, 300, 300, 100, 100, 100]
+    # damping_ratio = 4
+    # damping_ratio_z = 4
 
     # # impedance_ctrl_peg_insert_2048_envs
     # stiffness = [300, 300, 300, 1000, 1000, 1000]
     # damping_ratio = 4
     # damping_ratio_z = 8
 
-    # # impedance_ctrl_peg_insert_2048_envs_v2
+    # impedance_ctrl_peg_insert_2048_envs_v2
     # stiffness = [400, 400, 400, 1000, 1000, 1000]
     # damping_ratio = 6
     # damping_ratio_z = 8
@@ -46,10 +50,16 @@ class TaskParams:
     # damping_ratio = 6
     # damping_ratio_z = 8
 
-    # impedance_ctrl_peg_insert_2048_envs_v7 # impedance_ctrl_peg_insert_2048_envs_v8 # impedance_ctrl_peg_insert_2048_envs_v9 # impedance_ctrl_peg_insert_2048_envs_v10
-    stiffness = [300, 300, 300, 900, 900, 900]
+    # impedance_ctrl_peg_insert_2048_envs_v7 # impedance_ctrl_peg_insert_2048_envs_v8 # impedance_ctrl_peg_insert_2048_envs_v9 # impedance_ctrl_peg_insert_2048_envs_v10 # impedance_ctrl_peg_insert_2048_envs_v11
+    # stiffness = [300, 300, 300, 500, 900, 900]
+    # damping_ratio = 6
+    # damping_ratio_z = 8
+
+    # impedance_ctrl_peg_insert_2048_envs_v12
+    stiffness = [300, 300, 300, 850, 850, 850]
     damping_ratio = 6
     damping_ratio_z = 8
+
 
     damping = None # None = Critically damped
 

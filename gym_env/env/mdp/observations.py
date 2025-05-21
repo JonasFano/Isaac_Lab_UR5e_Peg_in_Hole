@@ -54,6 +54,8 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     robot: RigidObject | Articulation = env.scene[robot_cfg.name]
     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
 
+    # print(ee_frame.data.target_pos_w.squeeze(0))
+
     # Clone the body states in the world frame to avoid modifying the original tensor
     body_state_w_list = robot.data.body_state_w.clone()
 
@@ -68,6 +70,8 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
 
     # Compute the TCP pose in the world frame by adding the offset to the end-effector's position
     tcp_pose_w = torch.cat((ee_pose_w[:, :3] + offset_w, ee_pose_w[:, 3:7]), dim=-1)
+
+    # print(tcp_pose_w[:, :3])
 
     # Transform the TCP pose from the world frame to the robot's base frame
     tcp_pos_b, tcp_quat_b = subtract_frame_transforms(
@@ -85,6 +89,40 @@ def get_current_tcp_pose(env: ManagerBasedRLEnv, gripper_offset: List[float], ro
     tcp_pose_b = torch.cat((tcp_pos_b, tcp_quat_b), dim=-1)
 
     return tcp_pose_b
+
+
+def get_current_tcp_position(env: ManagerBasedRLEnv, robot_cfg: SceneEntityCfg, ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame")) -> torch.Tensor:
+    """
+    Compute the current TCP pose in both the base frame and world frame.
+    
+    Args:
+        env: ManagerBasedRLEnv object containing the virtual environment.
+        robot_cfg: Configuration for the robot entity, defaults to "robot".
+    
+    Returns:
+        tcp_pose_b: TCP pose in the robot's base frame (position + quaternion).
+    """
+
+    # Access the robot object from the scene using the provided configuration
+    robot: RigidObject | Articulation = env.scene[robot_cfg.name]
+    ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
+
+    # Clone the body states in the world frame to avoid modifying the original tensor
+    tcp_pos_w = ee_frame.data.target_pos_w.clone()
+    tcp_quat_w = ee_frame.data.target_quat_w.clone()
+
+    # Extract the pose of the end-effector (position + orientation) in the world frame
+    tcp_pose_w = torch.cat((tcp_pos_w, tcp_quat_w), dim=-1).squeeze(0)
+
+    # Transform the TCP pose from the world frame to the robot's base frame
+    tcp_pos_b, _ = subtract_frame_transforms(
+        robot.data.root_state_w[:, :3],  # Robot base position in world frame
+        robot.data.root_state_w[:, 3:7],  # Robot base orientation in world frame
+        tcp_pose_w[:, :3],  # TCP position in world frame
+        tcp_pose_w[:, 3:7]  # TCP orientation in world frame
+    )
+
+    return tcp_pos_b
 
 
 def object_position_in_robot_root_frame(
@@ -203,3 +241,28 @@ def noisy_hole_pose_estimate(
     hole_pose_b = torch.cat((hole_pos_b, hole_quat_b), dim=-1)
 
     return hole_pose_b
+
+
+def noisy_hole_pose_estimate_pos_only(
+    env: ManagerBasedRLEnv,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
+    noise_std: float = 0.0025,  # 2.5 mm
+) -> torch.Tensor:
+    """Provide a noisy estimate of the hole position in the robot's root frame."""
+    robot: RigidObject | Articulation = env.scene[asset_cfg.name]
+    hole: RigidObject | Articulation = env.scene[hole_cfg.name]
+
+    # Get hole position in world frame
+    hole_pos_w = hole.data.root_pos_w[:, :3]
+
+    # Transform to robot base frame
+    hole_pos_b, hole_quat_b = subtract_frame_transforms(
+        robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], hole_pos_w
+    )
+
+    # Add Gaussian noise to X and Y
+    xy_noise = torch.randn_like(hole_pos_b[:, :2]) * noise_std
+    hole_pos_b[:, :2] += xy_noise
+
+    return hole_pos_b
