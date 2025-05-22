@@ -111,8 +111,11 @@ Contains all necessary information on how to start training and how to run a tra
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v10/sz0r69mn/model.zip
 
     # impedance_ctrl_peg_insert_2048_envs_v11 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.005 - -0.025 # Action scale: 0.005 # Added sequential_keypoint_distance reward 
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/s8txo45q/model.zip
 
+    # impedance_ctrl_peg_insert_2048_envs_v12 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.005 - -0.025 # Action scale: 0.005 # Added sequential_keypoint_distance reward # Position observations only
 
+    # impedance_ctrl_peg_insert_2048_envs_v13 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.05 - -0.1 # Action scale: 0.005 # Added sequential_keypoint_distance reward # Position observations only
 
 ## Franka
 ### Train

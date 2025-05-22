@@ -119,8 +119,8 @@ class TaskParams:
     # is_peg_centered_weight_bottom = 50.0
 
     # Contact wrench penalty
-    force_penalty_weight = -0.005
-    torque_penalty_weight = -0.025
+    force_penalty_weight = -0.05
+    torque_penalty_weight = -0.1
     
     ###################
     ### Termination ###
