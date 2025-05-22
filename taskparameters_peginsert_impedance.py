@@ -51,14 +51,14 @@ class TaskParams:
     # damping_ratio_z = 8
 
     # impedance_ctrl_peg_insert_2048_envs_v7 # impedance_ctrl_peg_insert_2048_envs_v8 # impedance_ctrl_peg_insert_2048_envs_v9 # impedance_ctrl_peg_insert_2048_envs_v10 # impedance_ctrl_peg_insert_2048_envs_v11
-    # stiffness = [300, 300, 300, 500, 900, 900]
-    # damping_ratio = 6
-    # damping_ratio_z = 8
-
-    # impedance_ctrl_peg_insert_2048_envs_v12
-    stiffness = [300, 300, 300, 850, 850, 850]
+    stiffness = [300, 300, 300, 500, 900, 900]
     damping_ratio = 6
     damping_ratio_z = 8
+
+    # impedance_ctrl_peg_insert_2048_envs_v12
+    # stiffness = [300, 300, 300, 850, 850, 850]
+    # damping_ratio = 6
+    # damping_ratio_z = 8
 
 
     damping = None # None = Critically damped
@@ -138,6 +138,7 @@ class TaskParams:
     # Robot parameters/gains
     joint_names = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
     ee_body_name = "wrist_3_link"
+    robot_init_pos = (0.3, -0.1, 0.0)
 
     robot_vel_limit = 180.0
     robot_effort_limit = 87.0
