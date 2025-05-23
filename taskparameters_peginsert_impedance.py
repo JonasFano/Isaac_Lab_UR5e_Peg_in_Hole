@@ -51,14 +51,14 @@ class TaskParams:
     # damping_ratio_z = 8
 
     # impedance_ctrl_peg_insert_2048_envs_v7 # impedance_ctrl_peg_insert_2048_envs_v8 # impedance_ctrl_peg_insert_2048_envs_v9 # impedance_ctrl_peg_insert_2048_envs_v10 # impedance_ctrl_peg_insert_2048_envs_v11
-    stiffness = [300, 300, 300, 500, 900, 900]
-    damping_ratio = 6
-    damping_ratio_z = 8
-
-    # impedance_ctrl_peg_insert_2048_envs_v12
-    # stiffness = [300, 300, 300, 850, 850, 850]
+    # stiffness = [300, 300, 300, 900, 900, 900]
     # damping_ratio = 6
     # damping_ratio_z = 8
+
+    # impedance_ctrl_peg_insert_2048_envs_v12 # impedance_ctrl_peg_insert_2048_envs_v13 # impedance_ctrl_peg_insert_2048_envs_v14 
+    stiffness = [300, 300, 300, 850, 850, 850]
+    damping_ratio = 6
+    damping_ratio_z = 8
 
 
     damping = None # None = Critically damped
@@ -70,7 +70,7 @@ class TaskParams:
     tcp_pose_unoise_min = -0.0001 # 0.1 mm
     tcp_pose_unoise_max = 0.0001 # 0.1 mm
 
-    noise_std_hole_pose = 0.00 # 0.0025 # 2.5 mm
+    noise_std_hole_pose = 0.0025 # 2.5 mm
 
 
     #########
@@ -119,8 +119,8 @@ class TaskParams:
     # is_peg_centered_weight_bottom = 50.0
 
     # Contact wrench penalty
-    force_penalty_weight = -0.05
-    torque_penalty_weight = -0.1
+    force_penalty_weight = -0.2
+    torque_penalty_weight = -0.5
     
     ###################
     ### Termination ###
