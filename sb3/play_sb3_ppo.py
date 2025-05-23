@@ -119,7 +119,7 @@ def main():
             # env stepping
             obs, rew, _, _ = env.step(actions)
 
-            print(rew)
+            print(obs)
 
         if args_cli.video:
             timestep += 1

@@ -51,11 +51,11 @@ class TaskParams:
     # damping_ratio_z = 8
 
     # impedance_ctrl_peg_insert_2048_envs_v7 # impedance_ctrl_peg_insert_2048_envs_v8 # impedance_ctrl_peg_insert_2048_envs_v9 # impedance_ctrl_peg_insert_2048_envs_v10 # impedance_ctrl_peg_insert_2048_envs_v11
-    # stiffness = [300, 300, 300, 500, 900, 900]
+    # stiffness = [300, 300, 300, 900, 900, 900]
     # damping_ratio = 6
     # damping_ratio_z = 8
 
-    # impedance_ctrl_peg_insert_2048_envs_v12
+    # impedance_ctrl_peg_insert_2048_envs_v12 # impedance_ctrl_peg_insert_2048_envs_v13 # impedance_ctrl_peg_insert_2048_envs_v14 
     stiffness = [300, 300, 300, 850, 850, 850]
     damping_ratio = 6
     damping_ratio_z = 8
@@ -70,7 +70,7 @@ class TaskParams:
     tcp_pose_unoise_min = -0.0001 # 0.1 mm
     tcp_pose_unoise_max = 0.0001 # 0.1 mm
 
-    noise_std_hole_pose = 0.00 # 0.0025 # 2.5 mm
+    noise_std_hole_pose = 0.001 # 2.5 mm
 
 
     #########
@@ -119,8 +119,8 @@ class TaskParams:
     # is_peg_centered_weight_bottom = 50.0
 
     # Contact wrench penalty
-    force_penalty_weight = -0.05
-    torque_penalty_weight = -0.1
+    force_penalty_weight = -0.2
+    torque_penalty_weight = -0.5
     
     ###################
     ### Termination ###
@@ -138,6 +138,7 @@ class TaskParams:
     # Robot parameters/gains
     joint_names = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
     ee_body_name = "wrist_3_link"
+    robot_init_pos = (0.3, -0.1, 0.0)
 
     robot_vel_limit = 180.0
     robot_effort_limit = 87.0
@@ -154,7 +155,7 @@ class TaskParams:
     # tcp_rand_range_y = (-0.004, -0.004)
     tcp_rand_range_y = (-0.006, 0.006) # (0.005, 0.005) # was +/- 2 cm before
     # tcp_rand_range_z = (0.27, 0.27)
-    tcp_rand_range_z = (0.068, 0.068) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
+    tcp_rand_range_z = (0.0675, 0.07) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)
     tcp_rand_range_pitch = (math.pi, math.pi)
     tcp_rand_range_yaw = (0.0, 0.0) # (-3.14, 3.14)
@@ -212,8 +213,8 @@ class TaskParams:
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
-    object_rand_pos_range_x = (-0.00, 0.00) # was +/- 3 mm before
-    object_rand_pos_range_z = (0.01, 0.01) # was (0.005, 0.02) before
+    object_rand_pos_range_x = (-0.001, 0.001) # was +/- 3 mm before
+    object_rand_pos_range_z = (0.008, 0.012) # was (0.005, 0.02) before
     object_width = 0.008 # 8 mm
     object_height = 0.05 # 5 cm
 
