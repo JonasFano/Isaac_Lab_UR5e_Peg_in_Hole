@@ -1,6 +1,6 @@
 program: train_sb3_wandb_ppo.py
 method: grid
-name: impedance_ctrl_peg_insert_2048_envs_v14
+name: impedance_ctrl_peg_insert_2048_envs_v15
 metric:
   goal: maximize
   name: rollout/ep_rew_mean

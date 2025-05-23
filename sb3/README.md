@@ -122,6 +122,9 @@ Contains all necessary information on how to start training and how to run a tra
     # impedance_ctrl_peg_insert_2048_envs_v14 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.2 - -0.5 # Action scale: 0.005 # Added sequential_keypoint_distance reward # Position observations only # noise_std_hole_pose = 0.0025 (before it was 0.0)
 
 
+    # impedance_ctrl_peg_insert_2048_envs_v15 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.2 - -0.5 # Action scale: 0.005 # Added sequential_keypoint_distance reward # Position observations only # noise_std_hole_pose = 0.001 # object_rand_pos_range_z = (0.008, 0.012) (was (0.01, 0.01) before) # object_rand_pos_range_x = (-0.001, 0.001) (was (0.0, 0.0) before) # Added TCP (+/- 0.0001), Wrench (+/- 0.1) and Hole Estimate (+/- 0.0001) UNoise
+
+
 
 ## Franka
 ### Train

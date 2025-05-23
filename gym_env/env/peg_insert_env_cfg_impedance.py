@@ -226,13 +226,13 @@ class ObservationsCfg:
         tcp_pose = ObsTerm(
             func=mdp.get_current_tcp_position,
             params={"gripper_offset": TaskParams.gripper_offset, "robot_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
-            # noise=Unoise(n_min=TaskParams.tcp_pose_unoise_min, n_max=TaskParams.tcp_pose_unoise_max),
+            noise=Unoise(n_min=TaskParams.tcp_pose_unoise_min, n_max=TaskParams.tcp_pose_unoise_max),
         )
 
         ee_wrench_b = ObsTerm(
             func=mdp.body_incoming_wrench_transform,
             params={"asset_cfg": SceneEntityCfg("robot", body_names=["wrist_3_link"])},
-            # noise=Unoise(n_min=-0.1, n_max=0.1),
+            noise=Unoise(n_min=-0.1, n_max=0.1),
         ) # Small force/torque if not in contact, small but noticeable changes when moving, gets big when in contact
 
         # noisy_hole_pose_estimate = ObsTerm(
@@ -250,6 +250,7 @@ class ObservationsCfg:
                 "hole_cfg": SceneEntityCfg("hole"),
                 "noise_std": TaskParams.noise_std_hole_pose, 
             },
+            noise=Unoise(n_min=TaskParams.tcp_pose_unoise_min, n_max=TaskParams.tcp_pose_unoise_max),
         )
 
         actions = ObsTerm(
