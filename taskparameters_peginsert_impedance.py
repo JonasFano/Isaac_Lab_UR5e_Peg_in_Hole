@@ -132,12 +132,11 @@ class TaskParams:
     is_peg_centered_weight = 100.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 10000.0
+    is_peg_inserted_weight = 5000.0
 
     # Peg falls of hole edge
-    peg_missed_hole_weight = -100
+    peg_missed_hole_weight = -50
 
-    episode_ends_weight = -50
 
     # is_peg_centered_z_variability_top = -0.015
     # is_peg_centered_z_variability_middle = -0.012

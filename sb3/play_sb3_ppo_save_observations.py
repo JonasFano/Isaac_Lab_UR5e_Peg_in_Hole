@@ -112,7 +112,7 @@ def main():
     episode_counts = np.zeros(args_cli.num_envs, dtype=np.int32)
 
     save_dir = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/data"
-    csv_path = os.path.join(save_dir, "impedance_ctrl_peg_insert_2048_envs_v15.csv")
+    csv_path = os.path.join(save_dir, "impedance_ctrl_peg_insert_2048_envs_v14.csv")
 
     # simulate environment
     while simulation_app.is_running():

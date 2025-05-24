@@ -567,14 +567,6 @@ class RewardsCfg:
     # )
     ######################################################
 
-    episode_terminates = RewTerm(
-        func=mdp.is_terminated_term,
-        params={
-            "term_keys": "time_out", 
-        },
-        weight=TaskParams.episode_ends_weight,
-    )
-
     # Action penalty
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=TaskParams.action_rate_weight)
 
