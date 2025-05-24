@@ -68,23 +68,26 @@ class TaskParams:
     #######################
     # Gains Randomization #
     #######################
-    stiffness_ranges = {
+    impedance_stiffness_ranges = {
         "0": (100, 500),  # x
         "2": (100, 500),  # z
         "3": (700, 1200), # rx
     }
 
-    damping_ratio_ranges = {
+    impedance_damping_ratio_ranges = {
         "0": (2.0, 6.0),
         "2": (6.0, 10.0),
         "3": (2.0, 6.0),
     }
 
-    groupings = [
+    impedance_gain_groupings = [
         [0, 1],     # x = y
         [2],        # z
         [3, 4, 5],  # rx = ry = rz
     ]
+
+    impedance_gain_randomization_operation = "abs"
+    impedance_gain_randomization_distribution = "uniform"
 
 
     ################
