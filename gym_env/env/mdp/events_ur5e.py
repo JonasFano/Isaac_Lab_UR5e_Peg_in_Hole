@@ -19,6 +19,77 @@ if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedRLEnv
 
 
+
+def randomize_impedance_gains(
+    env: ManagerBasedRLEnv,
+    env_ids: torch.Tensor | None,
+    stiffness_ranges: dict[int, tuple[float, float]],
+    damping_ratio_ranges: dict[int, tuple[float, float]],
+    operation: Literal["abs", "add", "scale"] = "abs",
+    distribution: Literal["uniform", "log_uniform", "gaussian"] = "uniform",
+    groupings: list[list[int]] | None = None,
+):
+    """Randomize Kp and optionally Kd for impedance controller with optional axis grouping."""
+    controller = env.action_manager._terms["arm_action"]._controller
+    device = controller.device
+    num_envs = controller.Kp.shape[0]
+
+    # Convert string keys to ints if needed
+    stiffness_ranges = {int(k): v for k, v in stiffness_ranges.items()}
+    damping_ratio_ranges = {int(k): v for k, v in damping_ratio_ranges.items()}
+
+
+    # Grouped or per-dim stiffness
+    if groupings is not None:
+        for group in groupings:
+            first_dim = group[0]
+            range_ = stiffness_ranges[first_dim]
+            sampled = math_utils.sample_uniform(*range_, (num_envs, 1), device=device)
+            for dim in group:
+                _randomize_prop_by_op(
+                    data=controller.Kp,
+                    distribution_parameters=(sampled, sampled),  # Constant sampled value
+                    dim_0_ids=env_ids if env_ids is not None else None,
+                    dim_1_ids=[dim],
+                    operation=operation,
+                    distribution=distribution,
+                )
+    else:
+        # Independent per-dim randomisation
+        for dim, range_ in stiffness_ranges.items():
+            _randomize_prop_by_op(
+                data=controller.Kp,
+                distribution_parameters=range_,
+                dim_0_ids=env_ids if env_ids is not None else None,
+                dim_1_ids=[dim],
+                operation=operation,
+                distribution=distribution,
+            )
+
+    # Recompute Kd if not manually set
+    if controller.cfg.damping is None:
+        damping_ratios = torch.zeros_like(controller.Kd)
+        if groupings is not None:
+            for group in groupings:
+                first_dim = group[0]
+                range_ = damping_ratio_ranges[first_dim]
+                sampled = math_utils.sample_uniform(*range_, (num_envs,), device=device)
+                for dim in group:
+                    damping_ratios[:, dim] = sampled
+        else:
+            for dim, range_ in damping_ratio_ranges.items():
+                damping_ratios[:, dim] = math_utils.sample_uniform(*range_, (num_envs,), device=device)
+
+        controller.Kd[:] = damping_ratios * 2.0 * torch.sqrt(controller.Kp)
+        controller.Kd[:, 2] = damping_ratios[:, 2] * 2.0 * torch.sqrt(controller.Kp[:, 2])
+
+    print("Randomised Kp:", controller.Kp)
+    print("Updated Kd:", controller.Kd)
+
+
+
+
+
 def randomize_friction_coefficients(
     env: ManagerBasedRLEnv,
     env_ids: torch.Tensor | None,

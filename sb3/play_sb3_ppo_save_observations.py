@@ -45,7 +45,7 @@ import csv
 
 def save_observations_to_csv(file_path, timestep, obs):
     """Save observations to a CSV file."""
-    header = ["timestep"] + [f"tcp_pose_{i}" for i in range(7)] + [f"pose_command_{i}" for i in range(7)] + [f"actions_{i}" for i in range(7)]
+    header = ["timestep"] + [f"tcp_position_{i}" for i in range(3)] + [f"wrench_{i}" for i in range(6)] + [f"hole_position_{i}" for i in range(3)] + [f"actions_{i}" for i in range(3)]
     
     # Flatten the observation array (assuming it contains all elements in the correct order)
     data = [timestep] + obs.flatten().tolist()
@@ -109,9 +109,10 @@ def main():
     # reset environment
     obs = env.reset()
     timestep = 0
+    episode_counts = np.zeros(args_cli.num_envs, dtype=np.int32)
 
-    save_dir = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Reach/data"
-    csv_path = os.path.join(save_dir, "observations_1.csv")
+    save_dir = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/data"
+    csv_path = os.path.join(save_dir, "impedance_ctrl_peg_insert_2048_envs_v15.csv")
 
     # simulate environment
     while simulation_app.is_running():
@@ -122,11 +123,16 @@ def main():
 
             save_observations_to_csv(csv_path, timestep, obs)
             # env stepping
-            obs, _, _, _ = env.step(actions)
+            obs, _, dones, _ = env.step(actions)
+
+            # Track resets for vectorised envs
+            episode_counts += dones.astype(np.int32)  # shape: (num_envs,)
+            print(f"Timestep: {timestep}, Total Episodes Completed: {np.sum(episode_counts)}")
+
             # print(timestep)
             timestep += 1
 
-            if timestep > 3*748: # 373: # 748:
+            if timestep > np.inf: # 373: # 748:
                 env.close()
 
     # close the simulator

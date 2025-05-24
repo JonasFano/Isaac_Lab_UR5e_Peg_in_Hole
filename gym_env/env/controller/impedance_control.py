@@ -17,12 +17,12 @@ class ImpedanceController:
         self.target_dim = 3
         self.desired_ee_pose_b = torch.zeros((num_envs, 7), device=device)
 
-        self.Kp = torch.tensor(self.cfg.stiffness, device=self.device).view(1, 6).repeat(self.num_envs, 1)
+        self.Kp = torch.tensor(self.cfg.stiffness, dtype=torch.float32, device=self.device).view(1, 6).repeat(self.num_envs, 1)
         if self.cfg.damping is None:
             self.Kd = self.cfg.damping_ratio * 2.0 * torch.sqrt(self.Kp)
             self.Kd[:, 2] = self.cfg.damping_ratio_z * 2.0 * torch.sqrt(self.Kp[:, 2])
         else:
-            self.Kd = torch.tensor(self.cfg.damping, device=self.device).view(1, 6).repeat(self.num_envs, 1)
+            self.Kd = torch.tensor(self.cfg.damping, dtype=torch.float32, device=self.device).view(1, 6).repeat(self.num_envs, 1)
 
         self.max_torque_clamp = (
             torch.tensor(self.cfg.max_torque_clamping, device=device).view(1, -1).repeat(num_envs, 1)

@@ -64,13 +64,36 @@ class TaskParams:
     damping = None # None = Critically damped
 
 
+
+    #######################
+    # Gains Randomization #
+    #######################
+    stiffness_ranges = {
+        "0": (100, 500),  # x
+        "2": (100, 500),  # z
+        "3": (700, 1200), # rx
+    }
+
+    damping_ratio_ranges = {
+        "0": (2.0, 6.0),
+        "2": (6.0, 10.0),
+        "3": (2.0, 6.0),
+    }
+
+    groupings = [
+        [0, 1],     # x = y
+        [2],        # z
+        [3, 4, 5],  # rx = ry = rz
+    ]
+
+
     ################
     # Observations #
     ################
     tcp_pose_unoise_min = -0.0001 # 0.1 mm
     tcp_pose_unoise_max = 0.0001 # 0.1 mm
 
-    noise_std_hole_pose = 0.0025 # 2.5 mm
+    noise_std_hole_pose = 0.0025 # 0.0025 # 2.5 mm
 
 
     #########
@@ -106,10 +129,12 @@ class TaskParams:
     is_peg_centered_weight = 100.0
 
     # Is peg inserted
-    is_peg_inserted_weight = 5000.0
+    is_peg_inserted_weight = 10000.0
 
     # Peg falls of hole edge
-    peg_missed_hole_weight = -50
+    peg_missed_hole_weight = -100
+
+    episode_ends_weight = -50
 
     # is_peg_centered_z_variability_top = -0.015
     # is_peg_centered_z_variability_middle = -0.012
@@ -119,8 +144,8 @@ class TaskParams:
     # is_peg_centered_weight_bottom = 50.0
 
     # Contact wrench penalty
-    force_penalty_weight = -0.5
-    torque_penalty_weight = -1.0
+    force_penalty_weight = -5.0
+    torque_penalty_weight = -10.0
     
     ###################
     ### Termination ###
@@ -151,11 +176,11 @@ class TaskParams:
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
     # tcp_rand_range_x = (0.004, 0.004) 
-    tcp_rand_range_x = (-0.008, 0.008) # (0.0, 0.0) # was +/- 2 cm before
+    tcp_rand_range_x = (-0.008, 0.008) #(-0.005, 0.005) # (-0.008, 0.008) # (0.0, 0.0) # was +/- 2 cm before
     # tcp_rand_range_y = (-0.004, -0.004)
-    tcp_rand_range_y = (-0.008, 0.008) # (0.005, 0.005) # was +/- 2 cm before
+    tcp_rand_range_y = (-0.008, 0.008) #(-0.005, 0.005) # (-0.008, 0.008) # (0.005, 0.005) # was +/- 2 cm before
     # tcp_rand_range_z = (0.27, 0.27)
-    tcp_rand_range_z = (0.0675, 0.07) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
+    tcp_rand_range_z = (0.0675, 0.07) # (0.068, 0.068) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)
     tcp_rand_range_pitch = (math.pi, math.pi)
     tcp_rand_range_yaw = (0.0, 0.0) # (-3.14, 3.14)
@@ -171,14 +196,6 @@ class TaskParams:
     gripper_effort_limit = 200.0
     gripper_stiffness = 10000000.0
     gripper_damping = 50000.0
-
-    # Domain randomize gripper stiffness and damping
-    gripper_randomize_stiffness = (0.5, 2.5),
-    gripper_randomize_damping = (0.5, 2.5),
-    gripper_randomize_stiffness_operation = "scale",
-    gripper_randomize_damping_operation = "scale"
-    gripper_randomize_stiffness_distribution = "uniform"
-    gripper_randomize_damping_distribution = "uniform"
 
     # Randomize gripper finger friction
     gripper_static_friction_distribution_params = (1.4, 1.4)
@@ -213,8 +230,8 @@ class TaskParams:
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
 
-    object_rand_pos_range_x = (-0.0015, 0.0015) # was +/- 3 mm before
-    object_rand_pos_range_z = (0.008, 0.015) # was (0.005, 0.02) before
+    object_rand_pos_range_x = (-0.0015, 0.0015) # (0.001, 0.001) # (-0.0015, 0.0015) # was +/- 3 mm before
+    object_rand_pos_range_z = (0.008, 0.015) #(0.008, 0.012) #(0.01, 0.01) # (0.008, 0.015) # was (0.005, 0.02) before
     object_width = 0.008 # 8 mm
     object_height = 0.05 # 5 cm
 

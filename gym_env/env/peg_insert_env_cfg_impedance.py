@@ -281,6 +281,18 @@ class EventCfg:
         },
     )
 
+    randomize_impedance_gains = EventTerm(
+        func=mdp.randomize_impedance_gains,
+        mode="reset",
+        params={
+            "stiffness_ranges": TaskParams.impedance_stiffness_ranges,
+            "damping_ratio_ranges": TaskParams.impedance_damping_ratio_ranges,
+            "operation": TaskParams.impedance_gain_randomization_operation,
+            "distribution": TaskParams.impedance_gain_randomization_distribution,
+            "groupings": TaskParams.impedance_gain_groupings,
+        }
+    )
+
     # To test randomize_initial_state domain randomization
     # reset_object_position = EventTerm(
     #     func=mdp.reset_root_state_uniform,
@@ -554,6 +566,14 @@ class RewardsCfg:
     #     weight=TaskParams.peg_missed_hole_weight,
     # )
     ######################################################
+
+    episode_terminates = RewTerm(
+        func=mdp.is_terminated_term,
+        params={
+            "term_keys": "time_out", 
+        },
+        weight=TaskParams.episode_ends_weight,
+    )
 
     # Action penalty
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=TaskParams.action_rate_weight)
