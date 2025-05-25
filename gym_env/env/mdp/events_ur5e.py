@@ -92,8 +92,8 @@ def randomize_impedance_gains(
         )
 
 
-    print("Randomised Kp:", controller.Kp)
-    print("Updated Kd:", controller.Kd)
+    # print("Randomised Kp:", controller.Kp)
+    # print("Updated Kd:", controller.Kd)
 
 
 
