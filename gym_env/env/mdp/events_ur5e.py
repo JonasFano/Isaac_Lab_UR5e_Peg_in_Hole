@@ -44,7 +44,8 @@ def randomize_impedance_gains(
         for group in groupings:
             first_dim = group[0]
             range_ = stiffness_ranges[first_dim]
-            sampled = math_utils.sample_uniform(*range_, (num_envs, 1), device=device)
+            sampled_shape = (len(env_ids), 1) if env_ids is not None else (num_envs, 1)
+            sampled = math_utils.sample_uniform(*range_, sampled_shape, device=device)
             for dim in group:
                 _randomize_prop_by_op(
                     data=controller.Kp,
@@ -69,19 +70,27 @@ def randomize_impedance_gains(
     # Recompute Kd if not manually set
     if controller.cfg.damping is None:
         damping_ratios = torch.zeros_like(controller.Kd)
+        target_env_ids = env_ids if env_ids is not None else torch.arange(num_envs, device=device)
+
         if groupings is not None:
             for group in groupings:
                 first_dim = group[0]
                 range_ = damping_ratio_ranges[first_dim]
-                sampled = math_utils.sample_uniform(*range_, (num_envs,), device=device)
+                sampled = math_utils.sample_uniform(*range_, (len(target_env_ids),), device=device)
                 for dim in group:
-                    damping_ratios[:, dim] = sampled
+                    damping_ratios[target_env_ids, dim] = sampled
         else:
             for dim, range_ in damping_ratio_ranges.items():
-                damping_ratios[:, dim] = math_utils.sample_uniform(*range_, (num_envs,), device=device)
+                sampled = math_utils.sample_uniform(*range_, (len(target_env_ids),), device=device)
+                damping_ratios[target_env_ids, dim] = sampled
 
-        controller.Kd[:] = damping_ratios * 2.0 * torch.sqrt(controller.Kp)
-        controller.Kd[:, 2] = damping_ratios[:, 2] * 2.0 * torch.sqrt(controller.Kp[:, 2])
+        controller.Kd[target_env_ids] = (
+            damping_ratios[target_env_ids] * 2.0 * torch.sqrt(controller.Kp[target_env_ids])
+        )
+        controller.Kd[target_env_ids, 2] = (
+            damping_ratios[target_env_ids, 2] * 2.0 * torch.sqrt(controller.Kp[target_env_ids, 2])
+        )
+
 
     print("Randomised Kp:", controller.Kp)
     print("Updated Kd:", controller.Kd)
