@@ -133,7 +133,8 @@ Contains all necessary information on how to start training and how to run a tra
 
     # impedance_ctrl_peg_insert_2048_envs_v18 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -5.0 - -10.0 # Action scale: 0.005 # Added sequential_keypoint_distance reward # Position observations only # With impedance gain randomization # noise_std_hole_pose = 0.0025 # object_rand_pos_range_z = (0.008, 0.015) # object_rand_pos_range_x = (-0.0015, 0.0015) # Added TCP (+/- 0.0001), Wrench (+/- 0.1) and Hole Estimate (+/- 0.0001) UNoise # tcp_rand_range_x = (-0.008, 0.008) # tcp_rand_range_z = (0.0675, 0.07) 
 
-
+    # impedance_ctrl_peg_insert_2048_envs_v18 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -5.0 - -10.0 # Action scale: 0.005 # Added sequential_keypoint_distance reward # Position observations only # With impedance gain randomization # noise_std_hole_pose = 0.0025 # object_rand_pos_range_z = (0.008, 0.015) # object_rand_pos_range_x = (-0.0015, 0.0015) # Added TCP (+/- 0.0001), Wrench (+/- 0.1) and Hole Estimate (+/- 0.0001) UNoise # tcp_rand_range_x = (-0.008, 0.008) # tcp_rand_range_z = (0.0675, 0.07) # gripper_static_friction_distribution_params = (0.8, 1.2) (was 1.4 before) # gripper_dynamic_friction_distribution_params = (0.6, 1.0) (was 1.4 before) # gripper_restitution_distribution_params = (0.0, 0.1) (was 0.1 before) # object_static_friction_distribution_params = (0.4, 0.8) (was 0.4 before)
+    # object_dynamic_friction_distribution_params = (0.2, 0.6) (was 0.4 before) # object_restitution_distribution_params = (0.0, 0.2) (was 0.1 before)
 
 
 ## Franka
