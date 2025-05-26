@@ -200,9 +200,9 @@ class TaskParams:
     gripper_damping = 50000.0
 
     # Randomize gripper finger friction
-    gripper_static_friction_distribution_params = (1.4, 1.4)
-    gripper_dynamic_friction_distribution_params = (1.4, 1.4)
-    gripper_restitution_distribution_params = (0.1, 0.1)
+    gripper_static_friction_distribution_params = (0.8, 1.2)
+    gripper_dynamic_friction_distribution_params = (0.6, 1.0)
+    gripper_restitution_distribution_params = (0.0, 0.1)
     gripper_randomize_friction_operation = "abs"
     gripper_randomize_friction_distribution = "uniform"
     gripper_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
@@ -225,9 +225,9 @@ class TaskParams:
     object_init_pos = (-0.2, 0.0, 0.1)
 
     # Domain randomize object friction
-    object_static_friction_distribution_params = (0.2, 0.2)
-    object_dynamic_friction_distribution_params = (1.4, 1.4)
-    object_restitution_distribution_params = (0.1, 0.1)
+    object_static_friction_distribution_params = (0.4, 0.8)
+    object_dynamic_friction_distribution_params = (0.2, 0.6)
+    object_restitution_distribution_params = (0.0, 0.2)
     object_randomize_friction_operation = "abs"
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
