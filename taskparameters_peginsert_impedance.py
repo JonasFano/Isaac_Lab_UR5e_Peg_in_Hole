@@ -178,9 +178,9 @@ class TaskParams:
     robot_reset_joints_asset_cfg = SceneEntityCfg("robot", joint_names=["wrist_3_joint"]) # "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", 
 
     # tcp_rand_range_x = (0.004, 0.004) 
-    tcp_rand_range_x = (-0.008, 0.008) #(-0.005, 0.005) # (-0.008, 0.008) # (0.0, 0.0) # was +/- 2 cm before
+    tcp_rand_range_x = (-0.006, 0.006) #(-0.005, 0.005) # (-0.008, 0.008) # (0.0, 0.0) # was +/- 2 cm before
     # tcp_rand_range_y = (-0.004, -0.004)
-    tcp_rand_range_y = (-0.008, 0.008) #(-0.005, 0.005) # (-0.008, 0.008) # (0.005, 0.005) # was +/- 2 cm before
+    tcp_rand_range_y = (-0.006, 0.006) #(-0.005, 0.005) # (-0.008, 0.008) # (0.005, 0.005) # was +/- 2 cm before
     # tcp_rand_range_z = (0.27, 0.27)
     tcp_rand_range_z = (0.0675, 0.07) # (0.068, 0.068) # (0.1, 0.125)    # 7.6 cm is the height for the peg being almost in contact with the hole
     tcp_rand_range_roll = (0.0, 0.0)

@@ -126,7 +126,7 @@ Contains all necessary information on how to start training and how to run a tra
     ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v15/aeugyygr/model.zip
 
     # impedance_ctrl_peg_insert_2048_envs_v16 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -0.5 - -1.0 # Action scale: 0.005 # Added sequential_keypoint_distance reward # Position observations only # noise_std_hole_pose = 0.0025 # object_rand_pos_range_z = (0.008, 0.015) # object_rand_pos_range_x = (-0.0015, 0.0015) # Added TCP (+/- 0.0001), Wrench (+/- 0.1) and Hole Estimate (+/- 0.0001) UNoise # tcp_rand_range_x = (-0.008, 0.008) (was (-0.006, 0.006) before) # tcp_rand_range_z = (0.0675, 0.07)
-
+    ./isaaclab.sh -p /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/play_sb3_ppo.py --num_envs 1 --task UR5e-Peg-Insert-Impedance-Ctrl --checkpoint /home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/sb3/models/ur5e/impedance_ctrl/impedance_ctrl_peg_insert_2048_envs_v16/xnkvs9qs/model.zip
 
     # impedance_ctrl_peg_insert_2048_envs_v17 # Weights: 50.0 - 100.0 - 100.0 - 5000.0 - -50.0 - -5.0 - -10.0 # Action scale: 0.005 # Added sequential_keypoint_distance reward # Position observations only # noise_std_hole_pose = 0.0025 # object_rand_pos_range_z = (0.008, 0.015) # object_rand_pos_range_x = (-0.0015, 0.0015) # Added TCP (+/- 0.0001), Wrench (+/- 0.1) and Hole Estimate (+/- 0.0001) UNoise # tcp_rand_range_x = (-0.008, 0.008) # tcp_rand_range_z = (0.0675, 0.07)
 
