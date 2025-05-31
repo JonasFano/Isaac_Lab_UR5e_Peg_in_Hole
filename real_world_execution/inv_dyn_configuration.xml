@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<rtde_config>
+	<recipe key="state">
+		<field name="actual_TCP_pose" type="VECTOR6D"/>
+		<field name="actual_TCP_force" type="VECTOR6D"/>
+		<!-- <field name="ft_raw_wrench" type="VECTOR6D"/> -->
+        <field name="output_double_register_0" type="DOUBLE"/>
+        <field name="output_double_register_1" type="DOUBLE"/>
+        <field name="output_double_register_2" type="DOUBLE"/>
+        <field name="output_double_register_3" type="DOUBLE"/>
+        <field name="output_double_register_4" type="DOUBLE"/>
+        <field name="output_double_register_5" type="DOUBLE"/>
+        <field name="output_double_register_6" type="DOUBLE"/>
+        <field name="output_double_register_7" type="DOUBLE"/>
+        <field name="output_double_register_8" type="DOUBLE"/>
+        <field name="output_double_register_9" type="DOUBLE"/>
+        <field name="output_double_register_10" type="DOUBLE"/>
+        <field name="output_double_register_11" type="DOUBLE"/>
+        <!-- <field name="output_double_register_12" type="DOUBLE"/>
+        <field name="output_double_register_13" type="DOUBLE"/>
+        <field name="output_double_register_14" type="DOUBLE"/>
+        <field name="output_double_register_15" type="DOUBLE"/>
+        <field name="output_double_register_16" type="DOUBLE"/>
+        <field name="output_double_register_17" type="DOUBLE"/>
+        <field name="output_double_register_18" type="DOUBLE"/>
+        <field name="output_double_register_19" type="DOUBLE"/>
+        <field name="output_double_register_20" type="DOUBLE"/>
+        <field name="output_double_register_21" type="DOUBLE"/>
+        <field name="output_double_register_22" type="DOUBLE"/>
+        <field name="output_double_register_23" type="DOUBLE"/>
+        <field name="output_double_register_24" type="DOUBLE"/>
+        <field name="output_double_register_25" type="DOUBLE"/>
+        <field name="output_double_register_26" type="DOUBLE"/>
+        <field name="output_double_register_27" type="DOUBLE"/>
+        <field name="output_double_register_28" type="DOUBLE"/>
+        <field name="output_double_register_29" type="DOUBLE"/>
+        <field name="output_double_register_30" type="DOUBLE"/>
+        <field name="output_double_register_31" type="DOUBLE"/>
+        <field name="output_double_register_32" type="DOUBLE"/>
+        <field name="output_double_register_33" type="DOUBLE"/>
+        <field name="output_double_register_34" type="DOUBLE"/>
+        <field name="output_double_register_35" type="DOUBLE"/>
+		<field name="output_double_register_36" type="DOUBLE"/>
+		<field name="output_double_register_37" type="DOUBLE"/>
+		<field name="output_double_register_38" type="DOUBLE"/>
+		<field name="output_double_register_39" type="DOUBLE"/>
+		<field name="output_double_register_40" type="DOUBLE"/>
+		<field name="output_double_register_41" type="DOUBLE"/> -->
+	</recipe>
+
+	<recipe key="pose_error_register">
+		<field name="input_double_register_0" type="DOUBLE"/>
+		<field name="input_double_register_1" type="DOUBLE"/>
+		<field name="input_double_register_2" type="DOUBLE"/>
+		<field name="input_double_register_3" type="DOUBLE"/>
+		<field name="input_double_register_4" type="DOUBLE"/>
+		<field name="input_double_register_5" type="DOUBLE"/>
+	</recipe>
+
+	<recipe key="control_stamp">
+		<field name="input_int_register_0" type="INT32"/>
+		<field name="input_double_register_6" type="DOUBLE"/>
+	</recipe>
+
+</rtde_config>

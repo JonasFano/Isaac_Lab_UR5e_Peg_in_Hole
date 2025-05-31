@@ -55,7 +55,7 @@ class TaskParams:
     # damping_ratio = 6
     # damping_ratio_z = 8
 
-    # impedance_ctrl_peg_insert_2048_envs_v12 # impedance_ctrl_peg_insert_2048_envs_v13 # impedance_ctrl_peg_insert_2048_envs_v14 # impedance_ctrl_peg_insert_2048_envs_v15 # impedance_ctrl_peg_insert_2048_envs_v16
+    # impedance_ctrl_peg_insert_2048_envs_v12 # impedance_ctrl_peg_insert_2048_envs_v13 # impedance_ctrl_peg_insert_2048_envs_v14 # impedance_ctrl_peg_insert_2048_envs_v15 # impedance_ctrl_peg_insert_2048_envs_v16 # impedance_ctrl_peg_insert_2048_envs_v17 # impedance_ctrl_peg_insert_2048_envs_v18
     stiffness = [300, 300, 300, 850, 850, 850]
     damping_ratio = 6
     damping_ratio_z = 8
@@ -75,9 +75,9 @@ class TaskParams:
     }
 
     impedance_damping_ratio_ranges = {
-        "0": (2.0, 6.0),
-        "2": (6.0, 10.0),
-        "3": (2.0, 6.0),
+        "0": (2.0, 5.0),
+        "2": (5.0, 8.0),
+        "3": (2.0, 5.0),
     }
 
     impedance_gain_groupings = [
@@ -200,9 +200,9 @@ class TaskParams:
     gripper_damping = 50000.0
 
     # Randomize gripper finger friction
-    gripper_static_friction_distribution_params = (0.8, 1.2)
-    gripper_dynamic_friction_distribution_params = (0.6, 1.0)
-    gripper_restitution_distribution_params = (0.0, 0.1)
+    gripper_static_friction_distribution_params = (1.4, 1.4) #(0.8, 1.2)
+    gripper_dynamic_friction_distribution_params = (1.4, 1.4) #(0.6, 1.0)
+    gripper_restitution_distribution_params = (0.1, 0.1) #(0.0, 0.1)
     gripper_randomize_friction_operation = "abs"
     gripper_randomize_friction_distribution = "uniform"
     gripper_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction
@@ -225,9 +225,9 @@ class TaskParams:
     object_init_pos = (-0.2, 0.0, 0.1)
 
     # Domain randomize object friction
-    object_static_friction_distribution_params = (0.4, 0.8)
-    object_dynamic_friction_distribution_params = (0.2, 0.6)
-    object_restitution_distribution_params = (0.0, 0.2)
+    object_static_friction_distribution_params = (0.4, 0.4) #(0.4, 0.8)
+    object_dynamic_friction_distribution_params = (0.4, 0.4) #(0.2, 0.6)
+    object_restitution_distribution_params = (0.1, 0.1) #(0.0, 0.2)
     object_randomize_friction_operation = "abs"
     object_randomize_friction_distribution = "uniform"
     object_randomize_friction_make_consistent = True # Ensure dynamic friction <= static friction

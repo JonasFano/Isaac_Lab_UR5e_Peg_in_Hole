@@ -1,0 +1,160 @@
+# Cartesian space impedance controller
+
+# Constants
+#UR5e, see https://www.universal-robots.com/articles/ur/robot-care-maintenance/max-joint-torques-cb3-and-e-series/
+maxTorque = [150.0, 150.0, 150.0, 28.0, 28.0, 28.0]
+
+# Desired stiffness matrix
+# K_p = [800, 800, 800, 75, 75, 75] # Video 1 # D_ratio 2
+# K_p = [800, 800, 800, 1000, 1000, 1000] # Video 2 # D_ratio 2 
+# K_p = [50, 50, 50, 100, 100, 100] # Video 3 # D_ratio 2
+# K_p = [200, 200, 200, 400, 400, 400] # Video 4 # D_ratio 2
+# K_p = [50, 50, 50, 100, 100, 100] # Video 5 # D_ratio 2 # Successful
+# K_p = [50, 50, 50, 100, 100, 100] # Video 6 # D_ratio 2 # Successful
+# K_p = [50, 50, 50, 100, 100, 100] # Video 7 # D_ratio 2
+# K_p = [50, 50, 50, 100, 100, 100] # Video 8 # D_ratio 4 # Successful
+# K_p = [50, 50, 50, 100, 100, 100] # Video 8 # D_ratio 6
+K_p = [100, 100, 100, 150, 150, 150] # Video 8 # D_ratio 6
+
+# critical damping ratio
+D_RATIO = 6
+
+D_d = make_list(6, 0) # Desired damping matrix
+i = 0
+while i < 6:
+    D_d[i] = 2 * D_RATIO * sqrt(K_p[i])
+    i = i + 1
+end
+ 
+# Helper functions
+ 
+# pose to list, URScript does not support scalar or list * pose
+def pose_to_list(p):
+    return [p[0], p[1], p[2], p[3], p[4], p[5]]
+end
+
+def friction_compensation(vel, viscous_coeffs, coulomb_coeffs):
+  # vel: joint velocities [rad/s]
+  # viscous_coeffs: list of viscous friction coefficients per joint
+  # coulomb_coeffs: list of Coulomb friction coefficients per joint
+
+  torque_friction = make_list(length(vel), 0)
+  i = 0
+  while i < length(vel):
+    # Determine sign for Coulomb friction
+    if vel[i] > 0:
+      sgn = 1
+    elif vel[i] < 0:
+      sgn = -1
+    else:
+      sgn = 0
+    end
+
+    # Compute friction torque: τ = kv * v + kc * sign(v)
+    torque_friction[i] = viscous_coeffs[i] * vel[i] + coulomb_coeffs[i] * sgn
+    i = i + 1
+  end
+
+  return torque_friction
+end
+
+
+# Abs Clamp function
+def clampArray(value, clampValue):
+    pdiff = value - clampValue
+    mdiff = value + clampValue
+    ret = value
+  
+    j = 0
+    while j < length(value):
+      if pdiff[j] > 0:
+        ret[j] = clampValue[j]
+      elif mdiff[j] < 0:
+        ret[j] = -clampValue[j]
+      end
+      j = j + 1
+    end
+    return ret
+  end
+
+# Move to the initial pose
+target_joint = [d2r(136), d2r(-67), d2r(106), d2r(-129), d2r(-90), d2r(46)]
+# target_joint = [d2r(141), d2r(-87), d2r(102), d2r(-105), d2r(-90), d2r(51)]
+movej(target_joint)
+pose_0 = get_target_tcp_pose()
+dot_x_d = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+# Impedance Controller loop
+timecounter = 0.0
+while True:
+    # Get the current state
+    x = get_actual_tcp_pose()
+    dot_x = pose_to_list(get_actual_tcp_speed())
+    wrench = get_tcp_force()
+    M_joint = get_mass_matrix()
+    J = get_jacobian()
+    J_T = transpose(get_jacobian())
+
+    # Task space mass matrix:  (J * M⁻¹ * Jᵗ)⁻¹
+    M_task = inv(J * inv(M_joint) * J_T)
+
+    # Send TCP Pose and Wrench to Policy Model (in Python)
+    vec_size = size(pose_to_list(x))
+    ele_count = 0
+    i = 0
+    while i < vec_size:
+       write_output_float_register(ele_count, x[i])
+       ele_count = ele_count + 1
+       i = i + 1
+    end
+
+    vec_size = size(pose_to_list(wrench))
+    i = 0
+    while i < vec_size:
+       write_output_float_register(ele_count, wrench[i])
+       ele_count = ele_count + 1
+       i = i + 1
+    end
+
+    # Get the pose error that incorporates the position displacement predicted by the policy
+    e_x = [read_input_float_register(0), read_input_float_register(1), read_input_float_register(2), read_input_float_register(3), read_input_float_register(4), read_input_float_register(5)]
+    # e_x = [0.005, 0, 0, 0, 0, 0]
+    e_dot_x = dot_x_d - dot_x
+
+    # Compute desired task space force
+    acc_des = D_d * e_dot_x + K_p * e_x
+
+    # # Transform to joint torques
+    # tau_task = transpose(get_jacobian()) * acc_des
+
+    # # Compute total desired torque
+    # ddot_q_d = transpose(get_jacobian_time_derivative()) * ddot_x_d
+    # tau_d_without_g = tau_task + get_mass_matrix() * ddot_q_d + get_coriolis_and_centrifugal_torques()
+
+    # Compute desired task-space wrench
+    F_d = M_task * acc_des
+
+    # Compute desired joint torques from desired task-space wrench and add Coriolis/Centrifugal compensation
+    viscous_coeffs = [5.62, 0.44, 1.52, 1.54, 0.93, 1.12] * 0.1
+    coulomb_coeffs = [2.87, 2.66, 1.63, 0.76, 0.66, 0.70]
+
+    i = 0
+    while i < length(coulomb_coeffs):
+      if i < 3:
+        coulomb_coeffs[i] = coulomb_coeffs[i] * 1.0
+      else:
+        coulomb_coeffs[i] = coulomb_coeffs[i] * 1.0
+      end
+      i = i + 1
+    end
+
+    tau_d = J_T * (F_d + wrench) + get_coriolis_and_centrifugal_torques() # + friction_compensation(get_actual_joint_speeds(), viscous_coeffs, coulomb_coeffs)
+
+    # Clamp target torque
+    tau_d = clampArray(tau_d, maxTorque)
+
+    # Apply torque control
+    torque_command(tau_d, friction_comp=True)
+ 
+    timecounter = timecounter + get_steptime()
+end

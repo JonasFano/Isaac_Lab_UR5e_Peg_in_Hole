@@ -5,8 +5,9 @@ import numpy as np
 # filename = "impedance_ctrl_peg_insert_2048_envs_v13"
 # filename = "impedance_ctrl_peg_insert_2048_envs_v14"
 # filename = "impedance_ctrl_peg_insert_2048_envs_v15"
-filename = "impedance_ctrl_peg_insert_2048_envs_v16"
+# filename = "impedance_ctrl_peg_insert_2048_envs_v16"
 # filename = "impedance_ctrl_peg_insert_2048_envs_v17"
+filename = "impedance_ctrl_peg_insert_2048_envs_v18"
 
 data_path = "/home/jofa/Downloads/Repositories/Isaac_Lab_UR5e_Peg_in_Hole/data/" 
 
